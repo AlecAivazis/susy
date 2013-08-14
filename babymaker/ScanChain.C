@@ -57,10 +57,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name){
       // only grab the hypothesis with the biggest pt
       for (unsigned int i = 0; i< hyp_p4().size(); i++){
 
-          int lt_id_ = hyp_lt_id().at(i);
-          int lt_idx = hyp_lt_index().at(i);
-          int ll_id_ = hyp_ll_id().at(i);
-          int ll_idx = hyp_ll_index().at(i);	
           if (hyp_ll_charge().at(i)*hyp_lt_charge().at(i) > 0) continue;
 
           if (hyp_ll_p4().at(i).pt() < 20) continue;
