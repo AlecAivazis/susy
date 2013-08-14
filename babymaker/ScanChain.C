@@ -67,6 +67,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name){
           if (hyp_lt_p4().at(i).pt() < 20) continue;
           if (hyp_ll_p4().at(i).eta() > 2.4) continue;
           if (hyp_lt_p4().at(i).eta() > 2.4) continue;
+          // if (samesign::isNumeratorHypothesis(i, false)) continue;
 
        
           if (hyp_type().at(i) != 0) continue;
@@ -126,6 +127,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name){
       int _nJetsPt30Tight = 0;
       int _nJetsPt40Tight = 0;
       int _nJets = 0;
+      
+      // jet loop - k
       
       std::vector<LorentzVector> _jets_p4_min ;
      
@@ -200,6 +203,11 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name){
       
 
       jets_p4_min = _jets_p4_min;
+
+
+      eventNumber = evt_event();
+      runNumber = evt_run();
+      lumiBlock = evt_lumiBlock();
       
 
       FillBabyNtuple();

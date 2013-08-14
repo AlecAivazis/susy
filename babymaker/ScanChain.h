@@ -14,6 +14,8 @@
 #include "Math/VectorUtil.h"
 #include "Math/Vector4D.h"
 
+#include "/home/users/aaivazis/CORE/ssSelections.h"
+
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
 
 class babyMaker {
@@ -75,6 +77,11 @@ class babyMaker {
 
   int nJets;
 
+
+  int eventNumber;
+  int runNumber;
+  int lumiBlock;
+
 };
 
 #endif
@@ -117,6 +124,10 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("nJetsPt30Tight", &nJetsPt30Tight);
   BabyTree_->Branch("nJets", &nJets);
   
+  BabyTree_->Branch("eventNumber", &scale_1fb);
+  BabyTree_->Branch("runNumber", &scale_1fb);
+  BabyTree_->Branch("lumiBlock", &scale_1fb);
+  
   BabyTree_->Branch("scale_1fb", &scale_1fb);
   BabyTree_->Branch("btagDiscriminant", &btagDiscriminant);
 
@@ -152,6 +163,11 @@ void babyMaker::InitBabyNtuple () {
   nJetsPt40Tight = 0;
 
   nJets = 0;
+
+  eventNumber = -1;
+  runNumber = -1;
+  lumiBlock = 1;
+
   return;
 }
 
