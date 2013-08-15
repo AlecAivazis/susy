@@ -11,6 +11,8 @@
 // CMS2
 #include "CMS2.h"
 
+#include "/home/users/aaivazis/CORE/muonSelections.h"
+
 // header
 #include "ScanChain.h"
 
@@ -64,7 +66,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name){
           if (hyp_ll_p4().at(i).eta() > 2.4) continue;
           if (hyp_lt_p4().at(i).eta() > 2.4) continue;
           if (!samesign2011::isNumeratorHypothesis(i)) continue;
-
        
           if (hyp_type().at(i) != 0) continue;
 
@@ -86,6 +87,9 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name){
       InitBabyNtuple();
 
       //analysis
+
+      ll_muonIso = muonIsoValuePF2012_deltaBeta(hyp_ll_index().at(index));
+      lt_muonIso = muonIsoValuePF2012_deltaBeta(hyp_lt_index().at(index));
 
       met = evt_pfmet();
       jets_p4 = pfjets_p4();
@@ -127,6 +131,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name){
       // jet loop - k
       
       std::vector<LorentzVector> _jets_p4_min ;
+
      
       for(unsigned int k = 0; k < pfjets_p4().size(); k++) {
 
