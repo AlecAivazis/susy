@@ -63,7 +63,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name){
           if (hyp_lt_p4().at(i).pt() < 20) continue;
           if (hyp_ll_p4().at(i).eta() > 2.4) continue;
           if (hyp_lt_p4().at(i).eta() > 2.4) continue;
-          if (samesign2011::isNumeratorHypothesis(i)) continue;
+          if (!samesign2011::isNumeratorHypothesis(i)) continue;
 
        
           if (hyp_type().at(i) != 0) continue;

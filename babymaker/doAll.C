@@ -6,12 +6,10 @@
 
   babyMaker *looper = new babyMaker();
   
-  /*
   TChain *signal = new TChain("Events"); 
   signal->Add("../signal200RAW.root");
 
   looper->ScanChain(signal, "signal200"); 
-  */
 
   TChain *dy = new TChain("Events"); 
   dy->Add("/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/DY1JetsToLL_M-50_TuneZ2Star_8TeV-madgraph_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-25/*.root");
