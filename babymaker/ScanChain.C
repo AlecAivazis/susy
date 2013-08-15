@@ -109,6 +109,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name){
       scale_1fb = evt_scale1fb();
       //jets_p4 = pfjets_p4().at(index);
 
+      file = Form("%s", currentFile->GetTitle());
+
       float looseDiscriminant = .244;
       float mediumDiscriminant = .679;
       float tightDiscriminant = .89;

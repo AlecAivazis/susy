@@ -86,6 +86,7 @@ class babyMaker {
   float ll_muonIso;
   float lt_muonIso;
 
+  string file;
 };
 
 #endif
@@ -138,6 +139,8 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("scale_1fb", &scale_1fb);
   BabyTree_->Branch("btagDiscriminant", &btagDiscriminant);
 
+  BabyTree_->Branch("file", &file);
+
   return;
 }
 
@@ -177,6 +180,7 @@ void babyMaker::InitBabyNtuple () {
 
   ll_muonIso = 0.0;
   lt_muonIso = 0.0;
+
 
   return;
 }
