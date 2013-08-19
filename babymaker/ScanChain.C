@@ -19,7 +19,7 @@
 using namespace std;
 using namespace tas;
 
-void babyMaker::ScanChain(TChain* chain, std::string baby_name){
+void babyMaker::ScanChain(TChain* chain, std::string baby_name, int numEvents = -1){
 
   MakeBabyNtuple( Form("%s.root", baby_name.c_str()) );
 
@@ -43,6 +43,11 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name){
     // Event Loop
     unsigned int nEventsTree = tree->GetEntriesFast();
 
+    // if numEvents has been set and it would actually do something
+    if (numEvents > -1 && nEventsTree > numEvents){
+        nEventsTree = numEvents;
+    }
+
 
     for( unsigned int event = 0; event < nEventsTree; ++event) {
     
@@ -63,11 +68,14 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name){
 
           if (hyp_ll_p4().at(i).pt() < 20) continue;
           if (hyp_lt_p4().at(i).pt() < 20) continue;
+          
+          if (hyp_type().at(i) != 0) continue;
+          
           if (hyp_ll_p4().at(i).eta() > 2.4) continue;
           if (hyp_lt_p4().at(i).eta() > 2.4) continue;
+
           if (!samesign2011::isNumeratorHypothesis(i)) continue;
        
-          if (hyp_type().at(i) != 0) continue;
 
           float sumPt = hyp_lt_p4().at(i).pt() + hyp_ll_p4().at(i).pt();
 
