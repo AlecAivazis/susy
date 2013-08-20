@@ -22,7 +22,7 @@ using namespace tas;
 void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int numEvents){
 
     if (numEvents != 0 ){
-        cout << "Processing the first " <<numEvents << " events" << endl;
+        cout << "Processing the first " << numEvents << " events" << endl;
     }
 
   MakeBabyNtuple( Form("%s.root", baby_name.c_str()) );
