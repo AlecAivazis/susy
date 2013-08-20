@@ -1,4 +1,4 @@
 #! /bin/bash
-root -bq doSignal.C
-root -bq doTTbar.C
-root -bq doDY.C
+root -b -q doSignal.C
+root -b -q doTTbar.C
+root -b -q doDY.C
