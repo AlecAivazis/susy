@@ -22,7 +22,7 @@ using namespace tas;
 void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int numEvents){
 
     if (numEvents != 0 ){
-        cout << "Processing the first " << numEvents << " events" << endl;
+        cout << "Processing the first " << numEvents << " file(s)" << endl;
     }
 
   MakeBabyNtuple( Form("%s.root", baby_name.c_str()) );
@@ -35,8 +35,19 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
   TObjArray *listOfFiles = chain->GetListOfFiles();
   TIter fileIter(listOfFiles);
   TFile *currentFile = 0;
+
+  unsigned int fileCounter = 0;
+
+  cout << "NumEvents : "<<  numEvents << endl;
+  
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
 
+    fileCounter++;
+    
+    cout << "filecounter : "<< fileCounter <<endl;
+    
+    if (fileCounter > numEvents && numEvents !=0) break;
+    
     // Get File Content
     TFile f( currentFile->GetTitle() );
     TTree *tree = (TTree*)f.Get("Events");
@@ -47,10 +58,12 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
     // Event Loop
     unsigned int nEventsTree = tree->GetEntriesFast();
 
+    /*
     // if numEvents has been set and it would actually do something
     if (numEvents != 0 && nEventsTree > numEvents){
         nEventsTree = numEvents;
     }
+    */
 
 
     for(unsigned int event = 0; event < nEventsTree; ++event) {
@@ -78,7 +91,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           if (hyp_ll_p4().at(i).eta() > 2.4) continue;
           if (hyp_lt_p4().at(i).eta() > 2.4) continue;
 
-          if (!samesign2011::isNumeratorHypothesis(i)) continue;
+          // if (!samesign2011::isNumeratorHypothesis(i)) continue;
        
 
           float sumPt = hyp_lt_p4().at(i).pt() + hyp_ll_p4().at(i).pt();
