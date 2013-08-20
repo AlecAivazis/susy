@@ -159,7 +159,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
           _nJets++ ;
 
-          _bTag = pfjets_combinedSecondaryVertexBJetTag().at(k);
+          float _bTag = pfjets_combinedSecondaryVertexBJetTag().at(k);
 
 
           // count the number of jets for a variety of mass points
