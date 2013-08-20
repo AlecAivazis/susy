@@ -95,6 +95,8 @@ int Analysis( TChain* chain, bool fast = true, int nEvents = -1, string skimFile
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
 
     int fileNumber = listOfFiles->IndexOf(currentFile);
+
+    if (fileNumber == 0 ) continue;
     
     // Get File Content
     TFile *file = new TFile( currentFile->GetTitle() );
@@ -169,7 +171,7 @@ int Analysis( TChain* chain, bool fast = true, int nEvents = -1, string skimFile
           }
 
           if (fileNumber == 0){
-              susy_met->Fill(met(), lumi* scale_1fb());
+               susy_met->Fill(met(), lumi* scale_1fb());
               susy_njets->Fill(numJets, lumi*scale_1fb());
               susy_ll_pt->Fill(ll_p4().at(index).pt(), lumi*scale_1fb());
               susy_lt_pt->Fill(lt_p4().at(index).pt(), lumi*scale_1fb());
