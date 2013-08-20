@@ -159,43 +159,45 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
           _nJets++ ;
 
+          _bTag = pfjets_combinedSecondaryVertexBJetTag().at(k);
+
 
           // count the number of jets for a variety of mass points
           if (pfjets_p4().at(k).pt() > 20){
-              if (pfjets_combinedSecondaryVertexBJetTag().at(k) > looseDiscriminant){
+              if (_bTag > looseDiscriminant){
                   _nJetsPt20Loose++ ;
 
                   _jets_p4_min.push_back(pfjets_p4().at(k));
 
               } 
-              if (pfjets_combinedSecondaryVertexBJetTag().at(k) > mediumDiscriminant){
+              if (_bTag > mediumDiscriminant){
                   _nJetsPt20Medium++ ;
               }
-              if (pfjets_combinedSecondaryVertexBJetTag().at(k) > tightDiscriminant){
+              if (_bTag > tightDiscriminant){
                   _nJetsPt20Tight++ ;
               }
           }
 
           if (pfjets_p4().at(k).pt() > 30){
-              if (pfjets_combinedSecondaryVertexBJetTag().at(k) > looseDiscriminant){
+              if (_bTag > looseDiscriminant){
                   _nJetsPt30Loose++ ;
               } 
-              if (pfjets_combinedSecondaryVertexBJetTag().at(k) > mediumDiscriminant){
+              if (_bTag > mediumDiscriminant){
                   _nJetsPt30Medium++ ;
               }
-              if (pfjets_combinedSecondaryVertexBJetTag().at(k) > tightDiscriminant){
+              if (_bTag > tightDiscriminant){
                   _nJetsPt30Tight++ ;
               }
           }
 
           if (pfjets_p4().at(k).pt() > 40){
-              if (pfjets_combinedSecondaryVertexBJetTag().at(k) > looseDiscriminant){
+              if (_bTag > looseDiscriminant){
                   _nJetsPt40Loose++ ;
               } 
-              if (pfjets_combinedSecondaryVertexBJetTag().at(k) > mediumDiscriminant){
+              if (_bTag > mediumDiscriminant){
                   _nJetsPt40Medium++ ;
               }
-              if (pfjets_combinedSecondaryVertexBJetTag().at(k) > tightDiscriminant){
+              if (_bTag > tightDiscriminant){
                   _nJetsPt40Tight++ ;
               }
           }
