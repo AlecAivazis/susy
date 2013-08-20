@@ -19,7 +19,11 @@
 using namespace std;
 using namespace tas;
 
-void babyMaker::ScanChain(TChain* chain, std::string baby_name, int numEvents = -1){
+void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int numEvents){
+
+    if (numEvents != 0 ){
+        cout << "Processing the first " <<numEvents << " events" << endl;
+    }
 
   MakeBabyNtuple( Form("%s.root", baby_name.c_str()) );
 
@@ -44,12 +48,12 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, int numEvents = 
     unsigned int nEventsTree = tree->GetEntriesFast();
 
     // if numEvents has been set and it would actually do something
-    if (numEvents > -1 && nEventsTree > numEvents){
+    if (numEvents != 0 && nEventsTree > numEvents){
         nEventsTree = numEvents;
     }
 
 
-    for( unsigned int event = 0; event < nEventsTree; ++event) {
+    for(unsigned int event = 0; event < nEventsTree; ++event) {
     
 
       // Get Event Content
@@ -230,7 +234,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, int numEvents = 
   }//end loop on files
   
   if ( nEventsChain != nEventsTotal ) {
-    std::cout << "ERROR: number of events from files is not equal to total number of events" << std::endl;
+    std::cout << "WARNING: The number of events added is not equal to the total number of events in the file." << std::endl;
   }
 
   cout << nDuplicates << " duplicate events were skipped." << endl;
