@@ -163,7 +163,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       lt_muonIso = muonIsoValuePF2012_deltaBeta(hyp_lt_index().at(index));
 
       met = evt_pfmet_type1cor();
-      jets_p4 = pfjets_p4();
+      jets_p4 = pfjets_corL1FastL2L3();
       type = hyp_type().at(index);
 
       ll_p4 = hyp_ll_p4().at(index);
