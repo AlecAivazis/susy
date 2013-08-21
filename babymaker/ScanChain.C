@@ -12,12 +12,57 @@
 #include "CMS2.h"
 
 #include "/home/users/aaivazis/CORE/muonSelections.h"
+#include "/home/users/aaivazis/CORE/electronSelections.h"
+#include "/home/users/aaivazis/CORE/ssSelections.h"
 
 // header
 #include "ScanChain.h"
 
 using namespace std;
 using namespace tas;
+
+enum IsolationType { DET_ISO, TIGHT_DET_ISO, COR_DET_ISO };
+
+
+bool isIsolatedLepton(int id, int idx, enum IsolationType iso_type)
+{
+    // electrons
+    if (abs(id) == 11) {
+        if (iso_type == DET_ISO)
+            return (pass_electronSelection(idx, electronSelection_ssV6_iso));
+        else if (iso_type == COR_DET_ISO)
+            return (electronIsolation_cor_rel_v1(idx, true) < 0.10);
+        else if (iso_type == TIGHT_DET_ISO)
+            return (electronIsolation_rel_v1(idx, true) < 0.10);
+    }
+
+    // muons
+    if (abs(id) == 13) {
+        if (iso_type == DET_ISO)
+            return (muonIsoValue(idx, false) < 0.15);
+        else if (iso_type == COR_DET_ISO)
+            return (muonCorIsoValue(idx, false) < 0.10);
+        else if (iso_type == TIGHT_DET_ISO)
+            return (muonIsoValue(idx, false) < 0.10);
+    }
+
+    return false;
+}
+
+bool isNumeratorLepton(int id, int idx, enum IsolationType iso_type)
+{
+    return (samesign2011::isGoodLepton(id, idx) && isIsolatedLepton(id, idx, iso_type));
+}
+
+bool isNumeratorHypothesis(int idx, enum IsolationType iso_type = DET_ISO)
+{
+    if (!isNumeratorLepton(cms2.hyp_lt_id().at(idx), cms2.hyp_lt_index().at(idx), iso_type))
+        return false;
+    if (!isNumeratorLepton(cms2.hyp_ll_id().at(idx), cms2.hyp_ll_index().at(idx), iso_type))
+        return false;
+
+    return true;
+}
 
 void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int numEvent){
 
@@ -47,11 +92,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
     cout << "filecounter : "<< fileCounter <<endl;
     
     if (fileCounter > numEvent && numEvent !=0) {
-
         break;
-
-        cout << "WTF??" << endl;
-    
     }
     // Get File Content
     TFile f( currentFile->GetTitle() );
@@ -91,12 +132,12 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           if (hyp_ll_p4().at(i).pt() < 20) continue;
           if (hyp_lt_p4().at(i).pt() < 20) continue;
           
-          if (hyp_type().at(i) != 0) continue;
+          if (hyp_type().at(i) == 3) continue;
           
           if (hyp_ll_p4().at(i).eta() > 2.4) continue;
           if (hyp_lt_p4().at(i).eta() > 2.4) continue;
 
-          // if (!samesign2011::isNumeratorHypothesis(i)) continue;
+          if (!isNumeratorHypothesis(i)) continue;
        
 
           float sumPt = hyp_lt_p4().at(i).pt() + hyp_ll_p4().at(i).pt();
