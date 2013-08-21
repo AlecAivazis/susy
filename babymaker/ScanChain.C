@@ -137,7 +137,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           if (hyp_ll_p4().at(i).eta() > 2.4) continue;
           if (hyp_lt_p4().at(i).eta() > 2.4) continue;
 
-          if (!isNumeratorHypothesis(i)) continue;
+          if (!samesign2011::isNumeratorHypothesis(i)) continue;
        
 
           float sumPt = hyp_lt_p4().at(i).pt() + hyp_ll_p4().at(i).pt();
