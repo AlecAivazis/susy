@@ -19,13 +19,13 @@
 using namespace std;
 using namespace tas;
 
-void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int numEvents){
+void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int numEvent){
 
-    if (numEvents != 0 ){
-        cout << "Processing the first " << numEvents << " file(s)" << endl;
+    if (numEvent != 0 ){
+        cout << "Processing the first " << numEvent << " file(s)" << endl;
     }
 
-  MakeBabyNtuple( Form("%s.root", baby_name.c_str()) );
+  MakeBabyNtuple( Form("minis/%s.root", baby_name.c_str()) );
 
   // File Loop
   int nDuplicates = 0;
@@ -38,7 +38,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
   unsigned int fileCounter = 0;
 
-  cout << "NumEvents : "<<  numEvents << endl;
+  cout << "NumEvents : "<<  numEvent << endl;
   
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
 
@@ -46,8 +46,13 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
     
     cout << "filecounter : "<< fileCounter <<endl;
     
-    if (fileCounter > numEvents && numEvents !=0) break;
+    if (fileCounter > numEvent && numEvent !=0) {
+
+        break;
+
+        cout << "WTF??" << endl;
     
+    }
     // Get File Content
     TFile f( currentFile->GetTitle() );
     TTree *tree = (TTree*)f.Get("Events");
@@ -132,6 +137,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       lt_index = hyp_lt_index().at(index);
       btagDiscriminant = pfjets_combinedSecondaryVertexBJetTag();
       scale_1fb = evt_scale1fb();
+      numEvents = tree->GetEntries();
       //jets_p4 = pfjets_p4().at(index);
 
       file = Form("%s", currentFile->GetTitle());
