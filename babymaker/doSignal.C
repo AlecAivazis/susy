@@ -9,7 +9,7 @@ doSignal(std::string file_name ="signal200", int numEvents=0)
   babyMaker *looper = new babyMaker();
   
   TChain *signal = new TChain("Events"); 
-  signal->Add("../signal200RAW.root");
+  signal->Add("/home/users/aaivazis/susy/signal200RAW.root");
 
   looper->ScanChain(signal, file_name, numEvents); 
 
