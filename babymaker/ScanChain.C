@@ -216,25 +216,26 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       for(unsigned int k = 0; k < pfjets_p4().size(); k++) {
 
           
+          if (pfjets_p4().at(k).pt() < 20) continue; 
                 
           float dR_lt = ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(k), hyp_lt_p4().at(index));
           float dR_ll = ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(k), hyp_ll_p4().at(index));
                     
           if (dR_ll < 0.4) continue;
           if (dR_lt < 0.4) continue;
-
-          if (pfjets_p4().at(k).pt() < 20) continue; 
           
           _nJets++ ;
 
           float _bTag = pfjets_combinedSecondaryVertexBJetTag().at(k);
 
-          // count the number of jets for a variety of mass points
-          if (_bTag > looseDiscriminant){
-              _nJetsPt20Loose++ ;
-              _jets_p4_min.push_back(pfjets_p4().at(k));
+          if (_bTag < looseDiscriminant) continue;
 
-          } 
+          // count the number of jets for a variety of mass points
+          //if (_bTag > looseDiscriminant){
+              _nJetsPt20Loose++ ;
+              //    _jets_p4_min.push_back(pfjets_p4().at(k));
+
+              //} 
           //if (_bTag > mediumDiscriminant){
           //  _nJetsPt20Medium++ ;
           // }
@@ -243,9 +244,9 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           // }
 
           if (pfjets_p4().at(k).pt() > 30){
-              if (_bTag > looseDiscriminant){
+              //if (_bTag > looseDiscriminant){
                   _nJetsPt30Loose++ ;
-              } 
+                  // } 
               //  if (_bTag > mediumDiscriminant){
               //    _nJetsPt30Medium++ ;
               // }
@@ -255,9 +256,9 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           }
 
           if (pfjets_p4().at(k).pt() > 40){
-              if (_bTag > looseDiscriminant){
+              //if (_bTag > looseDiscriminant){
                   _nJetsPt40Loose++ ;
-              } 
+                  //} 
               //if (_bTag > mediumDiscriminant){
               //    _nJetsPt40Medium++ ;
               // }
