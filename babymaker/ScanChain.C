@@ -128,6 +128,29 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       int index = -1;
       float delta_m_min = 999;
 
+      float looseDiscriminant = .244;
+      // float mediumDiscriminant = .679;
+      // float tightDiscriminant = .89;
+
+
+      int _nJetsPt20Loose = 0;
+      int _nJetsPt30Loose = 0;
+      int _nJetsPt40Loose = 0;
+      
+      
+      int _nJetsPt20Medium = 0;
+      int _nJetsPt30Medium = 0;
+      int _nJetsPt40Medium = 0;
+      
+      int _nJetsPt20Tight = 0;
+      int _nJetsPt30Tight = 0;
+      int _nJetsPt40Tight = 0;
+      int _nJets = 0;
+      
+      // jet loop - k
+      
+      std::vector<LorentzVector> _jets_p4_min ;
+
       // only grab the hypothesis with the biggest pt
       for (unsigned int i = 0; i< hyp_p4().size(); i++){
 
@@ -158,7 +181,48 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
               if (dR_ll < 0.4) continue;
               if (dR_lt < 0.4) continue;
               
-              // is there a cut to require b and b-bar?
+              _nJets++ ;
+
+              float _bTag = pfjets_combinedSecondaryVertexBJetTag().at(k);
+
+              if (_bTag < looseDiscriminant) continue;
+
+              // count the number of jets for a variety of mass points
+              //if (_bTag > looseDiscriminant){
+              _nJetsPt20Loose++ ;
+              //    _jets_p4_min.push_back(pfjets_p4().at(k));
+
+              //} 
+              //if (_bTag > mediumDiscriminant){
+              //  _nJetsPt20Medium++ ;
+              // }
+              //if (_bTag > tightDiscriminant){
+              //    _nJetsPt20Tight++ ;
+              // }
+
+              if (pfjets_p4().at(k).pt() > 30){
+                  //if (_bTag > looseDiscriminant){
+                  _nJetsPt30Loose++ ;
+                  // } 
+                  //  if (_bTag > mediumDiscriminant){
+                  //    _nJetsPt30Medium++ ;
+                  // }
+                  //if (_bTag > tightDiscriminant){
+                  //    _nJetsPt30Tight++ ;
+                  // }
+              }
+
+              if (pfjets_p4().at(k).pt() > 40){
+                  //if (_bTag > looseDiscriminant){
+                  _nJetsPt40Loose++ ;
+                  //} 
+                  //if (_bTag > mediumDiscriminant){
+                  //    _nJetsPt40Medium++ ;
+                  // }
+                  //if (_bTag > tightDiscriminant){
+                  //    _nJetsPt40Tight++ ;
+                  // }
+              }
 
               float val1 = hyp_ll_p4().at(i).mass() + pfjets_p4().at(k).mass();
               
@@ -224,98 +288,14 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       scale_1fb = evt_scale1fb();
       numEvents = tree->GetEntries();
       //jets_p4 = pfjets_p4().at(index);
-
-
       file = Form("%s", currentFile->GetTitle());
 
-      float looseDiscriminant = .244;
-      // float mediumDiscriminant = .679;
-      // float tightDiscriminant = .89;
-
-
-      int _nJetsPt20Loose = 0;
-      int _nJetsPt30Loose = 0;
-      int _nJetsPt40Loose = 0;
-      
-      
-      int _nJetsPt20Medium = 0;
-      int _nJetsPt30Medium = 0;
-      int _nJetsPt40Medium = 0;
-      
-      int _nJetsPt20Tight = 0;
-      int _nJetsPt30Tight = 0;
-      int _nJetsPt40Tight = 0;
-      int _nJets = 0;
-      
-      // jet loop - k
-      
-      std::vector<LorentzVector> _jets_p4_min ;
-
-     
-      for(unsigned int k = 0; k < pfjets_p4().size(); k++) {
-
-          
-          if (pfjets_p4().at(k).pt() < 20) continue; 
-                
-          float dR_lt = ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(k), hyp_lt_p4().at(index));
-          float dR_ll = ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(k), hyp_ll_p4().at(index));
-                    
-          if (dR_ll < 0.4) continue;
-          if (dR_lt < 0.4) continue;
-          
-          _nJets++ ;
-
-          float _bTag = pfjets_combinedSecondaryVertexBJetTag().at(k);
-
-          if (_bTag < looseDiscriminant) continue;
-
-          // count the number of jets for a variety of mass points
-          //if (_bTag > looseDiscriminant){
-              _nJetsPt20Loose++ ;
-              //    _jets_p4_min.push_back(pfjets_p4().at(k));
-
-              //} 
-          //if (_bTag > mediumDiscriminant){
-          //  _nJetsPt20Medium++ ;
-          // }
-          //if (_bTag > tightDiscriminant){
-          //    _nJetsPt20Tight++ ;
-          // }
-
-          if (pfjets_p4().at(k).pt() > 30){
-              //if (_bTag > looseDiscriminant){
-                  _nJetsPt30Loose++ ;
-                  // } 
-              //  if (_bTag > mediumDiscriminant){
-              //    _nJetsPt30Medium++ ;
-              // }
-              //if (_bTag > tightDiscriminant){
-              //    _nJetsPt30Tight++ ;
-              // }
-          }
-
-          if (pfjets_p4().at(k).pt() > 40){
-              //if (_bTag > looseDiscriminant){
-                  _nJetsPt40Loose++ ;
-                  //} 
-              //if (_bTag > mediumDiscriminant){
-              //    _nJetsPt40Medium++ ;
-              // }
-              //if (_bTag > tightDiscriminant){
-              //    _nJetsPt40Tight++ ;
-              // }
-          }
-      }
-
-      
       nJetsPt20Loose = _nJetsPt20Loose;
       nJetsPt30Loose = _nJetsPt30Loose;
       nJetsPt40Loose = _nJetsPt40Loose;
-      
       nJetsPt20Medium = _nJetsPt20Medium;
       nJetsPt30Medium = _nJetsPt30Medium;
       nJetsPt40Medium = _nJetsPt40Medium;
-     
       nJetsPt20Tight = _nJetsPt20Tight;
       nJetsPt30Tight = _nJetsPt30Tight;
       nJetsPt40Tight = _nJetsPt40Tight;
