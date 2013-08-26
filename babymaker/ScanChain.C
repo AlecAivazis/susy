@@ -187,41 +187,14 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
               if (_bTag < looseDiscriminant) continue;
 
-              // count the number of jets for a variety of mass points
-              //if (_bTag > looseDiscriminant){
               _nJetsPt20Loose++ ;
-              //    _jets_p4_min.push_back(pfjets_p4().at(k));
-
-              //} 
-              //if (_bTag > mediumDiscriminant){
-              //  _nJetsPt20Medium++ ;
-              // }
-              //if (_bTag > tightDiscriminant){
-              //    _nJetsPt20Tight++ ;
-              // }
 
               if (pfjets_p4().at(k).pt() > 30){
-                  //if (_bTag > looseDiscriminant){
                   _nJetsPt30Loose++ ;
-                  // } 
-                  //  if (_bTag > mediumDiscriminant){
-                  //    _nJetsPt30Medium++ ;
-                  // }
-                  //if (_bTag > tightDiscriminant){
-                  //    _nJetsPt30Tight++ ;
-                  // }
               }
 
               if (pfjets_p4().at(k).pt() > 40){
-                  //if (_bTag > looseDiscriminant){
                   _nJetsPt40Loose++ ;
-                  //} 
-                  //if (_bTag > mediumDiscriminant){
-                  //    _nJetsPt40Medium++ ;
-                  // }
-                  //if (_bTag > tightDiscriminant){
-                  //    _nJetsPt40Tight++ ;
-                  // }
               }
 
               float val1 = hyp_ll_p4().at(i).mass() + pfjets_p4().at(k).mass();
