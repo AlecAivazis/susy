@@ -55,6 +55,9 @@ class babyMaker {
   LorentzVector lt_p4;
   LorentzVector total_p4;
 
+  LorentzVector jetll_p4;
+  LorentzVector jetlt_p4;
+  
   int ll_id;
   int lt_id;
   int ll_charge;
@@ -141,6 +144,9 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("nJetsPt20Medium", &nJetsPt20Medium);
   BabyTree_->Branch("nJetsPt30Tight", &nJetsPt30Tight);
   BabyTree_->Branch("nJets", &nJets);
+  
+  BabyTree_->Branch("jetll_p4", &jetll_p4);
+  BabyTree_->Branch("jetlt_p4", &jetlt_p4);
   
   BabyTree_->Branch("eventNumber", &eventNumber);
   BabyTree_->Branch("runNumber", &runNumber);

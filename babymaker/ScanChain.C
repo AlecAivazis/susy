@@ -147,7 +147,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       int _nJetsPt40Tight = 0;
       int _nJets = 0;
       
-      // jet loop - k
+      int _jetll = -1;
+      int _jetlt = -1;
       
       std::vector<LorentzVector> _jets_p4_min ;
 
@@ -172,7 +173,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           // only select hypothesis that minimizes the delta_m between it and 2 pairs of jets
           for(unsigned int k = 0; k < pfjets_p4().size(); k++) {
 
-              
+              // cuts on k
               if (pfjets_p4().at(k).pt() < 20) continue; 
                 
               float dR_lt = ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(k), hyp_lt_p4().at(i));
@@ -200,9 +201,21 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
               float val1 = hyp_ll_p4().at(i).mass() + pfjets_p4().at(k).mass();
               
               for (unsigned int l = 0; l< pfjets_p4().size(); l++){
-
-                  if (l == k) continue;
                   
+                  // cuts on l loop
+                  if (l == k) continue;
+                  if (pfjets_p4().at(l).pt() < 20) continue; 
+                
+                  float l_dR_lt = ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(l), hyp_lt_p4().at(i));
+                  float l_dR_ll = ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(l), hyp_ll_p4().at(i));
+                    
+                  if (l_dR_ll < 0.4) continue;
+                  if (l_dR_lt < 0.4) continue;
+              
+                  float l_bTag = pfjets_combinedSecondaryVertexBJetTag().at(l);
+
+                  if (l_bTag < looseDiscriminant) continue;    
+              
                   float val2 = hyp_lt_p4().at(i).mass() + pfjets_p4().at(l).mass();
                   float _delta_m = abs(val2-val1);
               
@@ -210,6 +223,9 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
                   if (_delta_m < delta_m_min){
                       delta_m_min = _delta_m;
                       index = i;
+                      
+                      _jetll = k;
+                      _jetlt = l;
 
                   }
                   
@@ -230,6 +246,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       }
 
       if (index == -1) continue;
+      if ( _jetll == -1) continue;
+      if (_jetlt == -1) continue;
 
       // Progress
       CMS2::progress( nEventsTotal, nEventsChain );
@@ -277,6 +295,9 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       
 
       jets_p4_min = _jets_p4_min;
+
+      jetll_p4 = pfjets_p4().at(_jetll);
+      jetlt_p4 = pfjets_p4().at(_jetlt);
 
 
       eventNumber = evt_event();
