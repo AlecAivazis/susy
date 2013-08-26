@@ -21,6 +21,8 @@
 using namespace std;
 using namespace tas;
 
+/*
+
 enum IsolationType { DET_ISO, TIGHT_DET_ISO, COR_DET_ISO };
 
 
@@ -63,6 +65,8 @@ bool isNumeratorHypothesis(int idx, enum IsolationType iso_type = DET_ISO)
 
     return true;
 }
+
+*/
 
 void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int numEvent){
 
@@ -151,6 +155,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       if (index == -1) continue;
 
 
+      cout << "I found one at " << index << endl;
     
       // Progress
       CMS2::progress( nEventsTotal, nEventsChain );
@@ -158,12 +163,12 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       InitBabyNtuple();
 
       //analysis
+      met = evt_pfmet();
+      metCorrection = evt_pfmet_type1cor();
 
-      ll_muonIso = muonIsoValuePF2012_deltaBeta(hyp_ll_index().at(index));
-      lt_muonIso = muonIsoValuePF2012_deltaBeta(hyp_lt_index().at(index));
+      jets_p4 = pfjets_p4();
+      jetsCorrection = pfjets_corL1FastL2L3();
 
-      met = evt_pfmet_type1cor();
-      jets_p4 = pfjets_corL1FastL2L3();
       type = hyp_type().at(index);
 
       ll_p4 = hyp_ll_p4().at(index);
@@ -181,11 +186,12 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       numEvents = tree->GetEntries();
       //jets_p4 = pfjets_p4().at(index);
 
+
       file = Form("%s", currentFile->GetTitle());
 
       float looseDiscriminant = .244;
-      float mediumDiscriminant = .679;
-      float tightDiscriminant = .89;
+      // float mediumDiscriminant = .679;
+      // float tightDiscriminant = .89;
 
 
       int _nJetsPt20Loose = 0;
@@ -217,49 +223,47 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           if (dR_ll < 0.4) continue;
           if (dR_lt < 0.4) continue;
 
+          if (pfjets_p4().at(k).pt() < 20) continue; 
+          
           _nJets++ ;
 
           float _bTag = pfjets_combinedSecondaryVertexBJetTag().at(k);
 
-
           // count the number of jets for a variety of mass points
-          if (pfjets_p4().at(k).pt() > 20){
-              if (_bTag > looseDiscriminant){
-                  _nJetsPt20Loose++ ;
+          if (_bTag > looseDiscriminant){
+              _nJetsPt20Loose++ ;
+              _jets_p4_min.push_back(pfjets_p4().at(k));
 
-                  _jets_p4_min.push_back(pfjets_p4().at(k));
-
-              } 
-              if (_bTag > mediumDiscriminant){
-                  _nJetsPt20Medium++ ;
-              }
-              if (_bTag > tightDiscriminant){
-                  _nJetsPt20Tight++ ;
-              }
-          }
+          } 
+          //if (_bTag > mediumDiscriminant){
+          //  _nJetsPt20Medium++ ;
+          // }
+          //if (_bTag > tightDiscriminant){
+          //    _nJetsPt20Tight++ ;
+          // }
 
           if (pfjets_p4().at(k).pt() > 30){
               if (_bTag > looseDiscriminant){
                   _nJetsPt30Loose++ ;
               } 
-              if (_bTag > mediumDiscriminant){
-                  _nJetsPt30Medium++ ;
-              }
-              if (_bTag > tightDiscriminant){
-                  _nJetsPt30Tight++ ;
-              }
+              //  if (_bTag > mediumDiscriminant){
+              //    _nJetsPt30Medium++ ;
+              // }
+              //if (_bTag > tightDiscriminant){
+              //    _nJetsPt30Tight++ ;
+              // }
           }
 
           if (pfjets_p4().at(k).pt() > 40){
               if (_bTag > looseDiscriminant){
                   _nJetsPt40Loose++ ;
               } 
-              if (_bTag > mediumDiscriminant){
-                  _nJetsPt40Medium++ ;
-              }
-              if (_bTag > tightDiscriminant){
-                  _nJetsPt40Tight++ ;
-              }
+              //if (_bTag > mediumDiscriminant){
+              //    _nJetsPt40Medium++ ;
+              // }
+              //if (_bTag > tightDiscriminant){
+              //    _nJetsPt40Tight++ ;
+              // }
           }
       }
 
@@ -286,6 +290,12 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       runNumber = evt_run();
       lumiBlock = evt_lumiBlock();
       
+      if (abs(lt_id) == 13) lt_iso = muonIsoValuePF2012_deltaBeta(hyp_lt_index().at(index));
+      if (abs(ll_id) == 13) ll_iso = muonIsoValuePF2012_deltaBeta(hyp_ll_index().at(index));
+
+      // this needs to be done with the correct electron isolation value branch
+      if (abs(lt_id) == 11) lt_iso = 0.0;
+      if (abs(ll_id) == 11) ll_iso = 0.0;
 
       FillBabyNtuple();
     }//end loop on events in a file

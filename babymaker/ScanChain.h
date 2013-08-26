@@ -43,8 +43,10 @@ class babyMaker {
 
   //baby ntuple variables
   float met;
+  float metCorrection;
 
   std::vector<LorentzVector> jets_p4;
+  std::vector<float> jetsCorrection;
   std::vector<LorentzVector> jets_p4_min;
 
   int type;
@@ -84,8 +86,8 @@ class babyMaker {
   int runNumber;
   int lumiBlock;
 
-  float ll_muonIso;
-  float lt_muonIso;
+  float ll_iso;
+  float lt_iso;
 
   string file;
 };
@@ -102,8 +104,10 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_ = new TTree("tree", "A Baby Ntuple");
 
   BabyTree_->Branch("met", &met );
+  BabyTree_->Branch("metCorrection", &metCorrection );
   BabyTree_->Branch("jets_p4", &jets_p4 );
   BabyTree_->Branch("jets_p4_min", &jets_p4_min );
+  BabyTree_->Branch("jetsCorrection", &jetsCorrection );
   BabyTree_->Branch("type", &type);
 
   BabyTree_->Branch("ll_p4", &ll_p4);
@@ -117,8 +121,8 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("ll_index", &ll_index);
   BabyTree_->Branch("lt_index", &lt_index);
   
-  BabyTree_->Branch("lt_muonIso", &lt_muonIso);
-  BabyTree_->Branch("lt_muonIso", &lt_muonIso);
+  BabyTree_->Branch("lt_iso", &lt_iso);
+  BabyTree_->Branch("ll_iso", &ll_iso);
   
   BabyTree_->Branch("nJetsPt20Loose", &nJetsPt20Loose);
   BabyTree_->Branch("nJetsPt30Medium", &nJetsPt30Medium);
@@ -150,6 +154,7 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
 void babyMaker::InitBabyNtuple () {
 
   met        = -999.0;
+  metCorrection = 0.0;
 
   type = -1;
 
@@ -181,8 +186,8 @@ void babyMaker::InitBabyNtuple () {
   runNumber = -1;
   lumiBlock = 1;
 
-  ll_muonIso = 0.0;
-  lt_muonIso = 0.0;
+  ll_iso = 0.0;
+  lt_iso = 0.0;
 
   numEvents = 0;
 
