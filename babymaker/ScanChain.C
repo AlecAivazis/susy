@@ -124,9 +124,9 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       cms2.GetEntry(event);
       ++nEventsTotal;
 
-      float maxPt = 0;
+      // float maxPt = 0;
       int index = -1;
-
+      float delta_m_min = 999;
 
       // only grab the hypothesis with the biggest pt
       for (unsigned int i = 0; i< hyp_p4().size(); i++){
@@ -141,22 +141,59 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           if (hyp_ll_p4().at(i).eta() > 2.4) continue;
           if (hyp_lt_p4().at(i).eta() > 2.4) continue;
 
-          if (!samesign2011::isNumeratorHypothesis(i)) continue;
-       
+         
 
+          if (!samesign2011::isNumeratorHypothesis(i)) continue;
+          
+
+          // only select hypothesis that minimizes the delta_m between it and 2 pairs of jets
+          for(unsigned int k = 0; k < pfjets_p4().size(); k++) {
+
+              
+              if (pfjets_p4().at(k).pt() < 20) continue; 
+                
+              float dR_lt = ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(k), hyp_lt_p4().at(i));
+              float dR_ll = ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(k), hyp_ll_p4().at(i));
+                    
+              if (dR_ll < 0.4) continue;
+              if (dR_lt < 0.4) continue;
+              
+              // is there a cut to require b and b-bar?
+
+              float val1 = hyp_ll_p4().at(i).mass() + pfjets_p4().at(k).mass();
+              
+              for (unsigned int l = 0; l< pfjets_p4().size(); l++){
+
+                  if (l == k) continue;
+                  
+                  float val2 = hyp_lt_p4().at(i).mass() + pfjets_p4().at(l).mass();
+                  float _delta_m = abs(val2-val1);
+              
+
+                  if (_delta_m < delta_m_min){
+                      delta_m_min = _delta_m;
+                      index = i;
+
+                  }
+                  
+              }
+
+          }
+
+       
+          /* this selects the highest pt hypothesis
+          
           float sumPt = hyp_lt_p4().at(i).pt() + hyp_ll_p4().at(i).pt();
 
           if (sumPt > maxPt){
               maxPt = sumPt;
               index = i;
           }
+          */
       }
 
       if (index == -1) continue;
 
-
-      cout << "I found one at " << index << endl;
-    
       // Progress
       CMS2::progress( nEventsTotal, nEventsChain );
 
@@ -165,6 +202,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       //analysis
       met = evt_pfmet();
       metCorrection = evt_pfmet_type1cor();
+
+      delta_m = delta_m_min;
 
       jets_p4 = pfjets_p4();
       jetsCorrection = pfjets_corL1FastL2L3();

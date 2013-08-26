@@ -89,6 +89,9 @@ class babyMaker {
   float ll_iso;
   float lt_iso;
 
+
+  float delta_m;
+
   string file;
 };
 
@@ -114,6 +117,8 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("lt_p4", &lt_p4);
   BabyTree_->Branch("total_p4", &total_p4);
 
+  BabyTree_->Branch("delta_m", &delta_m);
+  
   BabyTree_->Branch("ll_id", &ll_id);
   BabyTree_->Branch("lt_id", &lt_id);
   BabyTree_->Branch("ll_charge" , &ll_charge);
@@ -188,6 +193,8 @@ void babyMaker::InitBabyNtuple () {
 
   ll_iso = 0.0;
   lt_iso = 0.0;
+
+  delta_m = 0;
 
   numEvents = 0;
 
