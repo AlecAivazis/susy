@@ -254,8 +254,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       InitBabyNtuple();
 
       //analysis
-      met = evt_pfmet();
-      metCorrection = evt_pfmet_type1cor();
+      met = evt_pfmet_type1cor();;
 
       delta_m = delta_m_min;
 
