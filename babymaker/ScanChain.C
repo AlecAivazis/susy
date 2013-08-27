@@ -303,9 +303,10 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       if (abs(lt_id) == 13) lt_iso = muonIsoValuePF2012_deltaBeta(hyp_lt_index().at(index));
       if (abs(ll_id) == 13) ll_iso = muonIsoValuePF2012_deltaBeta(hyp_ll_index().at(index));
 
-      // this needs to be done with the correct electron isolation value branch
-      if (abs(lt_id) == 11) lt_iso =  0.0; // electronIsoValuePF2012_FastJetEffArea_v3(hyp_lt_index().at(index), .4);
-                                if (abs(ll_id) == 11) ll_iso =  0.0; //electronIsoValuePF2012_FastJetEffArea_v3(hyp_ll_index().at(index), .4);
+      // signal needs to be run through an up-to-date CMS2 in order to use these branches. Save it as 0.0 for now. 
+
+      if (abs(lt_id) == 11) lt_iso = 0.0 ; // electronIsoValuePF2012_FastJetEffArea_v3(hyp_lt_index().at(index), .4);
+      if (abs(ll_id) == 11) ll_iso =  0.0 ; //electronIsoValuePF2012_FastJetEffArea_v3(hyp_ll_index().at(index), .4);
 
       FillBabyNtuple();
     }//end loop on events in a file
