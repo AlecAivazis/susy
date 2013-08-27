@@ -68,18 +68,12 @@ class babyMaker {
   float scale_1fb;
   std::vector<float> btagDiscriminant;
 
-  int nJetsPt20Loose;
-  int nJetsPt30Loose;
-  int nJetsPt40Loose;
-      
-      
-  int nJetsPt20Medium;
-  int nJetsPt30Medium;
-  int nJetsPt40Medium;
-      
-  int nJetsPt20Tight;
-  int nJetsPt30Tight;
-  int nJetsPt40Tight;
+  int nJetsPt20;
+  int nJetsPt30;
+  int nJetsPt40;
+  int nJetsPt50;
+  int nJetsPt60;
+  
 
   int nJets;
 
@@ -132,17 +126,12 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("lt_iso", &lt_iso);
   BabyTree_->Branch("ll_iso", &ll_iso);
   
-  BabyTree_->Branch("nJetsPt20Loose", &nJetsPt20Loose);
-  BabyTree_->Branch("nJetsPt30Medium", &nJetsPt30Medium);
-  BabyTree_->Branch("nJetsPt40Tight", &nJetsPt40Tight);
+  BabyTree_->Branch("nJetsPt20", &nJetsPt20);
+  BabyTree_->Branch("nJetsPt30", &nJetsPt30);
+  BabyTree_->Branch("nJetsPt40", &nJetsPt40);
+  BabyTree_->Branch("nJetsPt50", &nJetsPt50);
+  BabyTree_->Branch("nJetsPt60", &nJetsPt60);
 
-  BabyTree_->Branch("nJetsPt30Loose", &nJetsPt30Loose);
-  BabyTree_->Branch("nJetsPt40Medium", &nJetsPt40Medium);
-  BabyTree_->Branch("nJetsPt20Tight", &nJetsPt20Tight);
-  
-  BabyTree_->Branch("nJetsPt40Loose", &nJetsPt40Loose);
-  BabyTree_->Branch("nJetsPt20Medium", &nJetsPt20Medium);
-  BabyTree_->Branch("nJetsPt30Tight", &nJetsPt30Tight);
   BabyTree_->Branch("nJets", &nJets);
   
   BabyTree_->Branch("jetll_p4", &jetll_p4);
@@ -178,18 +167,11 @@ void babyMaker::InitBabyNtuple () {
 
   scale_1fb = 1;
 
-  nJetsPt20Loose = 0;
-  nJetsPt30Loose = 0;
-  nJetsPt40Loose = 0;
-      
-      
-  nJetsPt20Medium = 0;
-  nJetsPt30Medium = 0;
-  nJetsPt40Medium = 0;
-      
-  nJetsPt20Tight = 0;
-  nJetsPt30Tight = 0;
-  nJetsPt40Tight = 0;
+  nJetsPt20 = 0;
+  nJetsPt30 = 0;
+  nJetsPt40 = 0;
+  nJetsPt50 = 0;
+  nJetsPt60 = 0;
 
   nJets = 0;
 

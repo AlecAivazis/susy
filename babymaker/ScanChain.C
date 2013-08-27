@@ -133,18 +133,12 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       // float tightDiscriminant = .89;
 
 
-      int _nJetsPt20Loose = 0;
-      int _nJetsPt30Loose = 0;
-      int _nJetsPt40Loose = 0;
+      int _nJetsPt20 = 0;
+      int _nJetsPt30 = 0;
+      int _nJetsPt40 = 0;
+      int _nJetsPt50 = 0;
+      int _nJetsPt60 = 0;
       
-      
-      int _nJetsPt20Medium = 0;
-      int _nJetsPt30Medium = 0;
-      int _nJetsPt40Medium = 0;
-      
-      int _nJetsPt20Tight = 0;
-      int _nJetsPt30Tight = 0;
-      int _nJetsPt40Tight = 0;
       int _nJets = 0;
       
       int _jetll = -1;
@@ -188,14 +182,20 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
               if (_bTag < looseDiscriminant) continue;
 
-              _nJetsPt20Loose++ ;
+              _nJetsPt20++;
 
               if (pfjets_p4().at(k).pt() > 30){
-                  _nJetsPt30Loose++ ;
+                  _nJetsPt30++;
               }
 
               if (pfjets_p4().at(k).pt() > 40){
-                  _nJetsPt40Loose++ ;
+                  _nJetsPt40++;
+              }
+              if (pfjets_p4().at(k).pt() > 50){
+                  _nJetsPt50++;
+              } 
+              if (pfjets_p4().at(k).pt() > 60){
+                  _nJetsPt60++;
               }
 
               float val1 = hyp_ll_p4().at(i).mass() + pfjets_p4().at(k).mass();
@@ -226,7 +226,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
                       
                       _jetll = k;
                       _jetlt = l;
-
                   }
                   
               }
@@ -281,15 +280,12 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       //jets_p4 = pfjets_p4().at(index);
       file = Form("%s", currentFile->GetTitle());
 
-      nJetsPt20Loose = _nJetsPt20Loose;
-      nJetsPt30Loose = _nJetsPt30Loose;
-      nJetsPt40Loose = _nJetsPt40Loose;
-      nJetsPt20Medium = _nJetsPt20Medium;
-      nJetsPt30Medium = _nJetsPt30Medium;
-      nJetsPt40Medium = _nJetsPt40Medium;
-      nJetsPt20Tight = _nJetsPt20Tight;
-      nJetsPt30Tight = _nJetsPt30Tight;
-      nJetsPt40Tight = _nJetsPt40Tight;
+      nJetsPt20 = _nJetsPt20;
+      nJetsPt30 = _nJetsPt30;
+      nJetsPt40 = _nJetsPt40;
+      nJetsPt50 = _nJetsPt50;
+      nJetsPt60 = _nJetsPt60;
+
 
       nJets = _nJets;
       
@@ -308,8 +304,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       if (abs(ll_id) == 13) ll_iso = muonIsoValuePF2012_deltaBeta(hyp_ll_index().at(index));
 
       // this needs to be done with the correct electron isolation value branch
-      if (abs(lt_id) == 11) lt_iso = 0.0;
-      if (abs(ll_id) == 11) ll_iso = 0.0;
+      if (abs(lt_id) == 11) lt_iso =  0.0; // electronIsoValuePF2012_FastJetEffArea_v3(hyp_lt_index().at(index), .4);
+                                if (abs(ll_id) == 11) ll_iso =  0.0; //electronIsoValuePF2012_FastJetEffArea_v3(hyp_ll_index().at(index), .4);
 
       FillBabyNtuple();
     }//end loop on events in a file
