@@ -145,6 +145,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       int _jetlt = -1;
       
       std::vector<LorentzVector> _jets_p4_min ;
+      std::vector<float> _jets_p4_minCorrection ;
 
       // only grab the hypothesis with the biggest pt
       for (unsigned int i = 0; i< hyp_p4().size(); i++){
@@ -168,7 +169,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           for(unsigned int k = 0; k < pfjets_p4().size(); k++) {
 
               // cuts on k
-              if (pfjets_p4().at(k).pt() < 20) continue; 
+              float jetPt = pfjets_p4().at(k).pt() * pfjets_corL1FastL2L3().at(k);
+              if (jetPt < 20) continue; 
                 
               float dR_lt = ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(k), hyp_lt_p4().at(i));
               float dR_ll = ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(k), hyp_ll_p4().at(i));
@@ -177,6 +179,9 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
               if (dR_lt < 0.4) continue;
               
               _nJets++ ;
+
+              _jets_p4_min.push_back(pfjets_p4().at(k));
+              _jets_p4_minCorrection.push_back(pfjets_corL1FastL2L3().at(k));
 
                    float _bTag = pfjets_combinedSecondaryVertexBJetTag().at(k);
 
@@ -204,7 +209,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
                   
                   // cuts on l loop
                   if (l == k) continue;
-                  if (pfjets_p4().at(l).pt() < 20) continue; 
+                  float l_jetPt = pfjets_p4().at(k).pt() * pfjets_corL1FastL2L3().at(k);
+                  if (l_jetPt < 20) continue; 
                 
                   float l_dR_lt = ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(l), hyp_lt_p4().at(i));
                   float l_dR_ll = ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(l), hyp_ll_p4().at(i));
@@ -259,7 +265,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       delta_m = delta_m_min;
 
       jets_p4 = pfjets_p4();
-      jetsCorrection = pfjets_corL1FastL2L3();
+      jets_p4Correction = pfjets_corL1FastL2L3();
+      jets_p4_minCorrection = _jets_p4_minCorrection;
 
       type = hyp_type().at(index);
 
