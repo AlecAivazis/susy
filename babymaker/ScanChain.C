@@ -203,7 +203,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
                   _nJetsPt60++;
               }
 
-              float val1 = hyp_ll_p4().at(i).mass() + pfjets_p4().at(k).mass();
+              float val1 = (hyp_ll_p4().at(i) + pfjets_p4().at(k)).mass();
               
               for (unsigned int l = 0; l< pfjets_p4().size(); l++){
                   
@@ -222,7 +222,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
                   if (l_bTag < looseDiscriminant) continue;    
               
-                  float val2 = hyp_lt_p4().at(i).mass() + pfjets_p4().at(l).mass();
+                  float val2 = (hyp_lt_p4().at(i) + pfjets_p4().at(l)).mass();
                   float _delta_m = abs(val2-val1);
               
 
