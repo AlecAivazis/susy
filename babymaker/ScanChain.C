@@ -89,8 +89,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
   cout << "NumEvents : "<<  numEvent << endl;
   
-  int 
-  
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
 
     fileCounter++;
@@ -129,7 +127,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       // float maxPt = 0;
       int index = -1;
       float delta_m_min = 999;
-
+      float maxPt = 0.0;
       float looseDiscriminant = .244;
       // float mediumDiscriminant = .679;
       // float tightDiscriminant = .89;
@@ -241,16 +239,12 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
           }
 
-       
-          /* this selects the highest pt hypothesis
-          
           float sumPt = hyp_lt_p4().at(i).pt() + hyp_ll_p4().at(i).pt();
 
           if (sumPt > maxPt){
               maxPt = sumPt;
               index = i;
           }
-          */
       }
 
       if (index == -1) continue;
@@ -300,8 +294,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
       jets_p4_min = _jets_p4_min;
 
-      if ( _jetll == -1)  jetll_p4 = pfjets_p4().at(_jetll);
-      if (_jetlt == -1)  jetlt_p4 = pfjets_p4().at(_jetlt);
+      if ( _jetll != -1)  jetll_p4 = pfjets_p4().at(_jetll);
+      if (_jetlt != -1)  jetlt_p4 = pfjets_p4().at(_jetlt);
 
 
       eventNumber = evt_event();
