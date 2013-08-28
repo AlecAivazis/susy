@@ -183,9 +183,9 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
               _jets_p4_min.push_back(pfjets_p4().at(k));
               _jets_p4_minCorrection.push_back(pfjets_corL1FastL2L3().at(k));
 
-                   float _bTag = pfjets_combinedSecondaryVertexBJetTag().at(k);
+              float _bTag = pfjets_combinedSecondaryVertexBJetTag().at(k);
 
-               if (_bTag < looseDiscriminant) continue;
+              if (_bTag < looseDiscriminant) continue;
 
               _nJetsPt20++;
 
@@ -218,9 +218,9 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
                   if (l_dR_ll < 0.4) continue;
                   if (l_dR_lt < 0.4) continue;
               
-                    float l_bTag = pfjets_combinedSecondaryVertexBJetTag().at(l);
+                  float l_bTag = pfjets_combinedSecondaryVertexBJetTag().at(l);
 
-                                    if (l_bTag < looseDiscriminant) continue;    
+                  if (l_bTag < looseDiscriminant) continue;    
               
                   float val2 = hyp_lt_p4().at(i).mass() + pfjets_p4().at(l).mass();
                   float _delta_m = abs(val2-val1);
