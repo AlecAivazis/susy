@@ -89,6 +89,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
   cout << "NumEvents : "<<  numEvent << endl;
   
+  int 
+  
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
 
     fileCounter++;
@@ -233,6 +235,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
                       _jetll = k;
                       _jetlt = l;
                   }
+
                   
               }
 
@@ -251,8 +254,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       }
 
       if (index == -1) continue;
-      if ( _jetll == -1) continue;
-      if (_jetlt == -1) continue;
+     
 
       // Progress
       CMS2::progress( nEventsTotal, nEventsChain );
@@ -298,8 +300,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
       jets_p4_min = _jets_p4_min;
 
-      jetll_p4 = pfjets_p4().at(_jetll);
-      jetlt_p4 = pfjets_p4().at(_jetlt);
+      if ( _jetll == -1)  jetll_p4 = pfjets_p4().at(_jetll);
+      if (_jetlt == -1)  jetlt_p4 = pfjets_p4().at(_jetlt);
 
 
       eventNumber = evt_event();
