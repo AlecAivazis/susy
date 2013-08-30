@@ -165,80 +165,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           if (!samesign2011::isNumeratorHypothesis(i)) continue;
           
 
-          // only select hypothesis that minimizes the delta_m between it and 2 pairs of jets
-          for(unsigned int k = 0; k < pfjets_p4().size(); k++) {
-
-              // cuts on k
-              float jetPt = pfjets_p4().at(k).pt() * pfjets_corL1FastL2L3().at(k);
-              if (jetPt < 20) continue; 
-                
-              float dR_lt = ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(k), hyp_lt_p4().at(i));
-              float dR_ll = ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(k), hyp_ll_p4().at(i));
-                    
-              if (dR_ll < 0.4) continue;
-              if (dR_lt < 0.4) continue;
-              
-              _nJets++ ;
-
-              _jets_p4_min.push_back(pfjets_p4().at(k));
-              _jets_p4_minCorrection.push_back(pfjets_corL1FastL2L3().at(k));
-
-              float _bTag = pfjets_combinedSecondaryVertexBJetTag().at(k);
-
-              if (_bTag < looseDiscriminant) continue;
-
-              _nJetsPt20++;
-
-              if (pfjets_p4().at(k).pt() > 30){
-                  _nJetsPt30++;
-              }
-
-              if (pfjets_p4().at(k).pt() > 40){
-                  _nJetsPt40++;
-              }
-              if (pfjets_p4().at(k).pt() > 50){
-                  _nJetsPt50++;
-              } 
-              if (pfjets_p4().at(k).pt() > 60){
-                  _nJetsPt60++;
-              }
-
-              float val1 = (hyp_ll_p4().at(i) + pfjets_p4().at(k)).mass();
-              
-              for (unsigned int l = 0; l< pfjets_p4().size(); l++){
-                  
-                  // cuts on l loop
-                  if (l == k) continue;
-                  float l_jetPt = pfjets_p4().at(k).pt() * pfjets_corL1FastL2L3().at(k);
-                  if (l_jetPt < 20) continue; 
-                
-                  float l_dR_lt = ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(l), hyp_lt_p4().at(i));
-                  float l_dR_ll = ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(l), hyp_ll_p4().at(i));
-                    
-                  if (l_dR_ll < 0.4) continue;
-                  if (l_dR_lt < 0.4) continue;
-              
-                  float l_bTag = pfjets_combinedSecondaryVertexBJetTag().at(l);
-
-                  if (l_bTag < looseDiscriminant) continue;    
-              
-                  float val2 = (hyp_lt_p4().at(i) + pfjets_p4().at(l)).mass();
-                  float _delta_m = abs(val2-val1);
-              
-
-                  if (_delta_m < delta_m_min){
-                      delta_m_min = _delta_m;
-                      index = i;
-                      
-                      _jetll = k;
-                      _jetlt = l;
-                  }
-
-                  
-              }
-
-          }
-
+        
+          // select the highest pt hypothesis
           float sumPt = hyp_lt_p4().at(i).pt() + hyp_ll_p4().at(i).pt();
 
           if (sumPt > maxPt){
@@ -248,6 +176,80 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       }
 
       if (index == -1) continue;
+
+      // now that we have one hyp from each event, loop over the jets, count them and find the 
+      // best delta_m pair and store those jets
+      for(unsigned int k = 0; k < pfjets_p4().size(); k++) {
+
+          // cuts on k
+          float jetPt = pfjets_p4().at(k).pt() * pfjets_corL1FastL2L3().at(k);
+          if (jetPt < 20) continue; 
+                
+          float dR_lt = ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(k), hyp_lt_p4().at(index));
+          float dR_ll = ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(k), hyp_ll_p4().at(index));
+                    
+          if (dR_ll < 0.4) continue;
+          if (dR_lt < 0.4) continue;
+              
+          _nJets++ ;
+
+          _jets_p4_min.push_back(pfjets_p4().at(k));
+          _jets_p4_minCorrection.push_back(pfjets_corL1FastL2L3().at(k));
+
+          float _bTag = pfjets_combinedSecondaryVertexBJetTag().at(k);
+
+          if (_bTag < looseDiscriminant) continue;
+
+          _nJetsPt20++;
+
+          if (pfjets_p4().at(k).pt() > 30){
+              _nJetsPt30++;
+          }
+
+          if (pfjets_p4().at(k).pt() > 40){
+              _nJetsPt40++;
+          }
+          if (pfjets_p4().at(k).pt() > 50){
+              _nJetsPt50++;
+          } 
+          if (pfjets_p4().at(k).pt() > 60){
+              _nJetsPt60++;
+          }
+
+          float val1 = (hyp_ll_p4().at(index) + pfjets_p4().at(k)).mass();
+              
+          for (unsigned int l = 0; l< pfjets_p4().size(); l++){
+                  
+              // cuts on l loop
+              if (l == k) continue;
+              float l_jetPt = pfjets_p4().at(k).pt() * pfjets_corL1FastL2L3().at(k);
+              if (l_jetPt < 20) continue; 
+                
+              float l_dR_lt = ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(l), hyp_lt_p4().at(index));
+              float l_dR_ll = ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(l), hyp_ll_p4().at(index));
+                    
+              if (l_dR_ll < 0.4) continue;
+              if (l_dR_lt < 0.4) continue;
+              
+              float l_bTag = pfjets_combinedSecondaryVertexBJetTag().at(l);
+
+              if (l_bTag < looseDiscriminant) continue;    
+              
+              float val2 = (hyp_lt_p4().at(index) + pfjets_p4().at(l)).mass();
+              float _delta_m = abs(val2-val1);
+              
+
+              if (_delta_m < delta_m_min){
+                  delta_m_min = _delta_m;
+                      
+                  _jetll = k;
+                  _jetlt = l;
+              }
+
+                  
+          }
+
+      }
      
 
       // Progress
