@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <set>
+#include <fstream>
 
 // ROOT
 #include "TDirectory.h"
@@ -31,7 +32,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
   MakeBabyNtuple( Form("/home/users/aaivazis/susy/babymaker/minis%s.root", baby_name.c_str()) );
 
   // File Loop
-  int nEvents = chain->GetEntries();
   unsigned int nEventsTotal = 0;
   TObjArray *listOfFiles = chain->GetListOfFiles();
   TIter fileIter(listOfFiles);
@@ -207,13 +207,18 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       }
   }
   
+  ofstream stream;
+  stream.open("cutflow.txt");
   
-  cout << "Source: " << nEventsMini << endl;
-  cout << "Oppositely Charged: " << oppositeChargedCounter << endl;
-  cout << "Hyp pt > 20: " << ptCounter << endl;
-  cout << "Ignoring ee events: " << typeCounter << endl;
-  cout << "Eta > 2.4: " << etaCounter << endl;
-  cout << "ID/Isolation requirements: " << isoCounter << endl;
+  
+  stream << "Source: " << nEventsMini << endl;
+  stream << "Oppositely Charged: " << oppositeChargedCounter << endl;
+  stream << "Hyp pt > 20: " << ptCounter << endl;
+  stream << "Ignoring ee events: " << typeCounter << endl;
+  stream << "Eta > 2.4: " << etaCounter << endl;
+  stream << "ID/Isolation requirements: " << isoCounter << endl;
+  
+  stream.close();
   
   return;
 }

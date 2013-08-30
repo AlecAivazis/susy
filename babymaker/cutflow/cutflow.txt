@@ -1,0 +1,6 @@
+Source: 35200
+Oppositely Charged: 32221
+Hyp pt > 20: 31137
+Ignoring ee events: 31134
+Eta > 2.4: 31017
+ID/Isolation requirements: 22421
