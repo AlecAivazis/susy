@@ -127,6 +127,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       // float maxPt = 0;
       int index = -1;
       float delta_m_min = 999;
+      float _sum_m = 0.0;
       float maxPt = 0.0;
       float looseDiscriminant = .244;
       // float mediumDiscriminant = .679;
@@ -149,6 +150,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
       // only grab the hypothesis with the biggest pt
       for (unsigned int i = 0; i< hyp_p4().size(); i++){
+      
 
           if (hyp_ll_charge().at(i)*hyp_lt_charge().at(i) > 0) continue;
 
@@ -241,6 +243,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
               if (_delta_m < delta_m_min){
                   delta_m_min = _delta_m;
+                  _sum_m = val1+val2;
                       
                   _jetll = k;
                   _jetlt = l;
@@ -261,6 +264,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       met = evt_pfmet_type1cor();;
 
       delta_m = delta_m_min;
+      sum_m = _sum_m;
 
       jets_p4 = pfjets_p4();
       jets_p4Correction = pfjets_corL1FastL2L3();
