@@ -41,11 +41,9 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
   unsigned int fileCounter = 0;
 
   int oppositeChargedCounter =0;
-  int ll_Pt20Counter = 0;
-  int lt_Pt20Counter = 0;
+  int ptCounter = 0;
   int typeCounter = 0;
-  int ll_etaCounter = 0;
-  int lt_etaCounter = 0;
+  int etaCounter = 0;
   int isoCounter = 0;
   
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
@@ -55,7 +53,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       if (fileCounter > numEvent && numEvent !=0) {
           break;
       }
-
     
       // Get File Content
       TFile f( currentFile->GetTitle() );
@@ -63,7 +60,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       TTreeCache::SetLearnEntries(10);
       tree->SetCacheSize(128*1024*1024);
       cms2.Init(tree);
-    
     
       // Event Loop
       unsigned int nEventsTree = tree->GetEntriesFast();
@@ -78,44 +74,146 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           cms2.GetEntry(event);
           ++nEventsTotal;
 
+          // int counter = hyp_p4().size();
+          int counter =0; 
 
-
-
-          // cut flow counters
-
-          int counter = 0;
-      
-
-
-          // only grab the hypothesis with the biggest pt
           for (unsigned int i = 0; i< hyp_p4().size(); i++){
          
-              if (hyp_ll_charge().at(i)*hyp_lt_charge().at(i) < 0)  continue;
-          
-              /*
-                if (hyp_ll_p4().at(i).pt() < 20) continue;
-                if (hyp_lt_p4().at(i).pt() < 20) continue;
-                if (hyp_type().at(i) == 3) continue;
-                if (hyp_ll_p4().at(i).eta() > 2.4) continue;
-                if (hyp_lt_p4().at(i).eta() > 2.4) continue;
-                if (!samesign2011::isNumeratorHypothesis(i)) continue;
-              */
+              if (hyp_ll_charge().at(i)*hyp_lt_charge().at(i) > 0)  continue;
       
-              counter ++;
+              counter++;
         
           }
       
-          if (counter < hyp_p4().size()) {
+          if (counter > 0) {
               oppositeChargedCounter++;
           }
-
-     
+      }
       
+      for(unsigned int event = 0; event < nEventsTree; ++event) {
+    
+
+          // Get Event Content
+          tree->LoadTree(event);
+          cms2.GetEntry(event);
+          ++nEventsTotal;
+
+          // int counter = hyp_p4().size();
+          int counter =0; 
+
+          for (unsigned int i = 0; i< hyp_p4().size(); i++){
+         
+              if (hyp_ll_charge().at(i)*hyp_lt_charge().at(i) > 0)  continue;
+              if (hyp_ll_p4().at(i).pt() < 20) continue;
+              if (hyp_lt_p4().at(i).pt() < 20) continue;
+      
+              counter++;
+        
+          }
+      
+          if (counter > 0) {
+              ptCounter++;
+          }
+      }
+      for(unsigned int event = 0; event < nEventsTree; ++event) {
+    
+
+          // Get Event Content
+          tree->LoadTree(event);
+          cms2.GetEntry(event);
+          ++nEventsTotal;
+
+          // int counter = hyp_p4().size();
+          int counter =0; 
+
+          for (unsigned int i = 0; i< hyp_p4().size(); i++){
+         
+              if (hyp_ll_charge().at(i)*hyp_lt_charge().at(i) > 0)  continue;
+              
+              if (hyp_ll_p4().at(i).pt() < 20) continue;
+              if (hyp_lt_p4().at(i).pt() < 20) continue;
+              if (hyp_type().at(i) == 3) continue;
+      
+              counter++;
+        
+          }
+      
+          if (counter > 0) {
+              typeCounter++;
+          }
       }
 
+      for(unsigned int event = 0; event < nEventsTree; ++event) {
+    
+
+          // Get Event Content
+          tree->LoadTree(event);
+          cms2.GetEntry(event);
+          ++nEventsTotal;
+
+          // int counter = hyp_p4().size();
+          int counter =0; 
+
+          for (unsigned int i = 0; i< hyp_p4().size(); i++){
+         
+              if (hyp_ll_charge().at(i)*hyp_lt_charge().at(i) > 0)  continue;
+              
+              if (hyp_ll_p4().at(i).pt() < 20) continue;
+              if (hyp_lt_p4().at(i).pt() < 20) continue;
+              if (hyp_type().at(i) == 3) continue;
+              
+                if (hyp_ll_p4().at(i).eta() > 2.4) continue;
+                if (hyp_lt_p4().at(i).eta() > 2.4) continue;
+      
+              counter++;
+        
+          }
+      
+          if (counter > 0) {
+              etaCounter++;
+          }
+      }
+      for(unsigned int event = 0; event < nEventsTree; ++event) {
+    
+
+          // Get Event Content
+          tree->LoadTree(event);
+          cms2.GetEntry(event);
+          ++nEventsTotal;
+
+          // int counter = hyp_p4().size();
+          int counter =0; 
+
+          for (unsigned int i = 0; i< hyp_p4().size(); i++){
+         
+              if (hyp_ll_charge().at(i)*hyp_lt_charge().at(i) > 0)  continue;
+              
+              if (hyp_ll_p4().at(i).pt() < 20) continue;
+              if (hyp_lt_p4().at(i).pt() < 20) continue;
+              if (hyp_type().at(i) == 3) continue;
+              
+                if (hyp_ll_p4().at(i).eta() > 2.4) continue;
+                if (hyp_lt_p4().at(i).eta() > 2.4) continue;
+                if (!samesign2011::isNumeratorHypothesis(i)) continue;
+              
+      
+              counter++;
+        
+          }
+      
+          if (counter > 0) {
+              isoCounter++;
+          }
+      }
   }
+  
+  
   cout << "Source: " << nEventsMini << endl;
   cout << "Oppositely Charged: " << oppositeChargedCounter << endl;
+  cout << "Hyp pt > 20: " << ptCounter << endl;
+  cout << "Ignoring ee events: " << typeCounter << endl;
+  cout << "Eta > 2.4: " << etaCounter << endl;
+  cout << "ID/Isolation requirements: " << isoCounter << endl;
   
   return;
 }
