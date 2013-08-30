@@ -23,13 +23,12 @@ using namespace std;
 using namespace tas;
 
 
-void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int numEvent){
+void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int numEvent){
 
     if (numEvent != 0 ){
         cout << "Processing the first " << numEvent << " file(s)" << endl;
     }
 
-  MakeBabyNtuple( Form("/home/users/aaivazis/susy/babymaker/minis%s.root", baby_name.c_str()) );
 
   // File Loop
   unsigned int nEventsTotal = 0;
@@ -162,8 +161,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
               if (hyp_lt_p4().at(i).pt() < 20) continue;
               if (hyp_type().at(i) == 3) continue;
               
-                if (hyp_ll_p4().at(i).eta() > 2.4) continue;
-                if (hyp_lt_p4().at(i).eta() > 2.4) continue;
+              if (hyp_ll_p4().at(i).eta() > 2.4) continue;
+              if (hyp_lt_p4().at(i).eta() > 2.4) continue;
       
               counter++;
         
@@ -209,15 +208,16 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
   
   ofstream stream;
   stream.open("cutflow.txt");
-  
-  
+
+  stream << sample_name << ": " << endl;
   stream << "Source: " << nEventsMini << endl;
   stream << "Oppositely Charged: " << oppositeChargedCounter << endl;
   stream << "Hyp pt > 20: " << ptCounter << endl;
   stream << "Ignoring ee events: " << typeCounter << endl;
   stream << "Eta > 2.4: " << etaCounter << endl;
   stream << "ID/Isolation requirements: " << isoCounter << endl;
-  
+  stream << "--------------------------------" << endl;
+
   stream.close();
   
   return;
