@@ -21,52 +21,6 @@
 using namespace std;
 using namespace tas;
 
-/*
-
-enum IsolationType { DET_ISO, TIGHT_DET_ISO, COR_DET_ISO };
-
-
-bool isIsolatedLepton(int id, int idx, enum IsolationType iso_type)
-{
-    // electrons
-    if (abs(id) == 11) {
-        if (iso_type == DET_ISO)
-            return (pass_electronSelection(idx, electronSelection_ssV6_iso));
-        else if (iso_type == COR_DET_ISO)
-            return (electronIsolation_cor_rel_v1(idx, true) < 0.10);
-        else if (iso_type == TIGHT_DET_ISO)
-            return (electronIsolation_rel_v1(idx, true) < 0.10);
-    }
-
-    // muons
-    if (abs(id) == 13) {
-        if (iso_type == DET_ISO)
-            return (muonIsoValue(idx, false) < 0.15);
-        else if (iso_type == COR_DET_ISO)
-            return (muonCorIsoValue(idx, false) < 0.10);
-        else if (iso_type == TIGHT_DET_ISO)
-            return (muonIsoValue(idx, false) < 0.10);
-    }
-
-    return false;
-}
-
-bool isNumeratorLepton(int id, int idx, enum IsolationType iso_type)
-{
-    return (samesign2011::isGoodLepton(id, idx) && isIsolatedLepton(id, idx, iso_type));
-}
-
-bool isNumeratorHypothesis(int idx, enum IsolationType iso_type = DET_ISO)
-{
-    if (!isNumeratorLepton(cms2.hyp_lt_id().at(idx), cms2.hyp_lt_index().at(idx), iso_type))
-        return false;
-    if (!isNumeratorLepton(cms2.hyp_ll_id().at(idx), cms2.hyp_ll_index().at(idx), iso_type))
-        return false;
-
-    return true;
-}
-
-*/
 
 void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int numEvent){
 
@@ -77,286 +31,91 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
   MakeBabyNtuple( Form("/home/users/aaivazis/susy/babymaker/minis%s.root", baby_name.c_str()) );
 
   // File Loop
-  int nDuplicates = 0;
   int nEvents = chain->GetEntries();
-  unsigned int nEventsChain = nEvents;
   unsigned int nEventsTotal = 0;
   TObjArray *listOfFiles = chain->GetListOfFiles();
   TIter fileIter(listOfFiles);
   TFile *currentFile = 0;
+  int nEventsMini = 0;
 
   unsigned int fileCounter = 0;
 
-  cout << "NumEvents : "<<  numEvent << endl;
+  int oppositeChargedCounter =0;
+  int ll_Pt20Counter = 0;
+  int lt_Pt20Counter = 0;
+  int typeCounter = 0;
+  int ll_etaCounter = 0;
+  int lt_etaCounter = 0;
+  int isoCounter = 0;
   
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
 
-    fileCounter++;
+      fileCounter++;
     
-    cout << "filecounter : "<< fileCounter <<endl;
-    
-    if (fileCounter > numEvent && numEvent !=0) {
-        break;
-    }
-    // Get File Content
-    TFile f( currentFile->GetTitle() );
-    TTree *tree = (TTree*)f.Get("Events");
-    TTreeCache::SetLearnEntries(10);
-    tree->SetCacheSize(128*1024*1024);
-    cms2.Init(tree);
-    
-    // Event Loop
-    unsigned int nEventsTree = tree->GetEntriesFast();
-
-    /*
-    // if numEvents has been set and it would actually do something
-    if (numEvents != 0 && nEventsTree > numEvents){
-        nEventsTree = numEvents;
-    }
-    */
-
-
-    for(unsigned int event = 0; event < nEventsTree; ++event) {
-    
-
-      // Get Event Content
-      tree->LoadTree(event);
-      cms2.GetEntry(event);
-      ++nEventsTotal;
-
-      // float maxPt = 0;
-      int index = -1;
-      float delta_m_min = 999;
-      float maxPt = 0.0;
-      float looseDiscriminant = .244;
-      // float mediumDiscriminant = .679;
-      // float tightDiscriminant = .89;
-
-
-      int _nJetsPt20 = 0;
-      int _nJetsPt30 = 0;
-      int _nJetsPt40 = 0;
-      int _nJetsPt50 = 0;
-      int _nJetsPt60 = 0;
-      
-      int _nJets = 0;
-      
-      int _jetll = -1;
-      int _jetlt = -1;
-      
-      std::vector<LorentzVector> _jets_p4_min ;
-      std::vector<float> _jets_p4_minCorrection ;
-
-
-      // cut flow counters
-
-      //int hyp_oppositeChargedCounter =0;
-
-
-      // only grab the hypothesis with the biggest pt
-      for (unsigned int i = 0; i< hyp_p4().size(); i++){
-
-          if (hyp_ll_charge().at(i)*hyp_lt_charge().at(i) > 0)  continue;
-         
-          
-          if (hyp_ll_p4().at(i).pt() < 20) continue;
-          // cut counters to represent the number of hypotehsis that passed this cut
-          // hyp_ll_Counter++;
-
-          if (hyp_lt_p4().at(i).pt() < 20) continue;
-
-          if (hyp_type().at(i) == 3) continue;
-          
-          if (hyp_ll_p4().at(i).eta() > 2.4) continue;
-          if (hyp_lt_p4().at(i).eta() > 2.4) continue;
-
-         
-
-          if (!samesign2011::isNumeratorHypothesis(i)) continue;
-          
-
-          // only select hypothesis that minimizes the delta_m between it and 2 pairs of jets
-          for(unsigned int k = 0; k < pfjets_p4().size(); k++) {
-
-              // cuts on k
-              float jetPt = pfjets_p4().at(k).pt() * pfjets_corL1FastL2L3().at(k);
-              if (jetPt < 20) continue; 
-                
-              float dR_lt = ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(k), hyp_lt_p4().at(i));
-              float dR_ll = ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(k), hyp_ll_p4().at(i));
-                    
-              if (dR_ll < 0.4) continue;
-              if (dR_lt < 0.4) continue;
-              
-              _nJets++ ;
-
-              _jets_p4_min.push_back(pfjets_p4().at(k));
-              _jets_p4_minCorrection.push_back(pfjets_corL1FastL2L3().at(k));
-
-              float _bTag = pfjets_combinedSecondaryVertexBJetTag().at(k);
-
-              if (_bTag < looseDiscriminant) continue;
-
-              _nJetsPt20++;
-
-              if (pfjets_p4().at(k).pt() > 30){
-                  _nJetsPt30++;
-              }
-
-              if (pfjets_p4().at(k).pt() > 40){
-                  _nJetsPt40++;
-              }
-              if (pfjets_p4().at(k).pt() > 50){
-                  _nJetsPt50++;
-              } 
-              if (pfjets_p4().at(k).pt() > 60){
-                  _nJetsPt60++;
-              }
-
-              float val1 = (hyp_ll_p4().at(i) + pfjets_p4().at(k)).mass();
-              
-              for (unsigned int l = 0; l< pfjets_p4().size(); l++){
-                  
-                  // cuts on l loop
-                  if (l == k) continue;
-                  float l_jetPt = pfjets_p4().at(k).pt() * pfjets_corL1FastL2L3().at(k);
-                  if (l_jetPt < 20) continue; 
-                
-                  float l_dR_lt = ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(l), hyp_lt_p4().at(i));
-                  float l_dR_ll = ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(l), hyp_ll_p4().at(i));
-                    
-                  if (l_dR_ll < 0.4) continue;
-                  if (l_dR_lt < 0.4) continue;
-              
-                  float l_bTag = pfjets_combinedSecondaryVertexBJetTag().at(l);
-
-                  if (l_bTag < looseDiscriminant) continue;    
-              
-                  float val2 = (hyp_lt_p4().at(i) + pfjets_p4().at(l)).mass();
-                  float _delta_m = abs(val2-val1);
-              
-
-                  if (_delta_m < delta_m_min){
-                      delta_m_min = _delta_m;
-                      index = i;
-                      
-                      _jetll = k;
-                      _jetlt = l;
-                  }
-
-                  
-              }
-
-          }
-
-          // 
-
-      
-          float sumPt = hyp_lt_p4().at(i).pt() + hyp_ll_p4().at(i).pt();
-
-          if (sumPt > maxPt){
-              maxPt = sumPt;
-              index = i;
-          }
+      if (fileCounter > numEvent && numEvent !=0) {
+          break;
       }
 
-      if (index == -1) continue;
+    
+      // Get File Content
+      TFile f( currentFile->GetTitle() );
+      TTree *tree = (TTree*)f.Get("Events");
+      TTreeCache::SetLearnEntries(10);
+      tree->SetCacheSize(128*1024*1024);
+      cms2.Init(tree);
+    
+    
+      // Event Loop
+      unsigned int nEventsTree = tree->GetEntriesFast();
+
+      nEventsMini = nEventsMini + nEventsTree;
+
+      for(unsigned int event = 0; event < nEventsTree; ++event) {
+    
+
+          // Get Event Content
+          tree->LoadTree(event);
+          cms2.GetEntry(event);
+          ++nEventsTotal;
+
+
+
+
+          // cut flow counters
+
+          int counter = 0;
+      
+
+
+          // only grab the hypothesis with the biggest pt
+          for (unsigned int i = 0; i< hyp_p4().size(); i++){
+         
+              if (hyp_ll_charge().at(i)*hyp_lt_charge().at(i) < 0)  continue;
+          
+              /*
+                if (hyp_ll_p4().at(i).pt() < 20) continue;
+                if (hyp_lt_p4().at(i).pt() < 20) continue;
+                if (hyp_type().at(i) == 3) continue;
+                if (hyp_ll_p4().at(i).eta() > 2.4) continue;
+                if (hyp_lt_p4().at(i).eta() > 2.4) continue;
+                if (!samesign2011::isNumeratorHypothesis(i)) continue;
+              */
+      
+              counter ++;
+        
+          }
+      
+          if (counter < hyp_p4().size()) {
+              oppositeChargedCounter++;
+          }
+
      
-      // maxPt counter
-
-      // Progress
-      CMS2::progress( nEventsTotal, nEventsChain );
-
-      InitBabyNtuple();
-
-      //analysis
-      met = evt_pfmet_type1cor();;
-
-      delta_m = delta_m_min;
-
-      jets_p4 = pfjets_p4();
-      jets_p4Correction = pfjets_corL1FastL2L3();
-      jets_p4_minCorrection = _jets_p4_minCorrection;
-
-      type = hyp_type().at(index);
-
-      ll_p4 = hyp_ll_p4().at(index);
-      ll_id = hyp_ll_id().at(index);
-      total_p4 = hyp_p4().at(index);
-      ll_charge = hyp_ll_charge().at(index);
-      ll_index = hyp_ll_index().at(index);
-
-      lt_p4 = hyp_lt_p4().at(index);
-      lt_charge = hyp_lt_charge().at(index);
-      lt_id = hyp_lt_id().at(index);
-      lt_index = hyp_lt_index().at(index);
-      btagDiscriminant = pfjets_combinedSecondaryVertexBJetTag();
-      scale_1fb = evt_scale1fb();
-      numEvents = tree->GetEntries();
-      //jets_p4 = pfjets_p4().at(index);
-      file = Form("%s", currentFile->GetTitle());
-
-      nJetsPt20 = _nJetsPt20;
-      nJetsPt30 = _nJetsPt30;
-      nJetsPt40 = _nJetsPt40;
-      nJetsPt50 = _nJetsPt50;
-      nJetsPt60 = _nJetsPt60;
-
-
-      nJets = _nJets;
       
+      }
 
-      jets_p4_min = _jets_p4_min;
-
-      if ( _jetll != -1)  jetll_p4 = pfjets_p4().at(_jetll);
-      if (_jetlt != -1)  jetlt_p4 = pfjets_p4().at(_jetlt);
-
-
-      eventNumber = evt_event();
-      runNumber = evt_run();
-      lumiBlock = evt_lumiBlock();
-      
-      if (abs(lt_id) == 13) lt_iso = muonIsoValuePF2012_deltaBeta(hyp_lt_index().at(index));
-      if (abs(ll_id) == 13) ll_iso = muonIsoValuePF2012_deltaBeta(hyp_ll_index().at(index));
-
-      // signal needs to be run through an up-to-date CMS2 in order to use these branches. Save it as 0.0 for now. 
-
-      if (abs(lt_id) == 11) lt_iso = 0.0 ; // electronIsoValuePF2012_FastJetEffArea_v3(hyp_lt_index().at(index), .4);
-      if (abs(ll_id) == 11) ll_iso =  0.0 ; //electronIsoValuePF2012_FastJetEffArea_v3(hyp_ll_index().at(index), .4);
-
-      FillBabyNtuple();
-    
-      //if (hyp_ll_PtCounter == 0){ // then this cut was responsible for removing all of the hypotheses
-      //    event_counter1++;
-      //    continue;
-      //}
-      
-    }//end loop on events in a file
-  
-    
-    delete tree;
-    f.Close();
-  }//end loop on files
-  
-  
-
-  // print cut flow table using count = numEvents - counter1 - counter2, etc
-  // number of events after cut 1:
-  // print numEvents - event_counter1
-  
-  // number of events after cut2:
-  // print numEVents - event_counter1 - event_counter2
-
-
-
-
-  if ( nEventsChain != nEventsTotal ) {
-    std::cout << "WARNING: The number of events added is not equal to the total number of events in the file." << std::endl;
   }
-
-  cout << nDuplicates << " duplicate events were skipped." << endl;
-
-  CloseBabyNtuple();
-
+  cout << "Source: " << nEventsMini << endl;
+  cout << "Oppositely Charged: " << oppositeChargedCounter << endl;
+  
   return;
 }
