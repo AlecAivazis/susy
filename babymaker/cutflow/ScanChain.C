@@ -40,10 +40,12 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
   unsigned int fileCounter = 0;
 
   int oppositeChargedCounter =0;
-  int ptCounter = 0;
+  int pt20Counter = 0;
   int typeCounter = 0;
   int etaCounter = 0;
   int isoCounter = 0;
+  int bTagCounter = 0;
+  int pt40Counter = 0;
   
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
 
@@ -111,7 +113,7 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
           }
       
           if (counter > 0) {
-              ptCounter++;
+              pt20Counter++;
           }
       }
       for(unsigned int event = 0; event < nEventsTree; ++event) {
@@ -191,9 +193,9 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
               if (hyp_lt_p4().at(i).pt() < 20) continue;
               if (hyp_type().at(i) == 3) continue;
               
-                if (hyp_ll_p4().at(i).eta() > 2.4) continue;
-                if (hyp_lt_p4().at(i).eta() > 2.4) continue;
-                if (!samesign2011::isNumeratorHypothesis(i)) continue;
+              if (hyp_ll_p4().at(i).eta() > 2.4) continue;
+              if (hyp_lt_p4().at(i).eta() > 2.4) continue;
+              if (!samesign2011::isNumeratorHypothesis(i)) continue;
               
       
               counter++;
@@ -204,18 +206,108 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
               isoCounter++;
           }
       }
+      for(unsigned int event = 0; event < nEventsTree; ++event) {
+    
+
+          // Get Event Content
+          tree->LoadTree(event);
+          cms2.GetEntry(event);
+          ++nEventsTotal;
+
+          // int counter = hyp_p4().size();
+          int counter =0; 
+          int jetCounter = 0;
+          float looseDiscriminant = .244;
+
+          for (unsigned int i = 0; i< hyp_p4().size(); i++){
+         
+              if (hyp_ll_charge().at(i)*hyp_lt_charge().at(i) > 0)  continue;
+              
+              if (hyp_ll_p4().at(i).pt() < 20) continue;
+              if (hyp_lt_p4().at(i).pt() < 20) continue;
+              if (hyp_type().at(i) == 3) continue;
+              
+              if (hyp_ll_p4().at(i).eta() > 2.4) continue;
+              if (hyp_lt_p4().at(i).eta() > 2.4) continue;
+              if (!samesign2011::isNumeratorHypothesis(i)) continue;
+              
+              
+      
+              counter++;
+        
+          }
+      
+          if (counter > 0) {
+              for (unsigned int k = 0; k < pfjets_p4().size(); k++){
+                  
+                      float _bTag = pfjets_combinedSecondaryVertexBJetTag().at(k);
+                      if (_bTag > looseDiscriminant){
+                          jetCounter++;
+                      }
+              }
+              if (jetCounter >= 2){
+                  bTagCounter++;
+              }
+          }
+      }
+      for(unsigned int event = 0; event < nEventsTree; ++event) {
+    
+
+          // Get Event Content
+          tree->LoadTree(event);
+          cms2.GetEntry(event);
+          ++nEventsTotal;
+
+          // int counter = hyp_p4().size();
+          int counter =0; 
+          int jetCounter = 0;
+          float looseDiscriminant = .244;
+
+          for (unsigned int i = 0; i< hyp_p4().size(); i++){
+         
+              if (hyp_ll_charge().at(i)*hyp_lt_charge().at(i) > 0)  continue;
+              
+              if (hyp_ll_p4().at(i).pt() > 40) continue;
+              if (hyp_lt_p4().at(i).pt() > 40) continue;
+              if (hyp_type().at(i) == 3) continue;
+              
+              if (hyp_ll_p4().at(i).eta() > 2.4) continue;
+              if (hyp_lt_p4().at(i).eta() > 2.4) continue;
+              if (!samesign2011::isNumeratorHypothesis(i)) continue;
+              
+              
+      
+              counter++;
+        
+          }
+      
+          if (counter > 0) {
+              for (unsigned int k = 0; k < pfjets_p4().size(); k++){
+                  
+                      float _bTag = pfjets_combinedSecondaryVertexBJetTag().at(k);
+                      if (_bTag > looseDiscriminant){
+                          jetCounter++;
+                      }
+              }
+              if (jetCounter >= 2){
+                  pt40Counter++;
+              }
+          }
+      }
   }
   
   ofstream stream;
-  stream.open("cutflow.txt");
+  stream.open("cutflow.txt", ios::app);
 
   stream << sample_name << ": " << endl;
   stream << "Source: " << nEventsMini << endl;
   stream << "Oppositely Charged: " << oppositeChargedCounter << endl;
-  stream << "Hyp pt > 20: " << ptCounter << endl;
+  stream << "Hyp pt > 20: " << pt20Counter << endl;
   stream << "Ignoring ee events: " << typeCounter << endl;
   stream << "Eta > 2.4: " << etaCounter << endl;
   stream << "ID/Isolation requirements: " << isoCounter << endl;
+  stream << "2 bTagged Jets: " << bTagCounter << endl;
+  stream << "Hypothesis Pt > 40: " << pt40Counter << endl;
   stream << "--------------------------------" << endl;
 
   stream.close();
