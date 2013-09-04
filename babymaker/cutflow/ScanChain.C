@@ -39,13 +39,11 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
 
   unsigned int fileCounter = 0;
 
-  int oppositeChargedCounter =0;
-  int pt20Counter = 0;
+  int goodCounter =0;
+  int osCounter = 0;
+  int bTagsCounter = 0;
   int typeCounter = 0;
-  int etaCounter = 0;
-  int isoCounter = 0;
-  int bTagCounter = 0;
-  int pt40Counter = 0;
+  int ptCounter =0;
   
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
 
@@ -76,224 +74,64 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
           ++nEventsTotal;
 
           // int counter = hyp_p4().size();
-          int counter =0; 
+          int _osCounter =0; 
+          int _goodCounter = 0;
+          int _typeCounter = 0;
 
-          for (unsigned int i = 0; i< hyp_p4().size(); i++){
-         
-              if (hyp_ll_charge().at(i)*hyp_lt_charge().at(i) > 0)  continue;
-      
-              counter++;
-        
-          }
-      
-          if (counter > 0) {
-              oppositeChargedCounter++;
-          }
-      }
-      
-      for(unsigned int event = 0; event < nEventsTree; ++event) {
-    
-
-          // Get Event Content
-          tree->LoadTree(event);
-          cms2.GetEntry(event);
-          ++nEventsTotal;
-
-          // int counter = hyp_p4().size();
-          int counter =0; 
-
-          for (unsigned int i = 0; i< hyp_p4().size(); i++){
-         
-              if (hyp_ll_charge().at(i)*hyp_lt_charge().at(i) > 0)  continue;
-              if (hyp_ll_p4().at(i).pt() < 20) continue;
-              if (hyp_lt_p4().at(i).pt() < 20) continue;
-      
-              counter++;
-        
-          }
-      
-          if (counter > 0) {
-              pt20Counter++;
-          }
-      }
-      for(unsigned int event = 0; event < nEventsTree; ++event) {
-    
-
-          // Get Event Content
-          tree->LoadTree(event);
-          cms2.GetEntry(event);
-          ++nEventsTotal;
-
-          // int counter = hyp_p4().size();
-          int counter =0; 
-
-          for (unsigned int i = 0; i< hyp_p4().size(); i++){
-         
-              if (hyp_ll_charge().at(i)*hyp_lt_charge().at(i) > 0)  continue;
-              
-              if (hyp_ll_p4().at(i).pt() < 20) continue;
-              if (hyp_lt_p4().at(i).pt() < 20) continue;
-              if (hyp_type().at(i) == 3) continue;
-      
-              counter++;
-        
-          }
-      
-          if (counter > 0) {
-              typeCounter++;
-          }
-      }
-
-      for(unsigned int event = 0; event < nEventsTree; ++event) {
-    
-
-          // Get Event Content
-          tree->LoadTree(event);
-          cms2.GetEntry(event);
-          ++nEventsTotal;
-
-          // int counter = hyp_p4().size();
-          int counter =0; 
-
-          for (unsigned int i = 0; i< hyp_p4().size(); i++){
-         
-              if (hyp_ll_charge().at(i)*hyp_lt_charge().at(i) > 0)  continue;
-              
-              if (hyp_ll_p4().at(i).pt() < 20) continue;
-              if (hyp_lt_p4().at(i).pt() < 20) continue;
-              if (hyp_type().at(i) == 3) continue;
-              
-              if (hyp_ll_p4().at(i).eta() > 2.4) continue;
-              if (hyp_lt_p4().at(i).eta() > 2.4) continue;
-      
-              counter++;
-        
-          }
-      
-          if (counter > 0) {
-              etaCounter++;
-          }
-      }
-      for(unsigned int event = 0; event < nEventsTree; ++event) {
-    
-
-          // Get Event Content
-          tree->LoadTree(event);
-          cms2.GetEntry(event);
-          ++nEventsTotal;
-
-          // int counter = hyp_p4().size();
-          int counter =0; 
-
-          for (unsigned int i = 0; i< hyp_p4().size(); i++){
-         
-              if (hyp_ll_charge().at(i)*hyp_lt_charge().at(i) > 0)  continue;
-              
-              if (hyp_ll_p4().at(i).pt() < 20) continue;
-              if (hyp_lt_p4().at(i).pt() < 20) continue;
-              if (hyp_type().at(i) == 3) continue;
-              
-              if (hyp_ll_p4().at(i).eta() > 2.4) continue;
-              if (hyp_lt_p4().at(i).eta() > 2.4) continue;
-              if (!samesign2011::isNumeratorHypothesis(i)) continue;
-              
-      
-              counter++;
-        
-          }
-      
-          if (counter > 0) {
-              isoCounter++;
-          }
-      }
-      for(unsigned int event = 0; event < nEventsTree; ++event) {
-    
-
-          // Get Event Content
-          tree->LoadTree(event);
-          cms2.GetEntry(event);
-          ++nEventsTotal;
-
-          // int counter = hyp_p4().size();
-          int counter =0; 
           int jetCounter = 0;
+          
           float looseDiscriminant = .244;
+          
+          float maxPt = -1;
 
           for (unsigned int i = 0; i< hyp_p4().size(); i++){
          
-              if (hyp_ll_charge().at(i)*hyp_lt_charge().at(i) > 0)  continue;
-              
+              if (!samesign2011::isNumeratorHypothesis(i)) continue;
               if (hyp_ll_p4().at(i).pt() < 20) continue;
               if (hyp_lt_p4().at(i).pt() < 20) continue;
-              if (hyp_type().at(i) == 3) continue;
+              if (abs(hyp_ll_p4().at(i).eta()) > 2.4) continue;
+              if (abs(hyp_lt_p4().at(i).eta()) > 2.4) continue;
+              _goodCounter++;
               
-              if (hyp_ll_p4().at(i).eta() > 2.4) continue;
-              if (hyp_lt_p4().at(i).eta() > 2.4) continue;
-              if (!samesign2011::isNumeratorHypothesis(i)) continue;
-              
-              
-      
-              counter++;
-        
-          }
-      
-          if (counter > 0) {
-              for (unsigned int k = 0; k < pfjets_p4().size(); k++){
-                  
-                      float _bTag = pfjets_combinedSecondaryVertexBJetTag().at(k);
-                      if (_bTag > looseDiscriminant){
-                          jetCounter++;
-                      }
-              }
-              if (jetCounter >= 2){
-                  bTagCounter++;
-              }
-          }
-      }
-      for(unsigned int event = 0; event < nEventsTree; ++event) {
-    
-
-          // Get Event Content
-          tree->LoadTree(event);
-          cms2.GetEntry(event);
-          ++nEventsTotal;
-
-          // int counter = hyp_p4().size();
-          int counter =0; 
-          int jetCounter = 0;
-          float looseDiscriminant = .244;
-
-          for (unsigned int i = 0; i< hyp_p4().size(); i++){
-         
               if (hyp_ll_charge().at(i)*hyp_lt_charge().at(i) > 0)  continue;
+              _osCounter++;
               
-              if (hyp_ll_p4().at(i).pt() > 40) continue;
-              if (hyp_lt_p4().at(i).pt() > 40) continue;
               if (hyp_type().at(i) == 3) continue;
+              _typeCounter++;
+
+              maxPt = (min(hyp_ll_p4().at(i).pt(), hyp_lt_p4().at(i).pt()) > maxPt) ? min(hyp_ll_p4().at(i).pt(), hyp_lt_p4().at(i).pt()) : maxPt;
               
-              if (hyp_ll_p4().at(i).eta() > 2.4) continue;
-              if (hyp_lt_p4().at(i).eta() > 2.4) continue;
-              if (!samesign2011::isNumeratorHypothesis(i)) continue;
-              
-              
-      
-              counter++;
-        
           }
+          
+
+          if (_goodCounter > 0) goodCounter++;
+          else continue;
+
+          if (_osCounter > 0) osCounter++;
+          else continue;
+          
+          if (maxPt == -1) continue;
       
-          if (counter > 0) {
-              for (unsigned int k = 0; k < pfjets_p4().size(); k++){
-                  if (pfjets_p4().at(k).pt() < 20) continue;
+          if (_typeCounter == 0 ) continue;
+          typeCounter++;
+              
+          for (unsigned int k = 0; k < pfjets_p4().size(); k++){
+
+              if (pfjets_p4().at(k).pt() < 20) continue;
+              if (abs(pfjets_p4().at(k).eta()) > 2.4) continue;
                   
-                  float _bTag = pfjets_combinedSecondaryVertexBJetTag().at(k);
-                  if (_bTag > looseDiscriminant){
-                      jetCounter++;
-                  }
-              }
-              if (jetCounter >= 2){
-                  pt40Counter++;
+              float _bTag = pfjets_combinedSecondaryVertexBJetTag().at(k);
+              if (_bTag > looseDiscriminant){
+                  jetCounter++;
               }
           }
+          if (jetCounter >= 2) bTagsCounter++;
+          else continue;
+  
+          
+          if (maxPt > 40) ptCounter++;
+          else continue;
+          
       }
   }
   
@@ -301,14 +139,12 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
   stream.open("cutflow.txt", ios::app);
 
   stream << sample_name << ": " << endl;
-  stream << "Source: " << nEventsMini << endl;
-  stream << "Oppositely Charged: " << oppositeChargedCounter << endl;
-  stream << "Hyp pt > 20: " << pt20Counter << endl;
-  stream << "Ignoring ee events: " << typeCounter << endl;
-  stream << "Eta > 2.4: " << etaCounter << endl;
-  stream << "ID/Isolation requirements: " << isoCounter << endl;
-  stream << "2 bTagged Jets: " << bTagCounter << endl;
-  stream << "Hypothesis Pt > 40: " << pt40Counter << endl;
+  stream << Form("Source: %d", nEventsMini) << endl;
+  stream << Form("'Good' Hypothesis (ID/Isolation/eta/Pt): %d (%.2f)", goodCounter, double(goodCounter/nEventsMini)) << endl;
+  stream << Form("Oppositely Charged: %d (%.2f)", osCounter, double(osCounter/nEventsMini)) << endl;
+  stream << Form("Ignoring ee events: %d (%.2f)", typeCounter, double(typeCounter/nEventsMini)) << endl;
+  stream << Form("nBtags > 2: %d (%.2f)", bTagsCounter, double(bTagsCounter/nEventsMini)) << endl;
+  stream << Form("Hypothesis Pt > 40: %d (%.2f)", ptCounter, double(ptCounter/nEventsMini)) << endl;
   stream << "--------------------------------" << endl;
 
   stream.close();

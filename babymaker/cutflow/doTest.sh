@@ -1,2 +1,2 @@
 #! /bin/bash
-root -b -q "doDY.C(\"test\", 5)"
+root -b -q "doDY.C(\"test\", 1)"
