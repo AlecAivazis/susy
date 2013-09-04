@@ -283,11 +283,12 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
       
           if (counter > 0) {
               for (unsigned int k = 0; k < pfjets_p4().size(); k++){
+                  if (pfjets_p4().at(k).pt() < 20) continue;
                   
-                      float _bTag = pfjets_combinedSecondaryVertexBJetTag().at(k);
-                      if (_bTag > looseDiscriminant){
-                          jetCounter++;
-                      }
+                  float _bTag = pfjets_combinedSecondaryVertexBJetTag().at(k);
+                  if (_bTag > looseDiscriminant){
+                      jetCounter++;
+                  }
               }
               if (jetCounter >= 2){
                   pt40Counter++;
