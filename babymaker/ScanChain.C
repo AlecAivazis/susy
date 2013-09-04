@@ -238,10 +238,10 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
               if (l_bTag < looseDiscriminant) continue;    
               
               float val2 = (hyp_lt_p4().at(index) + pfjets_p4().at(l)).mass();
-              float _delta_m = abs(val2-val1);
+              float _delta_m = val2-val1;
               
 
-              if (_delta_m < delta_m_min){
+              if (abs(_delta_m) < abs(delta_m_min)){
                   delta_m_min = _delta_m;
                   _sum_m = val1+val2;
                       
