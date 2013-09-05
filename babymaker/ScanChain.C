@@ -264,7 +264,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       met = evt_pfmet_type1cor();;
 
       delta_m = delta_m_min;
-      sum_m = _sum_m;
+      avg_m = _sum_m/2;
 
       jets_p4 = pfjets_p4();
       jets_p4Correction = pfjets_corL1FastL2L3();

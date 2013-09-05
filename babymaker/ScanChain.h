@@ -88,7 +88,7 @@ class babyMaker {
 
 
   float delta_m;
-  float sum_m;
+  float avg_m;
 
   string file;
 };
@@ -116,7 +116,7 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("total_p4", &total_p4);
 
   BabyTree_->Branch("delta_m", &delta_m);
-  BabyTree_->Branch("sum_m", &sum_m);
+  BabyTree_->Branch("avg_m", &avg_m);
   
   BabyTree_->Branch("ll_id", &ll_id);
   BabyTree_->Branch("lt_id", &lt_id);
@@ -184,7 +184,7 @@ void babyMaker::InitBabyNtuple () {
   lt_iso = 0.0;
 
   delta_m = 0;
-  sum_m = 0;
+  avg_m = 0;
 
   numEvents = 0;
 
