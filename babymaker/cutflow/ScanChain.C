@@ -39,11 +39,11 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
 
   unsigned int fileCounter = 0;
 
-  int goodCounter =0;
-  int osCounter = 0;
-  int bTagsCounter = 0;
-  int typeCounter = 0;
-  int ptCounter =0;
+  double goodCounter =0;
+  double osCounter = 0;
+  double bTagsCounter = 0;
+  double typeCounter = 0;
+  double ptCounter =0;
   
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
 
@@ -140,11 +140,11 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
 
   stream << sample_name << ": " << endl;
   stream << Form("Source: %d", nEventsMini) << endl;
-  stream << Form("'Good' Hypothesis (ID/Isolation/eta/Pt): %d (%.2f)", goodCounter, double(goodCounter/nEventsMini)) << endl;
-  stream << Form("Oppositely Charged: %d (%.2f)", osCounter, double(osCounter/nEventsMini)) << endl;
-  stream << Form("Ignoring ee events: %d (%.2f)", typeCounter, double(typeCounter/nEventsMini)) << endl;
-  stream << Form("nBtags > 2: %d (%.2f)", bTagsCounter, double(bTagsCounter/nEventsMini)) << endl;
-  stream << Form("Hypothesis Pt > 40: %d (%.2f)", ptCounter, double(ptCounter/nEventsMini)) << endl;
+  stream << Form("'Good' Hypothesis (ID/Isolation/eta/Pt): %.0f (%.2f)", goodCounter, goodCounter/nEventsMini * 100) << endl;
+  stream << Form("Oppositely Charged: %.0f (%.2f)", osCounter, osCounter/nEventsMini * 100) << endl;
+  stream << Form("Ignoring ee events: %.0f (%.2f)", typeCounter, typeCounter/nEventsMini * 100) << endl;
+  stream << Form("nBtags > 2: %.0f (%.2f)", bTagsCounter, bTagsCounter/nEventsMini * 100) << endl;
+  stream << Form("Hypothesis Pt > 40: %.0f (%.2f)", ptCounter, ptCounter/nEventsMini * 100) << endl;
   stream << "--------------------------------" << endl;
 
   stream.close();
