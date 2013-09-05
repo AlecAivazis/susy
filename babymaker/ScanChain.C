@@ -126,27 +126,19 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
       // float maxPt = 0;
       int index = -1;
-      float delta_m_min = 999;
-      float _sum_m = 0.0;
       float _maxPt = 0.0;
       float looseDiscriminant = .244;
       // float mediumDiscriminant = .679;
       // float tightDiscriminant = .89;
 
-
-      int _nJetsPt20 = 0;
-      int _nJetsPt30 = 0;
-      int _nJetsPt40 = 0;
-      int _nJetsPt50 = 0;
-      int _nJetsPt60 = 0;
-      
-      int _nJets = 0;
-      
-      int _jetll = -1;
-      int _jetlt = -1;
-      
       std::vector<LorentzVector> _jets_p4_min ;
       std::vector<float> _jets_p4_minCorrection ;
+
+      
+      vector<float> _deltaM;
+      vector<float> _avgM;
+      vector<float> _minJetPt;
+
 
       // only grab the hypothesis with the biggest pt
       for (unsigned int i = 0; i< hyp_p4().size(); i++){
@@ -167,9 +159,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           // ignore ee events
           if (hyp_type().at(i) == 3) continue;
 
-          
-
-        
           // select the highest pt hypothesis
           float sumPt = hyp_lt_p4().at(i).pt() + hyp_ll_p4().at(i).pt();
 
@@ -195,30 +184,16 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           if (dR_ll < 0.4) continue;
           if (dR_lt < 0.4) continue;
               
-          _nJets++ ;
-
-          _jets_p4_min.push_back(pfjets_p4().at(k));
-          _jets_p4_minCorrection.push_back(pfjets_corL1FastL2L3().at(k));
-
+          // minimum loose bTag discriminant
           float _bTag = pfjets_combinedSecondaryVertexBJetTag().at(k);
 
           if (_bTag < looseDiscriminant) continue;
+          // save the
+          _jets_p4_min.push_back(pfjets_p4().at(k));
+          _jets_p4_minCorrection.push_back(pfjets_corL1FastL2L3().at(k));
 
-          _nJetsPt20++;
 
-          if (pfjets_p4().at(k).pt() > 30){
-              _nJetsPt30++;
-          }
-
-          if (pfjets_p4().at(k).pt() > 40){
-              _nJetsPt40++;
-          }
-          if (pfjets_p4().at(k).pt() > 50){
-              _nJetsPt50++;
-          } 
-          if (pfjets_p4().at(k).pt() > 60){
-              _nJetsPt60++;
-          }
+         
 
           float val1 = (hyp_ll_p4().at(index) + pfjets_p4().at(k)).mass();
               
@@ -240,16 +215,10 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
               if (l_bTag < looseDiscriminant) continue;    
               
               float val2 = (hyp_lt_p4().at(index) + pfjets_p4().at(l)).mass();
-              float _delta_m = val2-val1;
-              
 
-              if (abs(_delta_m) < abs(delta_m_min)){
-                  delta_m_min = _delta_m;
-                  _sum_m = val1+val2;
-                      
-                  _jetll = k;
-                  _jetlt = l;
-              }
+              _deltaM.push_back((val2-val1)/2);
+              _avgM.push_back((val2+val1)/2);
+              _minJetPt.push_back(min(jetPt,l_jetPt));
 
                   
           }
@@ -265,13 +234,12 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       //analysis
       met = evt_pfmet_type1cor();;
 
-      delta_m = delta_m_min;
-      avg_m = _sum_m/2;
-
       maxPt = _maxPt;
 
       jets_p4 = pfjets_p4();
       jets_p4Correction = pfjets_corL1FastL2L3();
+      
+      jets_p4_min = _jets_p4_min;
       jets_p4_minCorrection = _jets_p4_minCorrection;
 
       type = hyp_type().at(index);
@@ -286,27 +254,15 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       lt_charge = hyp_lt_charge().at(index);
       lt_id = hyp_lt_id().at(index);
       lt_index = hyp_lt_index().at(index);
+
       btagDiscriminant = pfjets_combinedSecondaryVertexBJetTag();
       scale_1fb = evt_scale1fb();
       numEvents = tree->GetEntries();
-      //jets_p4 = pfjets_p4().at(index);
       file = Form("%s", currentFile->GetTitle());
-
-      nJetsPt20 = _nJetsPt20;
-      nJetsPt30 = _nJetsPt30;
-      nJetsPt40 = _nJetsPt40;
-      nJetsPt50 = _nJetsPt50;
-      nJetsPt60 = _nJetsPt60;
-
-
-      nJets = _nJets;
-      
-
-      jets_p4_min = _jets_p4_min;
-
-      if ( _jetll != -1)  jetll_p4 = pfjets_p4().at(_jetll);
-      if (_jetlt != -1)  jetlt_p4 = pfjets_p4().at(_jetlt);
-
+    
+      deltaM = _deltaM;
+      avgM = _avgM;
+      minJetPt = _minJetPt;
 
       eventNumber = evt_event();
       runNumber = evt_run();

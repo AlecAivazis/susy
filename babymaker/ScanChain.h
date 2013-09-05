@@ -55,8 +55,6 @@ class babyMaker {
   LorentzVector lt_p4;
   LorentzVector total_p4;
 
-  LorentzVector jetll_p4;
-  LorentzVector jetlt_p4;
   
   int ll_id;
   int lt_id;
@@ -68,14 +66,7 @@ class babyMaker {
   float scale_1fb;
   std::vector<float> btagDiscriminant;
 
-  int nJetsPt20;
-  int nJetsPt30;
-  int nJetsPt40;
-  int nJetsPt50;
-  int nJetsPt60;
-  
 
-  int nJets;
 
   int numEvents;
 
@@ -87,8 +78,9 @@ class babyMaker {
   float lt_iso;
 
 
-  float delta_m;
-  float avg_m;
+  vector<float> deltaM;
+  vector<float> avgM;
+  vector<float> minJetPt;
 
   float maxPt;
 
@@ -117,8 +109,9 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("lt_p4", &lt_p4);
   BabyTree_->Branch("total_p4", &total_p4);
 
-  BabyTree_->Branch("delta_m", &delta_m);
-  BabyTree_->Branch("avg_m", &avg_m);
+  BabyTree_->Branch("deltaM", &deltaM);
+  BabyTree_->Branch("avgM", &avgM);
+  BabyTree_->Branch("minJetPt", &minJetPt);
   BabyTree_->Branch("maxPt", &maxPt);
   
   BabyTree_->Branch("ll_id", &ll_id);
@@ -130,17 +123,6 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
   
   BabyTree_->Branch("lt_iso", &lt_iso);
   BabyTree_->Branch("ll_iso", &ll_iso);
-  
-  BabyTree_->Branch("nJetsPt20", &nJetsPt20);
-  BabyTree_->Branch("nJetsPt30", &nJetsPt30);
-  BabyTree_->Branch("nJetsPt40", &nJetsPt40);
-  BabyTree_->Branch("nJetsPt50", &nJetsPt50);
-  BabyTree_->Branch("nJetsPt60", &nJetsPt60);
-
-  BabyTree_->Branch("nJets", &nJets);
-  
-  BabyTree_->Branch("jetll_p4", &jetll_p4);
-  BabyTree_->Branch("jetlt_p4", &jetlt_p4);
   
   BabyTree_->Branch("eventNumber", &eventNumber);
   BabyTree_->Branch("runNumber", &runNumber);
@@ -171,14 +153,6 @@ void babyMaker::InitBabyNtuple () {
 
   scale_1fb = 1;
 
-  nJetsPt20 = 0;
-  nJetsPt30 = 0;
-  nJetsPt40 = 0;
-  nJetsPt50 = 0;
-  nJetsPt60 = 0;
-
-  nJets = 0;
-
   eventNumber = -1;
   runNumber = -1;
   lumiBlock = 1;
@@ -186,8 +160,6 @@ void babyMaker::InitBabyNtuple () {
   ll_iso = 0.0;
   lt_iso = 0.0;
 
-  delta_m = 0;
-  avg_m = 0;
   maxPt = 0;
 
   numEvents = 0;
