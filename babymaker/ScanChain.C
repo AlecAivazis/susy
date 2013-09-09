@@ -201,7 +201,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
                   
               // cuts on l loop
               if (l == k) continue;
-              float l_jetPt = pfjets_p4().at(k).pt() * pfjets_corL1FastL2L3().at(k);
+              float l_jetPt = pfjets_p4().at(l).pt() * pfjets_corL1FastL2L3().at(l);
               if (l_jetPt < 20) continue; 
                 
               float l_dR_lt = ROOT::Math::VectorUtil::DeltaR(pfjets_p4().at(l), hyp_lt_p4().at(index));
