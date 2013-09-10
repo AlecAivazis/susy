@@ -138,6 +138,9 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       vector<float> _deltaM;
       vector<float> _avgM;
       vector<float> _minJetPt;
+      
+      float deltaMin40 = 1000;
+      float _avgM40 = 0;
 
 
       // only grab the hypothesis with the biggest pt
@@ -169,6 +172,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       }
 
       if (index == -1) continue;
+      
+      int _nBtags = 0;
 
       // now that we have one hyp from each event, loop over the jets, count them and find the 
       // best delta_m pair and store those jets
@@ -193,9 +198,19 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           _jets_p4_minCorrection.push_back(pfjets_corL1FastL2L3().at(k));
 
 
-         
+          _nBtags++;
+
 
           float val1 = (hyp_ll_p4().at(index) + pfjets_p4().at(k)).mass();
+
+          if (jetPt < 40) continue;
+
+          float _deltaM40 = 0;
+
+          float val140 = (hyp_ll_p4().at(index) + pfjets_p4().at(k)).mass();
+
+
+
               
           for (unsigned int l = 0; l< pfjets_p4().size(); l++){
                   
@@ -220,7 +235,16 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
               _avgM.push_back((val2+val1)/2);
               _minJetPt.push_back(min(jetPt,l_jetPt));
 
-                  
+              if (l_jetPt < 40) continue;
+
+              float val240 = (hyp_lt_p4().at(index) + pfjets_p4().at(l)).mass();
+    
+              _deltaM40 = val240 - val140;
+              if (_deltaM40 <= deltaMin40) {
+                  deltaMin40 = _deltaM40;
+                  _avgM40 = (val140 + val240)/2; 
+              }
+
           }
 
       }
@@ -233,6 +257,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
       //analysis
       met = evt_pfmet_type1cor();;
+
+      nBtags = _nBtags;
 
       maxPt = _maxPt;
 
@@ -263,6 +289,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       deltaM = _deltaM;
       avgM = _avgM;
       minJetPt = _minJetPt;
+      deltaM40 = deltaMin40;
+      avgM40 = _avgM40;
 
       eventNumber = evt_event();
       runNumber = evt_run();

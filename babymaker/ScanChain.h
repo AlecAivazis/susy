@@ -62,6 +62,8 @@ class babyMaker {
   int lt_charge;
   int ll_index;
   int lt_index;
+  
+  int nBtags;
 
   float scale_1fb;
   std::vector<float> btagDiscriminant;
@@ -83,6 +85,8 @@ class babyMaker {
   vector<float> minJetPt;
 
   float maxPt;
+  float avgM40;
+  float deltaM40;
 
   string file;
 };
@@ -113,6 +117,8 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("avgM", &avgM);
   BabyTree_->Branch("minJetPt", &minJetPt);
   BabyTree_->Branch("maxPt", &maxPt);
+  BabyTree_->Branch("avgM40", &avgM40);
+  BabyTree_->Branch("deltaM40", &deltaM40);
   
   BabyTree_->Branch("ll_id", &ll_id);
   BabyTree_->Branch("lt_id", &lt_id);
@@ -133,6 +139,8 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
 
   BabyTree_->Branch("numEvents", &numEvents);
 
+  BabyTree_->Branch("nBtags", &nBtags);
+
   BabyTree_->Branch("file", &file);
 
   return;
@@ -140,7 +148,9 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
 
 void babyMaker::InitBabyNtuple () {
 
-  met        = -999.0;
+  met = -999.0;
+
+  nBtags = 0;
 
   type = -1;
 
@@ -156,6 +166,9 @@ void babyMaker::InitBabyNtuple () {
   eventNumber = -1;
   runNumber = -1;
   lumiBlock = 1;
+
+  deltaM40 = 999;
+  avgM40 = 999;
 
   ll_iso = 0.0;
   lt_iso = 0.0;
