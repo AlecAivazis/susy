@@ -163,7 +163,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           if (hyp_type().at(i) == 3) continue;
 
           // select the highest pt hypothesis
-          float sumPt = hyp_lt_p4().at(i).pt() + hyp_ll_p4().at(i).pt();
+          float sumPt = (hyp_lt_p4().at(i) + hyp_ll_p4().at(i)).pt();
 
           if (sumPt > _maxPt){
               _maxPt = sumPt;
