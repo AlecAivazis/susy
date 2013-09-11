@@ -29,7 +29,7 @@ class babyMaker {
     delete BabyTree_;
   };
 
-  void ScanChain(TChain* chain, std::string baby_name = "testSample", unsigned int numEvents = 0);
+  void ScanChain(TChain* chain, std::string baby_name = "testSample", unsigned int numEvents = 0, bool showControlRegions = false);
 
   void MakeBabyNtuple(const char *);
   void InitBabyNtuple();

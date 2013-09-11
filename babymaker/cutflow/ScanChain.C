@@ -23,7 +23,7 @@ using namespace std;
 using namespace tas;
 
 
-void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int numEvent){
+void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int numEvent, bool showControlRegions){
 
     if (numEvent != 0 ){
         cout << "Processing the first " << numEvent << " file(s)" << endl;
@@ -44,6 +44,9 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
   double bTagsCounter = 0;
   double typeCounter = 0;
   double ptCounter =0;
+  double CR1counter =0;
+  double CR2counter =0;
+  double CR3counter =0;
   
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
 
@@ -78,11 +81,17 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
           int _goodCounter = 0;
           int _typeCounter = 0;
 
+          int index = 0;
+
           int jetCounter = 0;
           
           float looseDiscriminant = .244;
           
           float maxPt = -1;
+
+          float avgM = 0 ; 
+          float deltaM = 999;
+        
 
           for (unsigned int i = 0; i< hyp_p4().size(); i++){
          
@@ -98,8 +107,14 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
               
               if (hyp_type().at(i) == 3) continue;
               _typeCounter++;
+              
+              float maxPtOld = maxPt;
+              maxPt = (hyp_ll_p4().at(i) + hyp_lt_p4().at(i)).pt() > maxPt ? (hyp_ll_p4().at(i) + hyp_lt_p4().at(i)).pt() : maxPt;
 
-              maxPt = (min(hyp_ll_p4().at(i).pt(), hyp_lt_p4().at(i).pt()) > maxPt) ? min(hyp_ll_p4().at(i).pt(), hyp_lt_p4().at(i).pt()) : maxPt;
+              
+              if (maxPt > maxPtOld){
+                  index = i;
+              }
               
           }
           
@@ -121,16 +136,46 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
               if (abs(pfjets_p4().at(k).eta()) > 2.4) continue;
                   
               float _bTag = pfjets_combinedSecondaryVertexBJetTag().at(k);
-              if (_bTag > looseDiscriminant){
+              if (_bTag >= looseDiscriminant){
                   jetCounter++;
+
+                  if (!showControlRegions) continue;
+                  
+                  float val1 = (hyp_ll_p4().at(index) + pfjets_p4().at(k)).mass();
+
+                  for (unsigned int j = 0; j < pfjets_p4().size(); j++){
+                      
+                      if (pfjets_p4().at(j).pt() < 20) continue;
+                      if (abs(pfjets_p4().at(j).eta()) > 2.4) continue;
+                  
+                      float l_bTag = pfjets_combinedSecondaryVertexBJetTag().at(j);
+                      if (l_bTag >= looseDiscriminant){
+                          
+                          float val2 =  (hyp_ll_p4().at(index) + pfjets_p4().at(j)).mass();
+                          
+                          float deltaMOld = deltaM;
+                          deltaM = (val2-val1)/2 < deltaM ? (val2-val1)/2 : deltaM; 
+                          
+                          if (deltaM < deltaMOld){
+                              avgM = (val1+val2)/2;
+                          }
+                      }
+                  }
               }
           }
+
           if (jetCounter >= 2) bTagsCounter++;
           else continue;
   
           
           if (maxPt > 40) ptCounter++;
           else continue;
+                  
+          if (!showControlRegions) continue;
+
+          if ((avgM >= 50 && avgM <= 350) && (deltaM > -150 && deltaM < 150)) CR1counter++;
+          if ((avgM >= 100 && avgM <= 300) && (deltaM > -100 && deltaM < 100)) CR2counter++;
+          if ((avgM >= 150 && avgM <= 250) && (deltaM > -50 && deltaM < 50)) CR3counter++;
           
       }
   }
@@ -146,6 +191,14 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
   stream << Form("nBtags > 2: %.0f (%.2f)", bTagsCounter, bTagsCounter/nEventsMini * 100) << endl;
   stream << Form("Hypothesis Pt > 40: %.0f (%.2f)", ptCounter, ptCounter/nEventsMini * 100) << endl;
   stream << "--------------------------------" << endl;
+
+  if (showControlRegions){
+
+      stream << Form("Control Region 1: %.1f", (CR1counter/nEventsMini) * 100 ) <<  " " << CR1counter/9 << endl; 
+      stream << Form("Control Region 2: %.1f", (CR2counter/nEventsMini) * 100 ) << " " << CR2counter/4 << endl; 
+      stream << Form("Control Region 3: %.1f", (CR3counter/nEventsMini) * 100 ) << " " << CR3counter/1 << endl; 
+      stream << "--------------------------------" << endl;
+  }
 
   stream.close();
   

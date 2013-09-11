@@ -11,6 +11,6 @@ doSignal(std::string file_name ="signal200", int numEvents=0)
   TChain *signal = new TChain("Events"); 
   signal->Add("/home/users/aaivazis/susy/signal200RAW.root");
 
-  looper->ScanChain(signal, file_name, numEvents); 
+  looper->ScanChain(signal, file_name, numEvents, true); 
 
 }
