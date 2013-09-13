@@ -48,6 +48,9 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
   double CR1counter =0;
   double CR2counter =0;
   double CR3counter =0;
+  double idCounter = 0;
+  double hypPt20Counter = 0;
+  double etaCounter = 0;
   
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
 
@@ -79,8 +82,10 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
 
           // int counter = hyp_p4().size();
           int _osCounter =0; 
-          int _goodCounter = 0;
           int _typeCounter = 0;
+          int _idCounter = 0;
+          int _hypPt20Counter = 0;
+          int _etaCounter = 0;
 
           int index = -1;
 
@@ -98,11 +103,15 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
           for (unsigned int i = 0; i< hyp_p4().size(); i++){
          
               if (!samesign2011::isNumeratorHypothesis(i)) continue;
+              _idCounter++;
+              
               if (hyp_ll_p4().at(i).pt() < 20) continue;
               if (hyp_lt_p4().at(i).pt() < 20) continue;
+              _hypPt20Counter++;
+
               if (abs(hyp_ll_p4().at(i).eta()) > 2.4) continue;
               if (abs(hyp_lt_p4().at(i).eta()) > 2.4) continue;
-              _goodCounter++;
+              _etaCounter++;
               
               if (hyp_ll_charge().at(i)*hyp_lt_charge().at(i) > 0)  continue;
               _osCounter++;
@@ -120,16 +129,22 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
               
           }
           
-          if (_goodCounter > 0) goodCounter++;
+          if (_idCounter > 0) idCounter++;
           else continue;
 
+          if (_hypPt20Counter > 0) hypPt20Counter++;
+          else continue;
+
+          if (_etaCounter > 0) etaCounter++;
+          else continue;
+          
           if (_osCounter > 0) osCounter++;
           else continue;
           
-          if (maxPt == -1) continue;
-      
           if (_typeCounter == 0 ) continue;
           typeCounter++;
+
+          if (maxPt == -1) continue;
               
           for (unsigned int k = 0; k < pfjets_p4().size(); k++){
 
@@ -187,7 +202,9 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
   stream << sample_name << ": " << endl;
   stream << Form("Source: %d", nEventsMini) << endl;
   stream << Form("Events with Hypothesis: %.0f (%.2f)", hypCounter, hypCounter/nEventsMini * 100) << endl;
-  stream << Form("'Good' Hypothesis (ID/Isolation/eta/Pt): %.0f (%.2f)", goodCounter, goodCounter/nEventsMini * 100) << endl;
+  stream << Form("ID/Isolation: %.0f (%.2f)", idCounter, idCounter/nEventsMini * 100) << endl;
+  stream << Form("Hypothesis Pt > 20: %.0f (%.2f)", hypPt20Counter, hypPt20Counter/nEventsMini * 100) << endl;
+  stream << Form("Eta < 2.4: %.0f (%.2f)", etaCounter, etaCounter/nEventsMini * 100) << endl;
   stream << Form("Oppositely Charged: %.0f (%.2f)", osCounter, osCounter/nEventsMini * 100) << endl;
   stream << Form("Ignoring ee events: %.0f (%.2f)", typeCounter, typeCounter/nEventsMini * 100) << endl;
   stream << Form("nBtags > 2: %.0f (%.2f)", bTagsCounter, bTagsCounter/nEventsMini * 100) << endl;
