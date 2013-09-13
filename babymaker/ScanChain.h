@@ -48,6 +48,8 @@ class babyMaker {
   std::vector<float> jets_p4Correction;
   std::vector<float> jets_p4_minCorrection;
   std::vector<LorentzVector> jets_p4_min;
+  std::vector<LorentzVector> generated_p4;
+  std::vector<int> generated_id;
 
   int type;
 
@@ -67,6 +69,7 @@ class babyMaker {
 
   float scale_1fb;
   std::vector<float> btagDiscriminant;
+  
 
 
 
@@ -83,6 +86,7 @@ class babyMaker {
   vector<float> deltaM;
   vector<float> avgM;
   vector<float> minJetPt;
+  
 
   float maxPt;
   float avgM40;
@@ -136,7 +140,7 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
   
   BabyTree_->Branch("scale_1fb", &scale_1fb);
   BabyTree_->Branch("btagDiscriminant", &btagDiscriminant);
-
+  
   BabyTree_->Branch("numEvents", &numEvents);
 
   BabyTree_->Branch("nBtags", &nBtags);
