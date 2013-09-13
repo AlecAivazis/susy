@@ -38,7 +38,8 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
   int nEventsMini = 0;
 
   unsigned int fileCounter = 0;
-
+  
+  double hypCounter = 0;
   double goodCounter =0;
   double osCounter = 0;
   double bTagsCounter = 0;
@@ -81,7 +82,7 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
           int _goodCounter = 0;
           int _typeCounter = 0;
 
-          int index = 0;
+          int index = -1;
 
           int jetCounter = 0;
           
@@ -92,6 +93,7 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
           float avgM = 0 ; 
           float deltaM = 999;
         
+          if (hyp_p4().size() !=0) hypCounter++;
 
           for (unsigned int i = 0; i< hyp_p4().size(); i++){
          
@@ -118,7 +120,6 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
               
           }
           
-
           if (_goodCounter > 0) goodCounter++;
           else continue;
 
@@ -185,6 +186,7 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
 
   stream << sample_name << ": " << endl;
   stream << Form("Source: %d", nEventsMini) << endl;
+  stream << Form("Events with Hypothesis: %.0f (%.2f)", hypCounter, hypCounter/nEventsMini * 100) << endl;
   stream << Form("'Good' Hypothesis (ID/Isolation/eta/Pt): %.0f (%.2f)", goodCounter, goodCounter/nEventsMini * 100) << endl;
   stream << Form("Oppositely Charged: %.0f (%.2f)", osCounter, osCounter/nEventsMini * 100) << endl;
   stream << Form("Ignoring ee events: %.0f (%.2f)", typeCounter, typeCounter/nEventsMini * 100) << endl;
