@@ -11,8 +11,8 @@
 // CMS2
 #include "CMS2.h"
 
-#include "/home/users/aaivazis/CORE/muonSelections.h"
 #include "/home/users/aaivazis/CORE/electronSelections.h"
+#include "/home/users/aaivazis/CORE/muonSelections.h"
 #include "/home/users/aaivazis/CORE/ssSelections.h"
 
 // header
@@ -22,52 +22,23 @@ using namespace std;
 using namespace tas;
 using namespace ROOT::Math::VectorUtil;
 
-/*
-
-enum IsolationType { DET_ISO, TIGHT_DET_ISO, COR_DET_ISO };
-
-
-bool isIsolatedLepton(int id, int idx, enum IsolationType iso_type)
-{
-    // electrons
-    if (abs(id) == 11) {
-        if (iso_type == DET_ISO)
-            return (pass_electronSelection(idx, electronSelection_ssV6_iso));
-        else if (iso_type == COR_DET_ISO)
-            return (electronIsolation_cor_rel_v1(idx, true) < 0.10);
-        else if (iso_type == TIGHT_DET_ISO)
-            return (electronIsolation_rel_v1(idx, true) < 0.10);
-    }
-
-    // muons
-    if (abs(id) == 13) {
-        if (iso_type == DET_ISO)
-            return (muonIsoValue(idx, false) < 0.15);
-        else if (iso_type == COR_DET_ISO)
-            return (muonCorIsoValue(idx, false) < 0.10);
-        else if (iso_type == TIGHT_DET_ISO)
-            return (muonIsoValue(idx, false) < 0.10);
-    }
-
-    return false;
+bool matches(LorentzVector a, LorentzVector b){
+    return DeltaR(a,b) < 0.4;
 }
 
-bool isNumeratorLepton(int id, int idx, enum IsolationType iso_type)
-{
-    return (samesign2011::isGoodLepton(id, idx) && isIsolatedLepton(id, idx, iso_type));
+bool isValidPair(int hypIndex, int jetIndex){
+
+    // require the pair to be either mu- b or mu+ bbar
+    // 
+ 
+    // if(genps_id().at(hypIndex) * genps_id().at(jetIndex) ) return false;
+    
+    // muons have id = 13
+    // b's have id = 5
+    // i need bbar and muon (or opposite)
+    return genps_id().at(hypIndex) * genps_id().at(jetIndex) == -65;
+
 }
-
-bool isNumeratorHypothesis(int idx, enum IsolationType iso_type = DET_ISO)
-{
-    if (!isNumeratorLepton(cms2.hyp_lt_id().at(idx), cms2.hyp_lt_index().at(idx), iso_type))
-        return false;
-    if (!isNumeratorLepton(cms2.hyp_ll_id().at(idx), cms2.hyp_ll_index().at(idx), iso_type))
-        return false;
-
-    return true;
-}
-
-*/
 
 void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int numEvent){
 
@@ -147,8 +118,12 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       // only grab the hypothesis with the biggest pt
       for (unsigned int i = 0; i< hyp_p4().size(); i++){
       
-          // good hypothesis
-          if (!samesign2011::isNumeratorHypothesis(i)) continue;
+          // check ID
+          if (abs(hyp_lt_id().at(i)) == 11  && !samesign2011::isNumeratorHypothesis(i)) continue;
+          if (abs(hyp_ll_id().at(i)) == 11  && !samesign2011::isNumeratorHypothesis(i)) continue;
+          
+          if (abs(hyp_lt_id().at(i)) == 13 && !muonId(hyp_lt_index().at(i), NominalOSv1) ) continue;
+          if (abs(hyp_ll_id().at(i)) == 13 && !muonId(hyp_ll_index().at(i), NominalOSv1) ) continue;               
 
           if (hyp_ll_p4().at(i).pt() < 20) continue;
           if (hyp_lt_p4().at(i).pt() < 20) continue;
@@ -175,8 +150,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       if (index == -1) continue;
       
       int _nBtags = 0;
-      int jetllIndex = 0;
-      int jetltIndex = 0;
+      int jetllIndex = -1;
+      int jetltIndex = -1;
 
       // now that we have one hyp from each event, loop over the jets, count them and find the 
       // best delta_m pair and store those jets
@@ -243,7 +218,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
               float val240 = (hyp_lt_p4().at(index) + pfjets_p4().at(l)).mass();
     
               _deltaM40 = val240 - val140;
-              if (_deltaM40 <= deltaMin40) {
+              if (abs(_deltaM40) <= abs(deltaMin40)) {
                   deltaMin40 = _deltaM40;
                   _avgM40 = (val140 + val240)/2; 
                   jetltIndex = l;
@@ -252,45 +227,83 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           }
       }
 
+      if (jetltIndex == -1 || jetllIndex == -1 ) continue;
+
+
 
       // now that we've selected a hypothesis, loop over the generated p4
       // and find the matching particle
-      LorentzVector llGenerated;
-      LorentzVector ltGenerated;
-      LorentzVector jetllGenerated;
-      LorentzVector jetltGenerated;
+      int llGenerated = -1;
+      int ltGenerated = -1;
+      int jetllGenerated = -1;
+      int jetltGenerated =-1;
 
-      for (int i = 0; i < genps_p4().size(); i++ ){
+      
+      float ll_dRmin = 1001;
+      float lt_dRmin = 1001;
+      float llJet_dRmin = 1001;
+      float ltJet_dRmin = 1001;
 
-          if (matches(genps_p4().at(i), hyp_ll_p4().at(index))){
-              llGenerated = genps_p4().at(i);
-              continue;
-          }
+      for (unsigned int i = 0; i < genps_p4().size(); i++ ){
+
+          float deltaR = DeltaR(genps_p4().at(i), hyp_ll_p4().at(index));
           
-          if (matches(genps_p4().at(i), hyp_lt_p4().at(index))){
-              ltGenerated = genps_p4().at(i);
-              continue;
+          if (deltaR < ll_dRmin) {
+              ll_dRmin = deltaR;
+              llGenerated = i;
           }
+      }
+      
+      for (unsigned int i = 0; i < genps_p4().size(); i++ ){
+
+          if (i == llGenerated) continue;
+
+          float deltaR = DeltaR(genps_p4().at(i), hyp_lt_p4().at(index));
           
-          if (matches(genps_p4().at(i), pfjet_p4().at(jetltIndex))){
-              jetltGenerated = genps_p4().at(i);
-              continue;
+          if (deltaR < lt_dRmin) {
+              lt_dRmin = deltaR;
+              ltGenerated = i;
           }
-          
-          if (matches(genps_p4().at(i), pfjet_p4().at(jetllIndex)))
-              jetllGenerated = genps_p4().at(i);
       }
 
-      float generateVal1 = 0;
-      float generatedVal2 = 0;
+      for (unsigned int i = 0; i < genps_p4().size(); i++ ){
 
-      if (isValidPair(llGenerated, jetllGenerated))
-          generatedVal1 = (llGenerated + jetllGenerated).mass();
+          if (i == llGenerated || i == ltGenerated) continue;
+
+          float deltaR = DeltaR(genps_p4().at(i), pfjets_p4().at(jetllIndex));
+          
+          if (deltaR < llJet_dRmin) {
+              llJet_dRmin = deltaR;
+              jetllGenerated = i;
+          }
+      }
+  
+      for (unsigned int i = 0; i < genps_p4().size(); i++ ){
+
+          if (i == llGenerated || i == ltGenerated || i == jetllGenerated) continue;
+
+          float deltaR = DeltaR(genps_p4().at(i), pfjets_p4().at(jetltIndex));
+          
+          if (deltaR < ltJet_dRmin) {
+              ltJet_dRmin = deltaR;
+              jetltGenerated = i;
+          }
+      }    
 
 
-      if (isValidPair(ltGenerated, jetltGenerated))
-          generatedVal2 = (ltGenerated + jetltGenerated).mass();
+      float generatedVal1 = -1;
+      float generatedVal2 = -1;
+
+      if (llGenerated != -1 && ltGenerated != -1 && jetllGenerated != -1 && jetltGenerated != -1){
+
+          if (isValidPair(llGenerated, jetllGenerated))
+              generatedVal1 = (genps_p4().at(llGenerated) + genps_p4().at(jetllGenerated)).mass();
+
+
+          if (isValidPair(ltGenerated, jetltGenerated))
+              generatedVal2 = (genps_p4().at(ltGenerated) + genps_p4().at(jetltGenerated)).mass();
      
+      }
 
       // Progress
       CMS2::progress( nEventsTotal, nEventsChain );
@@ -338,6 +351,11 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       runNumber = evt_run();
       lumiBlock = evt_lumiBlock();
 
+      if (generatedVal2 != -1 && generatedVal1 != -1){
+          generatedAvgMass = (generatedVal2 + generatedVal1)/2;
+          generatedDeltaMass = (generatedVal2 - generatedVal1)/2;
+      }
+
       
       if (abs(lt_id) == 13) lt_iso = muonIsoValuePF2012_deltaBeta(hyp_lt_index().at(index));
       if (abs(ll_id) == 13) ll_iso = muonIsoValuePF2012_deltaBeta(hyp_ll_index().at(index));
@@ -366,12 +384,3 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
   return;
 }
 
-bool matches(LorentzVector a, LoretzVector b){
-    return ROOT::Math::VectorUtil::DeltaR(a ,b) < 0.1;
-}
-
-bool isValidPair(int hypIndex, int jetIndex){
-
-    if 
-
-}

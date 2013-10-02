@@ -51,6 +51,7 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
   double idCounter = 0;
   double hypPt20Counter = 0;
   double etaCounter = 0;
+  double muonCounter = 0;
   
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
 
@@ -101,8 +102,13 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
           if (hyp_p4().size() !=0) hypCounter++;
 
           for (unsigned int i = 0; i< hyp_p4().size(); i++){
-         
-              if (!samesign2011::isNumeratorHypothesis(i)) continue;
+              if (abs(hyp_lt_id().at(i)) == 11  && !samesign2011::isNumeratorHypothesis(i)) continue;
+              if (abs(hyp_ll_id().at(i)) == 11  && !samesign2011::isNumeratorHypothesis(i)) continue;
+              //if (!samesign2011::isNumeratorHypothesis(i)) continue;
+          
+              if (abs(hyp_lt_id().at(i)) == 13 && !muonId(hyp_lt_index().at(i), NominalOSv1) ) continue;
+              if (abs(hyp_ll_id().at(i)) == 13 && !muonId(hyp_ll_index().at(i), NominalOSv1) ) continue;
+
               _idCounter++;
               
               if (hyp_ll_p4().at(i).pt() < 20) continue;
@@ -119,6 +125,7 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
               if (hyp_type().at(i) == 3) continue;
               _typeCounter++;
               
+
               float maxPtOld = maxPt;
               maxPt = (hyp_ll_p4().at(i) + hyp_lt_p4().at(i)).pt() > maxPt ? (hyp_ll_p4().at(i) + hyp_lt_p4().at(i)).pt() : maxPt;
 
@@ -143,6 +150,8 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
           
           if (_typeCounter == 0 ) continue;
           typeCounter++;
+          
+          if (hyp_type().at(index) == 13) muonCounter++;
 
           if (maxPt == -1) continue;
               
@@ -207,6 +216,7 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
   stream << Form("Eta < 2.4: %.0f (%.2f)", etaCounter, etaCounter/nEventsMini * 100) << endl;
   stream << Form("Oppositely Charged: %.0f (%.2f)", osCounter, osCounter/nEventsMini * 100) << endl;
   stream << Form("Ignoring ee events: %.0f (%.2f)", typeCounter, typeCounter/nEventsMini * 100) << endl;
+  stream << Form("Muon Events: %.0f (%.2f)", muonCounter, muonCounter/nEventsMini * 100) << endl;
   stream << Form("nBtags > 2: %.0f (%.2f)", bTagsCounter, bTagsCounter/nEventsMini * 100) << endl;
   stream << Form("Hypothesis Pt > 40: %.0f (%.2f)", ptCounter, ptCounter/nEventsMini * 100) << endl;
   stream << "--------------------------------" << endl;
