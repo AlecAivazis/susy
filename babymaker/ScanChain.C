@@ -22,10 +22,6 @@ using namespace std;
 using namespace tas;
 using namespace ROOT::Math::VectorUtil;
 
-bool matches(LorentzVector a, LorentzVector b){
-    return DeltaR(a,b) < 0.4;
-}
-
 bool isValidPair(int hypIndex, int jetIndex){
 
     // require the pair to be either mu- b or mu+ bbar
@@ -128,9 +124,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           if (hyp_ll_p4().at(i).pt() < 20) continue;
           if (hyp_lt_p4().at(i).pt() < 20) continue;
           
-          
-          if (hyp_ll_p4().at(i).eta() > 2.4) continue;
-          if (hyp_lt_p4().at(i).eta() > 2.4) continue;
           
           // oppositely charged leptons
           if (hyp_ll_charge().at(i)*hyp_lt_charge().at(i) > 0) continue;
