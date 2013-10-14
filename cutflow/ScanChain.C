@@ -46,6 +46,7 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
   double goodCounter =0;
   double osCounter = 0;
   double bTagsCounter = 0;
+  double jetPtCounter = 0;
   double typeCounter = 0;
   double ptCounter = 0;
   double CR1counter =0;
@@ -102,6 +103,8 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
           int index = -1;
 
           int jetCounter = 0;
+
+          int _jetPtCounter = 0;
           
           float looseDiscriminant = .244;
           
@@ -208,7 +211,8 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
               
           for (unsigned int k = 0; k < pfjets_p4().size(); k++){
 
-              if (pfjets_p4().at(k).pt() < 20) continue;
+              if (pfjets_p4().at(k).pt() < 40) continue;
+              _jetPtCounter++;
               if (abs(pfjets_p4().at(k).eta()) > 2.4) continue;
                   
               float _bTag = pfjets_combinedSecondaryVertexBJetTag().at(k);
@@ -221,7 +225,7 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
 
                   for (unsigned int j = 0; j < pfjets_p4().size(); j++){
                       
-                      if (pfjets_p4().at(j).pt() < 20) continue;
+                      if (pfjets_p4().at(j).pt() < 40) continue;
                       if (abs(pfjets_p4().at(j).eta()) > 2.4) continue;
                   
                       float l_bTag = pfjets_combinedSecondaryVertexBJetTag().at(j);
@@ -239,6 +243,9 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
                   }
               }
           }
+
+          if(_jetPtCounter > 0) jetPtCounter++;
+          else continue;
 
           if (jetCounter >= 2) bTagsCounter++;
           else continue;
@@ -262,19 +269,20 @@ void babyMaker::ScanChain(TChain* chain, std::string sample_name, unsigned int n
   stream << sample_name << ": " << endl;
   stream << Form("Source: %d", nEventsMini) << endl;
   stream << Form("Events with Hypothesis: %.0f (%.2f)", hypCounter, hypCounter/nEventsMini * 100) << endl;
-  stream << "Id/Iso: " << endl;
-  stream << "--------------------------------" << endl;
+  stream <<  endl;
+  stream << "Id/Iso" << endl;
   stream << Form("Electron Isolation: %.0f (%.2f)", numeratorHypothesisCounter, numeratorHypothesisCounter/nEventsMini * 100) << endl;
   stream << Form("Eta < 2.4: %.0f (%.2f)", etaCounter, etaCounter/nEventsMini * 100) << endl;
   stream << Form("Average chi^2 <= 10: %.0f (%.2f)", chiCounter, chiCounter/nEventsMini * 100) << endl;
   stream << Form("Tight muon discriminant: %.0f (%.2f)", muonIdCounter, muonIdCounter/nEventsMini * 100) << endl;
   stream << Form("trks_d0_pv < .2: %.0f (%.2f)", idCounter, idCounter/nEventsMini * 100) << endl;
   stream << Form("trks_dz_pv < .1: %.0f (%.2f)", id2Counter, id2Counter/nEventsMini * 100) << endl;
-  stream << "--------------------------------" << endl;
+  stream << endl;
   stream << Form("Hypothesis Pt > 20: %.0f (%.2f)", hypPt20Counter, hypPt20Counter/nEventsMini * 100) << endl;
   stream << Form("Oppositely Charged: %.0f (%.2f)", osCounter, osCounter/nEventsMini * 100) << endl;
   stream << Form("Ignoring ee events: %.0f (%.2f)", typeCounter, typeCounter/nEventsMini * 100) << endl;
   stream << Form("Muon Events: %.0f (%.2f)", muonCounter, muonCounter/nEventsMini * 100) << endl;
+  stream << Form("Jet Pt > 40: %.0f (%.2f)", jetPtCounter, jetPtCounter/nEventsMini * 100) << endl;
   stream << Form("nBtags > 2: %.0f (%.2f)", bTagsCounter, bTagsCounter/nEventsMini * 100) << endl;
   stream << Form("Hypothesis Pt > 40: %.0f (%.2f)", ptCounter, ptCounter/nEventsMini * 100) << endl;
   stream << "--------------------------------" << endl;
