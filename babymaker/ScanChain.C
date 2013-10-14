@@ -55,8 +55,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
   unsigned int fileCounter = 0;
 
-  cout << "NumEvents : "<<  numEvent << endl;
-  
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
 
     fileCounter++;
@@ -85,7 +83,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
 
     for(unsigned int event = 0; event < nEventsTree; ++event) {
-    
 
       // Get Event Content
       tree->LoadTree(event);
@@ -113,13 +110,13 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
       // only grab the hypothesis with the biggest pt
       for (unsigned int i = 0; i< hyp_p4().size(); i++){
-      
+          
           // check ID
           if (abs(hyp_lt_id().at(i)) == 11  && !samesign2011::isNumeratorHypothesis(i)) continue;
           if (abs(hyp_ll_id().at(i)) == 11  && !samesign2011::isNumeratorHypothesis(i)) continue;
           
           if (abs(hyp_lt_id().at(i)) == 13 && !muonId(hyp_lt_index().at(i), NominalOSv1) ) continue;
-          if (abs(hyp_ll_id().at(i)) == 13 && !muonId(hyp_ll_index().at(i), NominalOSv1) ) continue;               
+          if (abs(hyp_ll_id().at(i)) == 13 && !muonId(hyp_ll_index().at(i), NominalOSv1) ) continue;              
 
           if (hyp_ll_p4().at(i).pt() < 20) continue;
           if (hyp_lt_p4().at(i).pt() < 20) continue;
@@ -142,6 +139,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
       if (index == -1) continue;
       
+
       int _nBtags = 0;
       int jetllIndex = -1;
       int jetltIndex = -1;
@@ -151,7 +149,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       for(unsigned int k = 0; k < pfjets_p4().size(); k++) {
 
           // cuts on k
-          float jetPt = pfjets_p4().at(k).pt() * pfjets_corL1FastL2L3().at(k);
+          float jetPt = (pfjets_p4().at(k) * pfjets_corL1FastL2L3().at(k)).pt();
           if (jetPt < 20) continue; 
                 
           float dR_lt = DeltaR(pfjets_p4().at(k), hyp_lt_p4().at(index));
@@ -171,25 +169,23 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
           _nBtags++;
 
-
-          float val1 = (hyp_ll_p4().at(index) + pfjets_p4().at(k)).mass();
-
           if (jetPt < 40) continue;
 
           float _deltaM40 = 0;
 
           float val140 = (hyp_ll_p4().at(index) + pfjets_p4().at(k)).mass();
 
-
-
-              
           for (unsigned int l = 0; l< pfjets_p4().size(); l++){
-                  
+
               // cuts on l loop
               if (l == k) continue;
-              float l_jetPt = pfjets_p4().at(l).pt() * pfjets_corL1FastL2L3().at(l);
+
+              float l_jetPt = (pfjets_p4().at(l) * pfjets_corL1FastL2L3().at(l)).pt();
+
               if (l_jetPt < 20) continue; 
-                
+
+              // cout << "pasedd jet pt > 20" << endl;
+
               float l_dR_lt = DeltaR(pfjets_p4().at(l), hyp_lt_p4().at(index));
               float l_dR_ll = DeltaR(pfjets_p4().at(l), hyp_ll_p4().at(index));
                     
@@ -200,17 +196,20 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
               if (l_bTag < looseDiscriminant) continue;    
               
-              float val2 = (hyp_lt_p4().at(index) + pfjets_p4().at(l)).mass();
-
-              _deltaM.push_back((val2-val1)/2);
-              _avgM.push_back((val2+val1)/2);
-              _minJetPt.push_back(min(jetPt,l_jetPt));
-
+              // cout << "passed bTag" << endl;
+              
               if (l_jetPt < 40) continue;
+              
+              // cout << "jet pt > 40";
 
               float val240 = (hyp_lt_p4().at(index) + pfjets_p4().at(l)).mass();
     
+              // cout << "calculated val240" << endl;
+
               _deltaM40 = val240 - val140;
+
+              cout << _deltaM40 << endl;
+
               if (abs(_deltaM40) <= abs(deltaMin40)) {
                   deltaMin40 = _deltaM40;
                   _avgM40 = (val140 + val240)/2; 
@@ -220,9 +219,12 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           }
       }
 
+      //      cout << jetltIndex << ", " << jetllIndex << endl;
+
       if (jetltIndex == -1 || jetllIndex == -1 ) continue;
 
 
+      // cout << "still works " << endl;
 
       // now that we've selected a hypothesis, loop over the generated p4
       // and find the matching particle
@@ -334,9 +336,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       numEvents = tree->GetEntries();
       file = Form("%s", currentFile->GetTitle());
     
-      deltaM = _deltaM;
-      avgM = _avgM;
-      minJetPt = _minJetPt;
       deltaM40 = deltaMin40;
       avgM40 = _avgM40;
 
@@ -359,6 +358,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       if (abs(ll_id) == 11) ll_iso =  0.0 ; //electronIsoValuePF2012_FastJetEffArea_v3(hyp_ll_index().at(index), .4);
 
       FillBabyNtuple();
+      cout << "I filled the event." << endl ; 
     }//end loop on events in a file
   
     

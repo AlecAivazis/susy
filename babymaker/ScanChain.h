@@ -55,7 +55,6 @@ class babyMaker {
   LorentzVector lt_p4;
   LorentzVector total_p4;
 
-  
   int ll_id;
   int lt_id;
   int ll_charge;
@@ -68,9 +67,6 @@ class babyMaker {
   float scale_1fb;
   std::vector<float> btagDiscriminant;
   
-
-
-
   int numEvents;
 
   int eventNumber;
@@ -81,11 +77,6 @@ class babyMaker {
   float lt_iso;
 
 
-  vector<float> deltaM;
-  vector<float> avgM;
-  vector<float> minJetPt;
-  
-
   float maxPt;
   float avgM40;
   float deltaM40;
@@ -94,7 +85,6 @@ class babyMaker {
 
   float generatedAvgMass;
   float generatedDeltaMass;
-
 };
 
 #endif
@@ -119,9 +109,6 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("lt_p4", &lt_p4);
   BabyTree_->Branch("total_p4", &total_p4);
 
-  BabyTree_->Branch("deltaM", &deltaM);
-  BabyTree_->Branch("avgM", &avgM);
-  BabyTree_->Branch("minJetPt", &minJetPt);
   BabyTree_->Branch("maxPt", &maxPt);
   BabyTree_->Branch("avgM40", &avgM40);
   BabyTree_->Branch("deltaM40", &deltaM40);
@@ -151,7 +138,6 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("nBtags", &nBtags);
 
   BabyTree_->Branch("file", &file);
-
   return;
 }
 

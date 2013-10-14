@@ -1,2 +1,2 @@
 #!/bin/bash
-root -b -q "doSignal.C(\"test\", 1)"
+root -b -q "doDY.C(\"test\", 1)"
