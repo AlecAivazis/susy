@@ -9,7 +9,7 @@ doZZ(std::string file_name="zz", int numEvents = 0)
  
   TChain *zz = new TChain("Events"); 
 
-  zz->Add("/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball_Summer12_DR53X-PU_S10_START53_V7A-v1/*.root");
+  zz->Add("/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/ZZJetsTo2L2Q_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23/*.root");
 
   looper->ScanChain(zz, file_name, numEvents); 
 }
