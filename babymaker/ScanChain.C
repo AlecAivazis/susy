@@ -371,9 +371,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           scale_1fb = evt_scale1fb();
           numEvents = tree->GetEntries();
           file = Form("%s", currentFile->GetTitle());
-    
-          deltaM40 = deltaMin40;
-          avgM40 = _avgM40;
 
           eventNumber = evt_event();
           runNumber = evt_run();
