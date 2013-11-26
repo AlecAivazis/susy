@@ -59,16 +59,18 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
   unsigned int fileCounter = 0;
 
-  double hypPt20Counter = 0;
-  double osCounter = 0;
-  double typeCounter = 0;
+  double _hypPt20Counter = 0;
+  double _numeratorHypothesisCounter = 0;
+  double _osCounter = 0;
+  double _typeCounter = 0;
+  double _etaCounter = 0;
+  double _muonIdCounter = 0;
+  double _muonIsoCounter = 0;
+  double _electronIdCounter = 0;
+  double _electronIsoCounter = 0;
+
   double hypCounter = 0;
-  double numeratorHypothesisCounter = 0;
-  double etaCounter = 0;
-  double chiCounter = 0;
-  double muonIdCounter = 0;
-  double idCounter = 0;
-  double id2Counter = 0;
+  double eventHypCounter = 0;
 
   // double CR1counter = 0;
   //double CR2counter = 0;
@@ -78,7 +80,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
     fileCounter++;
     
-    cout << "filecounter : "<< fileCounter <<endl;
     
     if (fileCounter > numEvent && numEvent !=0) {
         break;
@@ -95,25 +96,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
     nEventsMini = nEventsMini + nEventsTree;
 
-    /*
-    // if numEvents has been set and it would actually do something
-    if (numEvents != 0 && nEventsTree > numEvents){
-        nEventsTree = numEvents;
-    }
-    */
-
-
     for(unsigned int event = 0; event < nEventsTree; ++event) {
 
-        int _hypPt20Counter = 0;
-        int _osCounter = 0;
-        int _typeCounter = 0;
-        int _numeratorHypothesisCounter = 0;
-        int _etaCounter = 0;
-        int _chiCounter = 0;
-        int _muonIdCounter = 0;
-        int _idCounter = 0;
-        int _id2Counter = 0;
       // Get Event Content
       tree->LoadTree(event);
       cms2.GetEntry(event);
@@ -137,55 +121,13 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       float deltaMin40 = 1000;
       float _avgM40 = 0;
 
-      if (hyp_p4().size() != 0) hypCounter++;
+      if (hyp_p4().size() != 0) eventHypCounter++;
+
+      hypCounter = hypCounter + hyp_p4().size();
 
       // only grab the hypothesis with the biggest pt
       for (unsigned int i = 0; i< hyp_p4().size(); i++){
-          
-          // check ID
-          //if (abs(hyp_lt_id().at(i)) != 13) continue;
-          //if (abs(hyp_ll_id().at(i)) != 13) continue;
-  
-          if (abs(hyp_lt_id().at(i)) == 11  && !samesign2011::isNumeratorHypothesis(i)) continue;
-          if (abs(hyp_ll_id().at(i)) == 11  && !samesign2011::isNumeratorHypothesis(i)) continue;
-
-          _numeratorHypothesisCounter++;
-
-          // if (abs(hyp_lt_id().at(i)) == 13 && !muonId(hyp_lt_index().at(i), NominalOSv1) ) continue;
-          // if (abs(hyp_ll_id().at(i)) == 13 && !muonId(hyp_ll_index().at(i), NominalOSv1) ) continue;          
-
-          if (hyp_ll_id().at(i) == 13 && hyp_lt_id().at(i) == 13) {
-
-              int ll_trkidx = cms2.mus_trkidx().at(hyp_ll_index().at(i));
-              int lt_trkidx = cms2.mus_trkidx().at(hyp_lt_index().at(i));
-
-              int vtxidx = firstGoodVertex();
-
-              if (fabs(hyp_ll_p4().at(i).eta()) > 2.4) continue;
-              if (fabs(hyp_lt_p4().at(i).eta()) > 2.4) continue;
-              _etaCounter++;
-              
-              if (cms2.mus_gfit_chi2().at(hyp_ll_index().at(i))/cms2.mus_gfit_ndof().at(hyp_ll_index().at(i)) >= 10) continue;
-              if (cms2.mus_gfit_chi2().at(hyp_lt_index().at(i))/cms2.mus_gfit_ndof().at(hyp_lt_index().at(i)) >= 10) continue;
-              _chiCounter++;
-                                                               
-              if (!passes_muid_wp2012(hyp_ll_index().at(i), mu2012_tightness::TIGHT)) continue;
-              if (!passes_muid_wp2012(hyp_lt_index().at(i), mu2012_tightness::TIGHT)) continue;
-              _muonIdCounter++;
-
-                  
-              if (fabs(trks_d0_pv(lt_trkidx, vtxidx).first) > 0.2) continue;
-              if (fabs(trks_d0_pv(ll_trkidx, vtxidx).first) > 0.2) continue;
-
-              _idCounter++;
-
-              if (fabs(trks_dz_pv(lt_trkidx, vtxidx).first) > 0.1) continue;
-              if (fabs(trks_dz_pv(ll_trkidx, vtxidx).first) > 0.1) continue;
-
-              _id2Counter++;
-                  
-               }
-         
+ 
 
           if (hyp_ll_p4().at(i).pt() < 20) continue;
           if (hyp_lt_p4().at(i).pt() < 20) continue;
@@ -201,6 +143,39 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           if (hyp_type().at(i) == 3) continue;
 
           _typeCounter++;
+
+          if (fabs(hyp_ll_p4().at(i).eta()) > 2.4) continue;
+          if (fabs(hyp_lt_p4().at(i).eta()) > 2.4) continue;
+          _etaCounter++;
+
+          // electron id/iso
+
+          if (abs(hyp_ll_id().at(i)) == 11 || abs(hyp_lt_id().at(i)) == 11) {
+
+              if(!samesign2011::isGoodLepton(hyp_lt_id().at(i), hyp_lt_index().at(i))) continue;
+              if(!samesign2011::isGoodLepton(hyp_ll_id().at(i), hyp_ll_index().at(i))) continue;
+              _electronIdCounter++;
+
+              if(!samesign2011::isIsolatedLepton(hyp_lt_id().at(i), hyp_lt_index().at(i))) continue;
+              if(!samesign2011::isIsolatedLepton(hyp_ll_id().at(i), hyp_ll_index().at(i))) continue;
+
+              _electronIsoCounter++;
+          
+          }
+          // muon id/iso
+          if (abs(hyp_ll_id().at(i)) == 13 && abs(hyp_lt_id().at(i)) == 13) {
+              
+              
+              if(!samesign2011::isGoodLepton(hyp_lt_id().at(i), hyp_lt_index().at(i))) continue;
+              if(!samesign2011::isGoodLepton(hyp_ll_id().at(i), hyp_ll_index().at(i))) continue;
+              _muonIdCounter++;
+
+              if(!samesign2011::isIsolatedLepton(hyp_lt_id().at(i), hyp_lt_index().at(i))) continue;
+              if(!samesign2011::isIsolatedLepton(hyp_ll_id().at(i), hyp_ll_index().at(i))) continue;
+
+              _muonIsoCounter++;
+           
+          }
 
           // select the highest pt hypothesis
           float sumPt = hyp_lt_p4().at(i).pt() + hyp_ll_p4().at(i).pt();
@@ -238,11 +213,11 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
           if (_bTag < looseDiscriminant) continue;
 
-          // save the
+          // save the jets that have at least 20 pt
           _jets_p4_min.push_back(pfjets_p4().at(k));
           _jets_p4_minCorrection.push_back(pfjets_corL1FastL2L3().at(k));
 
-
+          // increment the number of bTags
           _nBtags++;
 
           if (jetPt < 40) continue;
@@ -260,8 +235,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
               if (l_jetPt < 20) continue; 
 
-              // cout << "pasedd jet pt > 20" << endl;
-
               float l_dR_lt = DeltaR(pfjets_p4().at(l), hyp_lt_p4().at(index));
               float l_dR_ll = DeltaR(pfjets_p4().at(l), hyp_ll_p4().at(index));
                     
@@ -272,19 +245,11 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
               if (l_bTag < looseDiscriminant) continue;    
               
-              // cout << "passed bTag" << endl;
-              
               if (l_jetPt < 40) continue;
               
-              // cout << "jet pt > 40";
-
               float val240 = (hyp_lt_p4().at(index) + pfjets_p4().at(l)).mass();
-    
-              // cout << "calculated val240" << endl;
 
               _deltaM40 = val240 - val140;
-
-              cout << _deltaM40 << endl;
 
               if (abs(_deltaM40) <= abs(deltaMin40)) {
                   deltaMin40 = _deltaM40;
@@ -294,21 +259,18 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
               }
           }
       }
-
-      //      cout << jetltIndex << ", " << jetllIndex << endl;
-
-      if (jetltIndex != -1 && jetllIndex != -1 ){
-
-
-          // cout << "still works " << endl;
-
-          // now that we've selected a hypothesis, loop over the generated p4
+    // now that we've selected a hypothesis, loop over the generated p4
           // and find the matching particle
+          float generatedVal1 = -1;
+          float generatedVal2 = -1;
           int llGenerated = -1;
           int ltGenerated = -1;
           int jetllGenerated = -1;
           int jetltGenerated =-1;
 
+      if (jetltIndex != -1 && jetllIndex != -1 ){
+
+      
       
           float ll_dRmin = 1001;
           float lt_dRmin = 1001;
@@ -362,8 +324,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           }    
 
 
-          float generatedVal1 = -1;
-          float generatedVal2 = -1;
 
           if (llGenerated != -1 && ltGenerated != -1 && jetllGenerated != -1 && jetltGenerated != -1){
 
@@ -424,94 +384,56 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
               generatedDeltaMass = (generatedVal2 - generatedVal1)/2;
           }
 
-      
-          if (abs(lt_id) == 13) lt_iso = muonIsoValuePF2012_deltaBeta(hyp_lt_index().at(index));
-          if (abs(ll_id) == 13) ll_iso = muonIsoValuePF2012_deltaBeta(hyp_ll_index().at(index));
-
-          // signal needs to be run through an up-to-date CMS2 in order to use these branches. Save it as 0.0 for now. 
-
-          if (abs(lt_id) == 11) lt_iso = 0.0 ; // electronIsoValuePF2012_FastJetEffArea_v3(hyp_lt_index().at(index), .4);
-          if (abs(ll_id) == 11) ll_iso =  0.0 ; //electronIsoValuePF2012_FastJetEffArea_v3(hyp_ll_index().at(index), .4);
-
           FillBabyNtuple();
-          cout << "I filled the event." << endl ; 
       }
 
-      if(_numeratorHypothesisCounter > 0) numeratorHypothesisCounter++;
-      else continue;
+    } // end of loop over events in file
 
-      if(_etaCounter > 0) etaCounter++;
-      else continue;
-
-      if(_chiCounter > 0) chiCounter++;
-      else continue;
-
-      if(_muonIdCounter > 0) muonIdCounter++;
-      else continue;
-
-      if (_idCounter > 0) idCounter++;
-      else continue;   
-
-      if(_id2Counter > 0) id2Counter++;
-      else continue;
-
-      if(_hypPt20Counter > 0) hypPt20Counter++;
-      else continue;
-
-      if (_osCounter > 0) osCounter++;
-      else continue;
-          
-      if (_typeCounter == 0 ) continue;
-          typeCounter++;
-
-          //  if ((avgM >= 50 && avgM <= 350) && (deltaM > -150 && deltaM < 150)) CR1counter++;
-          //if ((avgM >= 100 && avgM <= 300) && (deltaM > -100 && deltaM < 100)) CR2counter++;
-          //if ((avgM >= 150 && avgM <= 250) && (deltaM > -50 && deltaM < 50)) CR3counter++;
-          
-
-    }//end loop on events in a file
-  
-    
     delete tree;
     f.Close();
-  }//end loop on files
-  
-  if ( nEventsChain != nEventsTotal ) {
-    std::cout << "WARNING: The number of events added is not equal to the total number of events in the file." << std::endl;
+
+  } // end of loop over files
+
+  if (nEventsChain != nEventsTotal){
+      cout << "WARNING: The number of events added is not equal to the total number of events!" << endl;
   }
+
 
   cout << nDuplicates << " duplicate events were skipped." << endl;
 
   CloseBabyNtuple();
 
- ofstream stream;
+  ofstream stream;
   stream.open("cutflow.txt", ios::app);
 
   stream << baby_name << ": " << endl;
-  stream << Form("Source: %d", nEventsMini) << endl;
-  stream << Form("Events with Hypothesis: %.0f (%.2f)", hypCounter, hypCounter/nEventsMini * 100) << endl;
-  stream << Form("Electron Isolation: %.0f (%.2f)", numeratorHypothesisCounter, numeratorHypothesisCounter/nEventsMini * 100) << endl;
+  stream << Form("Source (Events): %.0f", nEventsMini) << endl;
+  stream << Form("Source (Hypotheses): %.0f", hypCounter) << endl;
+  stream << Form("Events with Hypothesis: %.0f (%.2f)", eventHypCounter, eventHypCounter/nEventsMini * 100) << endl;
+  stream << Form("Hypothesis Pt > 20: %.0f (%.2f)",_hypPt20Counter, _hypPt20Counter/hypCounter * 100) << endl;
+  stream << Form("Oppositely Charged: %.0f (%.2f)",_osCounter, _osCounter/hypCounter * 100) << endl;
+  stream << Form("Ignoring ee events: %.0f (%.2f)",_typeCounter, _typeCounter/hypCounter * 100) << endl;
+  stream << Form("Eta < 2.4: %.0f (%.2f)",_etaCounter, _etaCounter/hypCounter * 100) << endl;
+  stream << "Electron Id/Iso-" << endl; 
+  stream << Form("Electrons passing ID: %.0f (%.2f)", _electronIdCounter, _electronIdCounter/hypCounter * 100) << endl;
+  stream << Form("Electrons passing ISO: %.0f (%.2f)",_electronIsoCounter, _electronIsoCounter/hypCounter * 100) << endl;
   stream << "Muon Id/Iso-" << endl; 
-  stream << Form("Eta < 2.4: %.0f (%.2f)", etaCounter, etaCounter/nEventsMini * 100) << endl;
-  stream << Form("Average chi^2 <= 10: %.0f (%.2f)", chiCounter, chiCounter/nEventsMini * 100) << endl;
-  stream << Form("Tight muon discriminant: %.0f (%.2f)", muonIdCounter, muonIdCounter/nEventsMini * 100) << endl;
-  stream << Form("trks_d0_pv < .2: %.0f (%.2f)", idCounter, idCounter/nEventsMini * 100) << endl;
-  stream << Form("trks_dz_pv < .1: %.0f (%.2f)", id2Counter, id2Counter/nEventsMini * 100) << endl;
+  stream << Form("# muons passing ID: %.0f (%.2f)",_muonIdCounter, _muonIdCounter/hypCounter * 100) << endl;
+  stream << Form("# muons passing ISO: %.0f (%.2f)",_muonIsoCounter, _muonIsoCounter/hypCounter * 100) << endl;
   stream << "-" << endl;
-  stream << Form("Hypothesis Pt > 20: %.0f (%.2f)", hypPt20Counter, hypPt20Counter/nEventsMini * 100) << endl;
-  stream << Form("Oppositely Charged: %.0f (%.2f)", osCounter, osCounter/nEventsMini * 100) << endl;
-  stream << Form("Ignoring ee events: %.0f (%.2f)", typeCounter, typeCounter/nEventsMini * 100) << endl;
+  stream << Form("# of hypothesis passing ID/ISO: %.0f (%.2f)",(_muonIsoCounter + _numeratorHypothesisCounter), (_muonIsoCounter + _numeratorHypothesisCounter)/hypCounter * 100) << endl;
+
   // stream << Form("Muon Events: %.0f (%.2f)", muonCounter, muonCounter/nEventsMini * 100) << endl;
   stream << "--------------------------------" << endl;
 
   /*
-  if (showControlRegions){
+    if (showControlRegions){
 
-      stream << Form("Control Region 1: %.1f", (CR1counter/nEventsMini) * 100 ) <<  " " << CR1counter/9 << endl; 
-      stream << Form("Control Region 2: %.1f", (CR2counter/nEventsMini) * 100 ) << " " << CR2counter/4 << endl; 
-      stream << Form("Control Region 3: %.1f", (CR3counter/nEventsMini) * 100 ) << " " << CR3counter/1 << endl; 
-      stream << "--------------------------------" << endl;
-  }
+    stream << Form("Control Region 1: %.1f", (CR1counter/nEventsMini) * 100 ) <<  " " << CR1counter/9 << endl; 
+    stream << Form("Control Region 2: %.1f", (CR2counter/nEventsMini) * 100 ) << " " << CR2counter/4 << endl; 
+    stream << Form("Control Region 3: %.1f", (CR3counter/nEventsMini) * 100 ) << " " << CR3counter/1 << endl; 
+    stream << "--------------------------------" << endl;
+    }
   */
   stream.close();
   
