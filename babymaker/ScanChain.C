@@ -17,6 +17,7 @@
 #include "/home/users/aaivazis/CORE/ssSelections.h"
 #include "/home/users/aaivazis/CORE/trackSelections.h"
 #include "/home/users/aaivazis/CORE/eventSelections.h"
+#include "/home/users/aaivazis/CORE/susySelections.h"
 
 // header
 #include "ScanChain.h"
@@ -45,7 +46,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
         cout << "Processing the first " << numEvent << " file(s)" << endl;
     }
 
-  MakeBabyNtuple( Form("minis/%s.root", baby_name.c_str()) );
+  MakeBabyNtuple( Form("babies/%s.root", baby_name.c_str()) );
 
   // File Loop
   int nDuplicates = 0;
@@ -68,6 +69,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
   double _muonIsoCounter = 0;
   double _electronIdCounter = 0;
   double _electronIsoCounter = 0;
+  double _eventsCounter = 0;
 
   double hypCounter = 0;
   double eventHypCounter = 0;
@@ -152,8 +154,17 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
           if (abs(hyp_ll_id().at(i)) == 11 || abs(hyp_lt_id().at(i)) == 11) {
 
-              if(!samesign2011::isGoodLepton(hyp_lt_id().at(i), hyp_lt_index().at(i))) continue;
-              if(!samesign2011::isGoodLepton(hyp_ll_id().at(i), hyp_ll_index().at(i))) continue;
+              //  if(!samesign2011::isGoodLepton(hyp_lt_id().at(i), hyp_lt_index().at(i))) continue;
+              //if(!samesign2011::isGoodLepton(hyp_ll_id().at(i), hyp_ll_index().at(i))) continue;
+
+              if(abs(hyp_ll_id().at(i)) == 11){
+                  if(!passElectronSelection_ZMet2012_v3_Iso(hyp_ll_index().at(i))) continue;
+              }
+              
+              if(abs(hyp_lt_id().at(i)) == 11){
+                  if(!passElectronSelection_ZMet2012_v3_Iso(hyp_lt_index().at(i))) continue;
+              }
+
               _electronIdCounter++;
 
               if(!samesign2011::isIsolatedLepton(hyp_lt_id().at(i), hyp_lt_index().at(i))) continue;
@@ -166,8 +177,12 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           if (abs(hyp_ll_id().at(i)) == 13 && abs(hyp_lt_id().at(i)) == 13) {
               
               
-              if(!samesign2011::isGoodLepton(hyp_lt_id().at(i), hyp_lt_index().at(i))) continue;
-              if(!samesign2011::isGoodLepton(hyp_ll_id().at(i), hyp_ll_index().at(i))) continue;
+              //  if(!samesign2011::isGoodLepton(hyp_lt_id().at(i), hyp_lt_index().at(i))) continue;
+              // if(!samesign2011::isGoodLepton(hyp_ll_id().at(i), hyp_ll_index().at(i))) continue;
+
+              if(!muonId(hyp_ll_index().at(i), ZMet2012_v1)) continue;
+              if(!muonId(hyp_lt_index().at(i), ZMet2012_v1)) continue;
+          
               _muonIdCounter++;
 
               if(!samesign2011::isIsolatedLepton(hyp_lt_id().at(i), hyp_lt_index().at(i))) continue;
@@ -177,6 +192,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
            
           }
 
+
           // select the highest pt hypothesis
           float sumPt = hyp_lt_p4().at(i).pt() + hyp_ll_p4().at(i).pt();
 
@@ -184,7 +200,9 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           if (sumPt > _maxPt){
               _maxPt = sumPt;
               index = i;
+             _eventsCounter++;
           }
+          
       }
 
       if (index == -1) continue;
@@ -384,6 +402,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           FillBabyNtuple();
       }
 
+
     } // end of loop over events in file
 
     delete tree;
@@ -404,9 +423,9 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
   stream.open("cutflow.txt", ios::app);
 
   stream << baby_name << ": " << endl;
-  stream << Form("Source (Events): %.0f", nEventsMini) << endl;
-  stream << Form("Source (Hypotheses): %.0f", hypCounter) << endl;
+  stream << Form("Source (Events): %.0d", nEventsMini) << endl;
   stream << Form("Events with Hypothesis: %.0f (%.2f)", eventHypCounter, eventHypCounter/nEventsMini * 100) << endl;
+  stream << Form("Source (Hypotheses): %.0f", hypCounter) << endl;
   stream << Form("Hypothesis Pt > 20: %.0f (%.2f)",_hypPt20Counter, _hypPt20Counter/hypCounter * 100) << endl;
   stream << Form("Oppositely Charged: %.0f (%.2f)",_osCounter, _osCounter/hypCounter * 100) << endl;
   stream << Form("Ignoring ee events: %.0f (%.2f)",_typeCounter, _typeCounter/hypCounter * 100) << endl;
@@ -419,6 +438,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
   stream << Form("# muons passing ISO: %.0f (%.2f)",_muonIsoCounter, _muonIsoCounter/hypCounter * 100) << endl;
   stream << "-" << endl;
   stream << Form("# of hypothesis passing ID/ISO: %.0f (%.2f)",(_muonIsoCounter + _numeratorHypothesisCounter), (_muonIsoCounter + _numeratorHypothesisCounter)/hypCounter * 100) << endl;
+  stream << Form("# of hypothesis passing ID/ISO: %.0f (%.2f)",(_eventsCounter), (_eventsCounter)/eventHypCounter * 100) << endl;
 
   // stream << Form("Muon Events: %.0f (%.2f)", muonCounter, muonCounter/nEventsMini * 100) << endl;
   stream << "--------------------------------" << endl;
