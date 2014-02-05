@@ -55,6 +55,8 @@ class babyMaker {
   LorentzVector lt_p4;
   LorentzVector total_p4;
 
+  int stopMass;
+
   int ll_id;
   int lt_id;
   int ll_charge;
@@ -134,6 +136,8 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("nBtags", &nBtags);
 
   BabyTree_->Branch("file", &file);
+
+  BabyTree_->Branch("stopMass", &stopMass);
   return;
 }
 
@@ -142,6 +146,8 @@ void babyMaker::InitBabyNtuple () {
   met = -999.0;
 
   nBtags = 0;
+
+  stopMass = 600;
 
   type = -1;
 

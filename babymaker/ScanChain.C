@@ -42,6 +42,8 @@ bool isValidPair(int hypIndex, int jetIndex){
 
 void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int numEvent){
 
+    int _stopMass = 600;
+
     if (numEvent != 0 ){
         cout << "Processing the first " << numEvent << " file(s)" << endl;
     }
@@ -362,6 +364,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           //analysis
           met = evt_pfmet_type1cor();;
 
+          stopMass = _stopMass;
+
           nBtags = _nBtags;
 
           maxPt = _maxPt;
@@ -438,9 +442,9 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
   stream << Form("# muons passing ISO: %.0f (%.2f)",_muonIsoCounter, _muonIsoCounter/hypCounter * 100) << endl;
   stream << "-" << endl;
   stream << Form("# of hypothesis passing ID/ISO: %.0f (%.2f)",(_muonIsoCounter + _numeratorHypothesisCounter), (_muonIsoCounter + _numeratorHypothesisCounter)/hypCounter * 100) << endl;
-  stream << Form("# of hypothesis passing ID/ISO: %.0f (%.2f)",(_eventsCounter), (_eventsCounter)/eventHypCounter * 100) << endl;
-
-  // stream << Form("Muon Events: %.0f (%.2f)", muonCounter, muonCounter/nEventsMini * 100) << endl;
+  stream << Form("# of events passing ID/ISO: %.0f (%.2f)",(_eventsCounter), (_eventsCounter)/eventHypCounter * 100) << endl;
+  
+//stream << Form("Muon Events: %.0f (%.2f)", muonCounter, muonCounter/nEventsMini * 100) << endl;
   stream << "--------------------------------" << endl;
 
   /*
