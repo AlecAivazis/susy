@@ -133,8 +133,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       for (unsigned int i = 0; i< hyp_p4().size(); i++){
  
 
-          if (hyp_ll_p4().at(i).pt() < 20) continue;
-          if (hyp_lt_p4().at(i).pt() < 20) continue;
+          if (hyp_ll_p4().at(i).pt() < .1*_stopMass) continue;
+          if (hyp_lt_p4().at(i).pt() < .1*_stopMass) continue;
           
           _hypPt20Counter++;
           
@@ -220,7 +220,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
           // cuts on k
           float jetPt = (pfjets_p4().at(k) * pfjets_corL1FastL2L3().at(k)).pt();
-          if (jetPt < 20) continue; 
+          if (jetPt < .1*_stopMass) continue; 
                 
           float dR_lt = DeltaR(pfjets_p4().at(k), hyp_lt_p4().at(index));
           float dR_ll = DeltaR(pfjets_p4().at(k), hyp_ll_p4().at(index));
@@ -240,7 +240,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           // increment the number of bTags
           _nBtags++;
 
-          if (jetPt < 40) continue;
+          if (jetPt < .2*_stopMass) continue;
 
           float _deltaM40 = 0;
 
@@ -253,7 +253,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
               float l_jetPt = (pfjets_p4().at(l) * pfjets_corL1FastL2L3().at(l)).pt();
 
-              if (l_jetPt < 20) continue; 
+              if (l_jetPt < .1*_stopMass) continue; 
 
               float l_dR_lt = DeltaR(pfjets_p4().at(l), hyp_lt_p4().at(index));
               float l_dR_ll = DeltaR(pfjets_p4().at(l), hyp_ll_p4().at(index));
@@ -265,7 +265,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
               if (l_bTag < looseDiscriminant) continue;    
               
-              if (l_jetPt < 40) continue;
+              if (l_jetPt < .2*_stopMass) continue;
               
               float val240 = (hyp_lt_p4().at(index) + pfjets_p4().at(l)).mass();
 
