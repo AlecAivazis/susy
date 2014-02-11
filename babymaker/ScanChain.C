@@ -8,6 +8,7 @@
 #include "TDirectory.h"
 #include "TTreeCache.h"
 #include "Math/VectorUtil.h"
+#include "Math/LorentzVector.h"
 
 // CMS2
 #include "CMS2.h"
@@ -21,6 +22,8 @@
 
 // header
 #include "ScanChain.h"
+
+typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
 
 using namespace std;
 using namespace tas;
@@ -42,13 +45,13 @@ bool isValidPair(int hypIndex, int jetIndex){
 
 void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int numEvent){
 
-    int _stopMass = 600;
+    int _stopMass = 200;
 
     if (numEvent != 0 ){
         cout << "Processing the first " << numEvent << " file(s)" << endl;
     }
 
-  MakeBabyNtuple( Form("babies/%s.root", baby_name.c_str()) );
+  MakeBabyNtuple( Form("minis/%s.root", baby_name.c_str()) );
 
   // File Loop
   int nDuplicates = 0;
@@ -133,8 +136,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       for (unsigned int i = 0; i< hyp_p4().size(); i++){
  
 
-          if (hyp_ll_p4().at(i).pt() < .1*_stopMass) continue;
-          if (hyp_lt_p4().at(i).pt() < .1*_stopMass) continue;
+          if (hyp_ll_p4().at(i).pt() < .1 * _stopMass) continue;
+          if (hyp_lt_p4().at(i).pt() < .1 * _stopMass) continue;
           
           _hypPt20Counter++;
           
@@ -220,7 +223,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
           // cuts on k
           float jetPt = (pfjets_p4().at(k) * pfjets_corL1FastL2L3().at(k)).pt();
-          if (jetPt < .1*_stopMass) continue; 
+          if (jetPt < .1 * _stopMass) continue; 
                 
           float dR_lt = DeltaR(pfjets_p4().at(k), hyp_lt_p4().at(index));
           float dR_ll = DeltaR(pfjets_p4().at(k), hyp_ll_p4().at(index));
@@ -240,7 +243,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           // increment the number of bTags
           _nBtags++;
 
-          if (jetPt < .2*_stopMass) continue;
+          if (jetPt < .2 * _stopMass) continue;
 
           float _deltaM40 = 0;
 
@@ -253,7 +256,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
               float l_jetPt = (pfjets_p4().at(l) * pfjets_corL1FastL2L3().at(l)).pt();
 
-              if (l_jetPt < .1*_stopMass) continue; 
+              if (l_jetPt < .1 * _stopMass) continue; 
 
               float l_dR_lt = DeltaR(pfjets_p4().at(l), hyp_lt_p4().at(index));
               float l_dR_ll = DeltaR(pfjets_p4().at(l), hyp_ll_p4().at(index));
@@ -265,7 +268,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
               if (l_bTag < looseDiscriminant) continue;    
               
-              if (l_jetPt < .2*_stopMass) continue;
+              if (l_jetPt < .2 * _stopMass) continue;
               
               float val240 = (hyp_lt_p4().at(index) + pfjets_p4().at(l)).mass();
 
@@ -443,12 +446,13 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
   stream << "-" << endl;
   stream << Form("# of hypothesis passing ID/ISO: %.0f (%.2f)",(_muonIsoCounter + _numeratorHypothesisCounter), (_muonIsoCounter + _numeratorHypothesisCounter)/hypCounter * 100) << endl;
   stream << Form("# of events passing ID/ISO: %.0f (%.2f)",(_eventsCounter), (_eventsCounter)/eventHypCounter * 100) << endl;
+  stream << Form("# of expected events: %.0f (%.2f)",(_eventsCounter * scale_1fb * 19.5 )) << endl;
   
 //stream << Form("Muon Events: %.0f (%.2f)", muonCounter, muonCounter/nEventsMini * 100) << endl;
   stream << "--------------------------------" << endl;
 
   /*
-    if (showControlRegions){
+    if (showControlRegions){v
 
     stream << Form("Control Region 1: %.1f", (CR1counter/nEventsMini) * 100 ) <<  " " << CR1counter/9 << endl; 
     stream << Form("Control Region 2: %.1f", (CR2counter/nEventsMini) * 100 ) << " " << CR2counter/4 << endl; 

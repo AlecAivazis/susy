@@ -44,7 +44,8 @@ class babyMaker {
   //baby ntuple variables
   float met;
 
-  std::vector<LorentzVector> jets_p4;
+  //std::vector<LorentzVector> jets_p4;
+  std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > jets_p4;
   std::vector<float> jets_p4Correction;
   std::vector<float> jets_p4_minCorrection;
   std::vector<LorentzVector> jets_p4_min;
