@@ -51,7 +51,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
         cout << "Processing the first " << numEvent << " file(s)" << endl;
     }
 
-  MakeBabyNtuple( Form("minis/%s.root", baby_name.c_str()) );
+  MakeBabyNtuple( Form("babies/minis/%s.root", baby_name.c_str()) );
 
   // File Loop
   int nDuplicates = 0;
@@ -426,6 +426,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
   CloseBabyNtuple();
 
+  float expectedN = _eventsCounter * scale_1fb * 19.5;  
+
   ofstream stream;
   stream.open("cutflow.txt", ios::app);
 
@@ -438,15 +440,15 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
   stream << Form("Ignoring ee events: %.0f (%.2f)",_typeCounter, _typeCounter/hypCounter * 100) << endl;
   stream << Form("Eta < 2.4: %.0f (%.2f)",_etaCounter, _etaCounter/hypCounter * 100) << endl;
   stream << "Electron Id/Iso-" << endl; 
-  stream << Form("Electrons passing ID: %.0f (%.2f)", _electronIdCounter, _electronIdCounter/hypCounter * 100) << endl;
-  stream << Form("Electrons passing ISO: %.0f (%.2f)",_electronIsoCounter, _electronIsoCounter/hypCounter * 100) << endl;
+  stream << Form("e/mu passing ID: %.0f (%.2f)", _electronIdCounter, _electronIdCounter/hypCounter * 100) << endl;
+  stream << Form("e/mu passing ISO: %.0f (%.2f)",_electronIsoCounter, _electronIsoCounter/hypCounter * 100) << endl;
   stream << "Muon Id/Iso-" << endl; 
   stream << Form("# muons passing ID: %.0f (%.2f)",_muonIdCounter, _muonIdCounter/hypCounter * 100) << endl;
   stream << Form("# muons passing ISO: %.0f (%.2f)",_muonIsoCounter, _muonIsoCounter/hypCounter * 100) << endl;
   stream << "-" << endl;
   stream << Form("# of hypothesis passing ID/ISO: %.0f (%.2f)",(_muonIsoCounter + _numeratorHypothesisCounter), (_muonIsoCounter + _numeratorHypothesisCounter)/hypCounter * 100) << endl;
   stream << Form("# of events passing ID/ISO: %.0f (%.2f)",(_eventsCounter), (_eventsCounter)/eventHypCounter * 100) << endl;
-  stream << Form("# of expected events: %.0f (%.2f)",(_eventsCounter * scale_1fb * 19.5 )) << endl;
+  stream << Form("# of expected events: %.0f ",expectedN) << endl;
   
 //stream << Form("Muon Events: %.0f (%.2f)", muonCounter, muonCounter/nEventsMini * 100) << endl;
   stream << "--------------------------------" << endl;

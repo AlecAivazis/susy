@@ -1,0 +1,38 @@
+signal200-mini: 
+Source (Events): 10000
+Events with Hypothesis: 8938 (89.38)
+Source (Hypotheses): 19288
+Hypothesis Pt > 20: 13492 (69.95)
+Oppositely Charged: 10789 (55.94)
+Ignoring ee events: 10729 (55.63)
+Eta < 2.4: 10572 (54.81)
+Electron Id/Iso-
+e/mu passing ID: 78 (0.40)
+e/mu passing ISO: 48 (0.25)
+Muon Id/Iso-
+# muons passing ID: 7131 (36.97)
+# muons passing ISO: 6780 (35.15)
+-
+# of hypothesis passing ID/ISO: 6780 (35.15)
+# of events passing ID/ISO: 6816 (76.26)
+# of expected events: 132912 (0.00)
+--------------------------------
+signal600-mini: 
+Source (Events): 10000
+Events with Hypothesis: 9727 (97.27)
+Source (Hypotheses): 27874
+Hypothesis Pt > 20: 20799 (74.62)
+Oppositely Charged: 14982 (53.75)
+Ignoring ee events: 14822 (53.18)
+Eta < 2.4: 14757 (52.94)
+Electron Id/Iso-
+e/mu passing ID: 119 (0.43)
+e/mu passing ISO: 81 (0.29)
+Muon Id/Iso-
+# muons passing ID: 8400 (30.14)
+# muons passing ISO: 8197 (29.41)
+-
+# of hypothesis passing ID/ISO: 8197 (29.41)
+# of events passing ID/ISO: 8247 (84.78)
+# of expected events: 160816 (0.00)
+--------------------------------
