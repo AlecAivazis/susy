@@ -9,10 +9,10 @@ doSignal(std::string suffix ="", int numEvents=0)
   babyMaker *looper = new babyMaker();
   
   TChain *signal200 = new TChain("Events"); 
-  signal200->Add("/home/users/aaivazis/susy/signals/raw/signal200.root");
+  signal200->Add("/home/users/aaivazis/susy/signals/raw/200/*.root");
   looper->ScanChain(signal200, "signal200" + suffix, numEvents); 
 
   TChain *signal600 = new TChain("Events"); 
-  signal600->Add("/home/users/aaivazis/susy/signals/raw/signal600.root");
+  signal600->Add("/home/users/aaivazis/susy/signals/raw/600/*.root");
   looper->ScanChain(signal600, "signal600" + suffix, numEvents); 
 }
