@@ -206,12 +206,12 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           if (sumPt > _maxPt){
               _maxPt = sumPt;
               index = i;
-              _eventsCounter++;
           }
           
       }
 
       if (index == -1) continue;
+      _eventsCounter++;
       
 
       int _nBtags = 0;
