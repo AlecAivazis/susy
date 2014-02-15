@@ -74,6 +74,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
   double _electronIdCounter = 0;
   double _electronIsoCounter = 0;
   double _eventsCounter = 0;
+  double _muonCounter = 0;
 
   double hypCounter = 0;
   double eventHypCounter = 0;
@@ -180,6 +181,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           // muon id/iso
           if (abs(hyp_ll_id().at(i)) == 13 && abs(hyp_lt_id().at(i)) == 13) {
               
+	      _muonCounter++;
               
               //  if(!samesign2011::isGoodLepton(hyp_lt_id().at(i), hyp_lt_index().at(i))) continue;
               // if(!samesign2011::isGoodLepton(hyp_ll_id().at(i), hyp_ll_index().at(i))) continue;
@@ -204,7 +206,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           if (sumPt > _maxPt){
               _maxPt = sumPt;
               index = i;
-             _eventsCounter++;
+              _eventsCounter++;
           }
           
       }
@@ -440,10 +442,11 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
   stream << Form("e/mu passing ID: %.0f (%.2f)", _electronIdCounter, _electronIdCounter/hypCounter * 100) << endl;
   stream << Form("e/mu passing ISO: %.0f (%.2f)",_electronIsoCounter, _electronIsoCounter/hypCounter * 100) << endl;
   stream << "Muon Id/Iso-" << endl; 
+  stream << Form("# of muons : %.0f (%.2f)",_muonCounter, _muonCounter/hypCounter * 100) << endl;
   stream << Form("# muons passing ID: %.0f (%.2f)",_muonIdCounter, _muonIdCounter/hypCounter * 100) << endl;
   stream << Form("# muons passing ISO: %.0f (%.2f)",_muonIsoCounter, _muonIsoCounter/hypCounter * 100) << endl;
   stream << "-" << endl;
-  stream << Form("# of hypothesis passing ID/ISO: %.0f (%.2f)",(_muonIsoCounter + _numeratorHypothesisCounter), (_muonIsoCounter + _numeratorHypothesisCounter)/hypCounter * 100) << endl;
+  stream << Form("# of hypothesis passing ID/ISO: %.0f (%.2f)",(_muonIsoCounter + _electronIsoCounter), (_muonIsoCounter + _electronIsoCounter)/hypCounter * 100) << endl;
   stream << Form("# of events passing ID/ISO: %.0f (%.2f)",(_eventsCounter), (_eventsCounter)/eventHypCounter * 100) << endl;
   stream << Form("# of expected events: %.0f ",expectedN) << endl;
   
