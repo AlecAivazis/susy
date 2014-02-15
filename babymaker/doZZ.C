@@ -1,4 +1,4 @@
-doZZ(std::string file_name="zz", int numEvents = 0)
+doZZ(int numEvents = 0, std::string file_name="zz")
 {
   gSystem->AddIncludePath(Form("-I%s/CORE", gSystem->Getenv("HOME")));
   gSystem->Load(Form("%s/CORE/libCMS2NtupleMacrosCORE.so", gSystem->Getenv("HOME")));

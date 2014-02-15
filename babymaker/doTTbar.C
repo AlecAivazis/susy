@@ -1,4 +1,4 @@
-doTTbar(std::string file_name = "ttjets", int numEvents = 0)
+doTTbar(int numEvents = 0, std::string file_name = "ttjets")
 {
   gSystem->AddIncludePath(Form("-I%s/CORE", gSystem->Getenv("HOME")));
   gSystem->Load(Form("%s/CORE/libCMS2NtupleMacrosCORE.so", gSystem->Getenv("HOME")));
