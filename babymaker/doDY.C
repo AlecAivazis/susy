@@ -1,4 +1,4 @@
-doDY(std::string int numEvents = 0, file_name="dy")
+doDY(int numEvents = 0, std::string file_name="dy")
 {
   gSystem->AddIncludePath(Form("-I%s/CORE", gSystem->Getenv("HOME")));
   // gSystem->Load(Form("%s/CORE/libCMS2NtupleMacrosCORE.so", gSystem->Getenv("HOME")));
