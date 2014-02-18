@@ -300,7 +300,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           float llJet_dRmin = 1001;
           float ltJet_dRmin = 1001;
 
-          for (unsigned int i = 0; i < genps_p4().size(); i++ ){
+          for ( int i = 0; i < genps_p4().size(); i++ ){
 
               float deltaR = DeltaR(genps_p4().at(i), hyp_ll_p4().at(index));
           
@@ -310,7 +310,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
               }
           }
       
-          for (unsigned int i = 0; i < genps_p4().size(); i++ ){
+          for ( int i = 0; i < genps_p4().size(); i++ ){
 
               if (i == llGenerated) continue;
 
@@ -322,7 +322,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
               }
           }
 
-          for (unsigned int i = 0; i < genps_p4().size(); i++ ){
+          for ( int i = 0; i < genps_p4().size(); i++ ){
 
               if (i == llGenerated || i == ltGenerated) continue;
 
@@ -334,7 +334,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
               }
           }
   
-          for (unsigned int i = 0; i < genps_p4().size(); i++ ){
+          for ( int i = 0; i < genps_p4().size(); i++ ){
 
               if (i == llGenerated || i == ltGenerated || i == jetllGenerated) continue;
 
@@ -372,7 +372,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           maxPt = _maxPt;
 
           ll_iso = muonCorIsoValue(hyp_ll_index().at(index), false);
-          lt_iso = muonCorIsoValue(hyp_lt_index().at(index), false);
+          // lt_iso = muonCorIsoValue(hyp_lt_index().at(index), false);
 
           cout << muonCorIsoValue(hyp_ll_index().at(index), false) << endl;
 
