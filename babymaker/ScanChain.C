@@ -65,7 +65,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
   unsigned int fileCounter = 0;
 
   double _hypPt20Counter = 0;
-  double _numeratorHypothesisCounter = 0;
   double _osCounter = 0;
   double _typeCounter = 0;
   double _etaCounter = 0;
@@ -371,6 +370,11 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           nBtags = _nBtags;
 
           maxPt = _maxPt;
+
+          ll_iso = muonCorIsoValue(hyp_ll_index().at(index), false);
+          lt_iso = muonCorIsoValue(hyp_lt_index().at(index), false);
+
+          cout << muonCorIsoValue(hyp_ll_index().at(index), false) << endl;
 
           jets_p4 = pfjets_p4();
           jets_p4Correction = pfjets_corL1FastL2L3();
