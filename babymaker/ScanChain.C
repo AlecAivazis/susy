@@ -129,7 +129,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           _osCounter++;
 
           // require one muon
-          if (abs(hyp_ll_id().at(iHyp)) != 13 || abs(hyp_lt_id().at(iHyp)) != 13) continue;
+          if (abs(hyp_ll_id().at(i)) != 13 || abs(hyp_lt_id().at(i)) != 13) continue;
           _typeCounter++;
 
           // eta < 2.4
