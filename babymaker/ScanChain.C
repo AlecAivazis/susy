@@ -119,7 +119,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
       // apply cuts to hypotheses
       for (unsigned int i = 0; i< hyp_p4().size(); i++){
- 
 
           if (hyp_ll_p4().at(i).pt() < 20) continue;
           if (hyp_lt_p4().at(i).pt() < 20) continue;
@@ -129,8 +128,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           if (hyp_ll_charge().at(i)*hyp_lt_charge().at(i) > 0) continue;
           _osCounter++;
 
-          // ignore ee events
-          if (hyp_type().at(i) == 3) continue;
+          // require one muon
+          if (abs(hyp_ll_id().at(iHyp)) != 13 || abs(hyp_lt_id().at(iHyp)) != 13) continue;
           _typeCounter++;
 
           // eta < 2.4
