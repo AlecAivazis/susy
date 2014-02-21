@@ -47,8 +47,6 @@ class babyMaker {
   //std::vector<LorentzVector> jets_p4;
   std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > jets_p4;
   std::vector<float> jets_p4Correction;
-  std::vector<float> jets_p4_minCorrection;
-  std::vector<LorentzVector> jets_p4_min;
 
   int type;
 
@@ -63,7 +61,6 @@ class babyMaker {
   int ll_index;
   int lt_index;
   
-  int nBtags;
 
   float scale_1fb;
   std::vector<float> btagDiscriminant;
@@ -73,12 +70,6 @@ class babyMaker {
   int eventNumber;
   int runNumber;
   int lumiBlock;
-
-  float ll_iso;
-  float lt_iso;
-
-
-  float maxPt;
 
   string file;
 
@@ -100,25 +91,18 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("met", &met );
   BabyTree_->Branch("jets_p4", &jets_p4 );
   BabyTree_->Branch("jets_p4Correction", &jets_p4Correction );
-  BabyTree_->Branch("jets_p4_min", &jets_p4_min );
-  BabyTree_->Branch("jets_p4_minCorrection", &jets_p4_minCorrection);
   BabyTree_->Branch("type", &type);
 
   BabyTree_->Branch("ll_p4", &ll_p4);
   BabyTree_->Branch("lt_p4", &lt_p4);
   BabyTree_->Branch("total_p4", &total_p4);
 
-  BabyTree_->Branch("maxPt", &maxPt);
- 
   BabyTree_->Branch("ll_id", &ll_id);
   BabyTree_->Branch("lt_id", &lt_id);
   BabyTree_->Branch("ll_charge" , &ll_charge);
   BabyTree_->Branch("lt_charge", &lt_charge);
   BabyTree_->Branch("ll_index", &ll_index);
   BabyTree_->Branch("lt_index", &lt_index);
-  
-  BabyTree_->Branch("lt_iso", &lt_iso);
-  BabyTree_->Branch("ll_iso", &ll_iso);
   
   BabyTree_->Branch("eventNumber", &eventNumber);
   BabyTree_->Branch("runNumber", &runNumber);
@@ -132,7 +116,6 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
   
   BabyTree_->Branch("numEvents", &numEvents);
 
-  BabyTree_->Branch("nBtags", &nBtags);
 
   BabyTree_->Branch("file", &file);
 
@@ -142,8 +125,6 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
 void babyMaker::InitBabyNtuple () {
 
   met = -999.0;
-
-  nBtags = 0;
 
   type = -1;
 
@@ -160,13 +141,7 @@ void babyMaker::InitBabyNtuple () {
   runNumber = -1;
   lumiBlock = 1;
 
-  ll_iso = 0.0;
-  lt_iso = 0.0;
-
-  maxPt = 0;
-
   numEvents = 0;
-
 
   generatedDeltaMass = 999;
   generatedAvgMass = 0;

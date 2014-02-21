@@ -103,6 +103,9 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       tree->LoadTree(event);
       cms2.GetEntry(event);
       ++nEventsTotal;
+      
+      // Progress
+      CMS2::progress( nEventsTotal, nEventsChain );
 
       int index = -1;
       float _maxPt = 0.0;
@@ -132,15 +135,15 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           if (fabs(hyp_lt_p4().at(i).eta()) > 2.4) continue;
           _etaCounter++;
 
-          /* This iso is too tight. Saving in case they change their mind....
-             if(!samesign2011::isGoodLepton(hyp_lt_id().at(i), hyp_lt_index().at(i))) continue;
-             if(!samesign2011::isGoodLepton(hyp_ll_id().at(i), hyp_ll_index().at(i))) continue;
-          */
-
           // count number of muons before ID/iso
           if (abs(hyp_ll_id().at(i)) == 13 && abs(hyp_lt_id().at(i)) == 13) {
 	      _muonCounter++;
           }
+
+          /* This iso is too tight. Saving in case they change their mind....
+             if(!isGoodLepton(hyp_lt_id().at(i), hyp_lt_index().at(i))) continue;
+             if(!isGoodLepton(hyp_ll_id().at(i), hyp_ll_index().at(i))) continue;
+          */
 
           // electron id
           if (abs(hyp_ll_id().at(i) == 11) && !passElectronSelection_ZMet2012_v3_Iso(hyp_ll_index().at(i))) continue;
@@ -179,7 +182,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
               _electronIsoCounter++;
           }
 
-          // select the highest pt hypothesis
+          // select the highest pt hypothesis - Alex does the pt of the sum. Can't those cancel before you take the measurement?
           float sumPt = hyp_lt_p4().at(i).pt() + hyp_ll_p4().at(i).pt();
          
           if (sumPt > _maxPt){
@@ -267,20 +270,11 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       */
 
 
-      // Progress
-      CMS2::progress( nEventsTotal, nEventsChain );
-
+      // create the ntuple
       InitBabyNtuple();
 
-      //analysis
-      met = evt_pfmet_type1cor();;
-
-      nBtags = 0;
-
-      maxPt = _maxPt;
-
-      ll_iso = muonCorIsoValue(hyp_ll_index().at(index), false);
-      //lt_iso = muonCorIsoValue(hyp_lt_index().at(index), false);
+      // set the branch values
+      met = evt_pfmet_type1cor();
 
       jets_p4 = pfjets_p4();
       jets_p4Correction = pfjets_corL1FastL2L3();
@@ -314,6 +308,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       }
       */
 
+      // fill that sucker
       FillBabyNtuple();
 
 
