@@ -2,4 +2,4 @@
 *.d
 *~
 *.root
-graphs/
+analysis/images/
