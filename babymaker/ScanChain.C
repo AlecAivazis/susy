@@ -112,9 +112,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       // float maxPt = 0;
       int index = -1;
       float _maxPt = 0.0;
-      float looseDiscriminant = .244;
-      // float mediumDiscriminant = .679;
-      // float tightDiscriminant = .89;
 
       std::vector<LorentzVector> _jets_p4_min ;
       std::vector<float> _jets_p4_minCorrection ;
@@ -127,7 +124,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
       hypCounter = hypCounter + hyp_p4().size();
 
-      // only grab the hypothesis with the biggest pt
+      // apply cuts to hypotheses
       for (unsigned int i = 0; i< hyp_p4().size(); i++){
  
 
@@ -148,56 +145,43 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           if (fabs(hyp_lt_p4().at(i).eta()) > 2.4) continue;
           _etaCounter++;
 
-          // electron id/iso
-          if (abs(hyp_ll_id().at(i)) == 11 || abs(hyp_lt_id().at(i)) == 11) {
 
-              /* This iso is too tight. Saving in case they change their mind....
-              if(!samesign2011::isGoodLepton(hyp_lt_id().at(i), hyp_lt_index().at(i))) continue;
-              if(!samesign2011::isGoodLepton(hyp_ll_id().at(i), hyp_ll_index().at(i))) continue;
-              */
+          /* This iso is too tight. Saving in case they change their mind....
+             if(!samesign2011::isGoodLepton(hyp_lt_id().at(i), hyp_lt_index().at(i))) continue;
+             if(!samesign2011::isGoodLepton(hyp_ll_id().at(i), hyp_ll_index().at(i))) continue;
+          */
 
-              // electron id
-              if(abs(hyp_ll_id().at(i)) == 11){
-                  if(!passElectronSelection_ZMet2012_v3_Iso(hyp_ll_index().at(i))) continue;
-              }
-              
-              if(abs(hyp_lt_id().at(i)) == 11){
-                  if(!passElectronSelection_ZMet2012_v3_Iso(hyp_lt_index().at(i))) continue;
-              }
-              _electronIdCounter++;
+          // electron id
+          if (abs(hyp_ll_id().at(i) == 11) && !passElectronSelection_ZMet2012_v3_Iso(hyp_ll_index().at(i))) continue;
+          if (abs(hyp_lt_id().at(i) == 11) && !passElectronSelection_ZMet2012_v3_Iso(hyp_lt_index().at(i))) continue;
+          _electronIdCounter++;
 
 
-              if(!samesign2011::isIsolatedLepton(hyp_lt_id().at(i), hyp_lt_index().at(i))) continue;
-              if(!samesign2011::isIsolatedLepton(hyp_ll_id().at(i), hyp_ll_index().at(i))) continue;
-
-              _electronIsoCounter++;
+          // electron iso
+          if(!samesign2011::isIsolatedLepton(hyp_lt_id().at(i), hyp_lt_index().at(i))) continue;
+          if(!samesign2011::isIsolatedLepton(hyp_ll_id().at(i), hyp_ll_index().at(i))) continue;
+          _electronIsoCounter++;
           
-          }
-          // muon id/iso
+ 
+          // count number of muons before ID/iso
           if (abs(hyp_ll_id().at(i)) == 13 && abs(hyp_lt_id().at(i)) == 13) {
-              
 	      _muonCounter++;
-              
-              //  if(!samesign2011::isGoodLepton(hyp_lt_id().at(i), hyp_lt_index().at(i))) continue;
-              // if(!samesign2011::isGoodLepton(hyp_ll_id().at(i), hyp_ll_index().at(i))) continue;
-
-              if(!muonId(hyp_ll_index().at(i), ZMet2012_v1)) continue;
-              if(!muonId(hyp_lt_index().at(i), ZMet2012_v1)) continue;
-          
-              _muonIdCounter++;
-
-              if(!samesign2011::isIsolatedLepton(hyp_lt_id().at(i), hyp_lt_index().at(i))) continue;
-              if(!samesign2011::isIsolatedLepton(hyp_ll_id().at(i), hyp_ll_index().at(i))) continue;
-
-              _muonIsoCounter++;
-           
           }
+
+          // muon id
+          if (abs(hyp_ll_id().at(i)) == 13 && !muonId(hyp_ll_index().at(i), ZMet2012_v1)) continue;
+          if (abs(hyp_lt_id().at(i)) == 13 && !muonId(hyp_lt_index().at(i), ZMet2012_v1)) continue;
+          _muonIdCounter++;
+
+          // muon iso
+          if(!samesign2011::isIsolatedLepton(hyp_lt_id().at(i), hyp_lt_index().at(i))) continue;
+          if(!samesign2011::isIsolatedLepton(hyp_ll_id().at(i), hyp_ll_index().at(i))) continue;
+          _muonIsoCounter++;
 
 
           // select the highest pt hypothesis
           float sumPt = hyp_lt_p4().at(i).pt() + hyp_ll_p4().at(i).pt();
-
-
+         
           if (sumPt > _maxPt){
               _maxPt = sumPt;
               index = i;
@@ -208,41 +192,9 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       if (index == -1) continue;
       _eventsCounter++;
       
-
-      int _nBtags = 0;
-      int jetllIndex = -1;
-      int jetltIndex = -1;
-
-      // now that we have one hyp from each event, loop over the jets, count them and find the 
-      // best delta_m pair and store those jets
-      for(unsigned int k = 0; k < pfjets_p4().size(); k++) {
-
-          // cuts on k
-          float jetPt = (pfjets_p4().at(k) * pfjets_corL1FastL2L3().at(k)).pt();
-          if (jetPt < 20) continue; 
-
-          // save the jets that have at least 20 pt
-          _jets_p4_min.push_back(pfjets_p4().at(k));
-          _jets_p4_minCorrection.push_back(pfjets_corL1FastL2L3().at(k));
-                
-          float dR_lt = DeltaR(pfjets_p4().at(k), hyp_lt_p4().at(index));
-          float dR_ll = DeltaR(pfjets_p4().at(k), hyp_ll_p4().at(index));
-                    
-          if (dR_ll < 0.4) continue;
-          if (dR_lt < 0.4) continue;
-              
-          // minimum loose bTag discriminant
-          float _bTag = pfjets_combinedSecondaryVertexBJetTag().at(k);
-
-          if (_bTag < looseDiscriminant) continue;
-
-          // increment the number of bTags
-          _nBtags++;
-
-      }
-
-      // now that we've selected a hypothesis, loop over the generated p4
-      // and find the matching particle, store its index and value
+      /*
+      now that we've selected a hypothesis, loop over the generated p4
+      and find the matching particle, store its index and value
       float generatedVal1 = -1;
       float generatedVal2 = -1;
       int llGenerated = -1;
@@ -312,6 +264,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
      
       }
 
+      */
+
 
       // Progress
       CMS2::progress( nEventsTotal, nEventsChain );
@@ -321,7 +275,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       //analysis
       met = evt_pfmet_type1cor();;
 
-      nBtags = _nBtags;
+      nBtags = 0;
 
       maxPt = _maxPt;
 
@@ -356,10 +310,12 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       runNumber = evt_run();
       lumiBlock = evt_lumiBlock();
 
+      /*
       if (generatedVal2 != -1 && generatedVal1 != -1){
           generatedAvgMass = (generatedVal2 + generatedVal1)/2;
           generatedDeltaMass = (generatedVal2 - generatedVal1)/2;
       }
+      */
 
       FillBabyNtuple();
 
