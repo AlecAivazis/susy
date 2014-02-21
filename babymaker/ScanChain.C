@@ -118,15 +118,11 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
       std::vector<LorentzVector> _jets_p4_min ;
       std::vector<float> _jets_p4_minCorrection ;
-
       
       vector<float> _deltaM;
       vector<float> _avgM;
       vector<float> _minJetPt;
       
-      float deltaMin40 = 1000;
-      float _avgM40 = 0;
-
       if (hyp_p4().size() != 0) eventHypCounter++;
 
       hypCounter = hypCounter + hyp_p4().size();
@@ -137,30 +133,30 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
           if (hyp_ll_p4().at(i).pt() < 20) continue;
           if (hyp_lt_p4().at(i).pt() < 20) continue;
-          
           _hypPt20Counter++;
           
           // oppositely charged leptons
           if (hyp_ll_charge().at(i)*hyp_lt_charge().at(i) > 0) continue;
-          
           _osCounter++;
 
           // ignore ee events
           if (hyp_type().at(i) == 3) continue;
-
           _typeCounter++;
 
+          // eta < 2.4
           if (fabs(hyp_ll_p4().at(i).eta()) > 2.4) continue;
           if (fabs(hyp_lt_p4().at(i).eta()) > 2.4) continue;
           _etaCounter++;
 
           // electron id/iso
-
           if (abs(hyp_ll_id().at(i)) == 11 || abs(hyp_lt_id().at(i)) == 11) {
 
-              //  if(!samesign2011::isGoodLepton(hyp_lt_id().at(i), hyp_lt_index().at(i))) continue;
-              //if(!samesign2011::isGoodLepton(hyp_ll_id().at(i), hyp_ll_index().at(i))) continue;
+              /* This iso is too tight. Saving in case they change their mind....
+              if(!samesign2011::isGoodLepton(hyp_lt_id().at(i), hyp_lt_index().at(i))) continue;
+              if(!samesign2011::isGoodLepton(hyp_ll_id().at(i), hyp_ll_index().at(i))) continue;
+              */
 
+              // electron id
               if(abs(hyp_ll_id().at(i)) == 11){
                   if(!passElectronSelection_ZMet2012_v3_Iso(hyp_ll_index().at(i))) continue;
               }
@@ -168,8 +164,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
               if(abs(hyp_lt_id().at(i)) == 11){
                   if(!passElectronSelection_ZMet2012_v3_Iso(hyp_lt_index().at(i))) continue;
               }
-
               _electronIdCounter++;
+
 
               if(!samesign2011::isIsolatedLepton(hyp_lt_id().at(i), hyp_lt_index().at(i))) continue;
               if(!samesign2011::isIsolatedLepton(hyp_ll_id().at(i), hyp_ll_index().at(i))) continue;
@@ -224,6 +220,10 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           // cuts on k
           float jetPt = (pfjets_p4().at(k) * pfjets_corL1FastL2L3().at(k)).pt();
           if (jetPt < 20) continue; 
+
+          // save the jets that have at least 20 pt
+          _jets_p4_min.push_back(pfjets_p4().at(k));
+          _jets_p4_minCorrection.push_back(pfjets_corL1FastL2L3().at(k));
                 
           float dR_lt = DeltaR(pfjets_p4().at(k), hyp_lt_p4().at(index));
           float dR_ll = DeltaR(pfjets_p4().at(k), hyp_ll_p4().at(index));
@@ -236,181 +236,132 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
           if (_bTag < looseDiscriminant) continue;
 
-          // save the jets that have at least 20 pt
-          _jets_p4_min.push_back(pfjets_p4().at(k));
-          _jets_p4_minCorrection.push_back(pfjets_corL1FastL2L3().at(k));
-
           // increment the number of bTags
           _nBtags++;
 
-          if (jetPt < 40) continue;
+      }
 
-          float _deltaM40 = 0;
+      // now that we've selected a hypothesis, loop over the generated p4
+      // and find the matching particle, store its index and value
+      float generatedVal1 = -1;
+      float generatedVal2 = -1;
+      int llGenerated = -1;
+      int ltGenerated = -1;
+      int jetllGenerated = -1;
+      int jetltGenerated =-1;
 
-          float val140 = (hyp_ll_p4().at(index) + pfjets_p4().at(k)).mass();
+      float ll_dRmin = 1001;
+      float lt_dRmin = 1001;
+      float llJet_dRmin = 1001;
+      float ltJet_dRmin = 1001;
 
-          for (unsigned int l = 0; l< pfjets_p4().size(); l++){
+      for ( int i = 0; i < genps_p4().size(); i++ ){
 
-              // cuts on l loop
-              if (l == k) continue;
-
-              float l_jetPt = (pfjets_p4().at(l) * pfjets_corL1FastL2L3().at(l)).pt();
-
-              if (l_jetPt < 20) continue; 
-
-              float l_dR_lt = DeltaR(pfjets_p4().at(l), hyp_lt_p4().at(index));
-              float l_dR_ll = DeltaR(pfjets_p4().at(l), hyp_ll_p4().at(index));
-                    
-              if (l_dR_ll < 0.4) continue;
-              if (l_dR_lt < 0.4) continue;
-              
-              float l_bTag = pfjets_combinedSecondaryVertexBJetTag().at(l);
-
-              if (l_bTag < looseDiscriminant) continue;    
-              
-              if (l_jetPt < 40) continue;
-              
-              float val240 = (hyp_lt_p4().at(index) + pfjets_p4().at(l)).mass();
-
-              _deltaM40 = val240 - val140;
-
-              if (abs(_deltaM40) <= abs(deltaMin40)) {
-                  deltaMin40 = _deltaM40;
-                  _avgM40 = (val140 + val240)/2; 
-                  jetltIndex = l;
-                  jetllIndex = k;
-              }
+          float deltaR = DeltaR(genps_p4().at(i), hyp_ll_p4().at(index));
+          
+          if (deltaR < ll_dRmin) {
+              ll_dRmin = deltaR;
+              llGenerated = i;
           }
       }
-    // now that we've selected a hypothesis, loop over the generated p4
-          // and find the matching particle
-          float generatedVal1 = -1;
-          float generatedVal2 = -1;
-          int llGenerated = -1;
-          int ltGenerated = -1;
-          int jetllGenerated = -1;
-          int jetltGenerated =-1;
-
-      if (jetltIndex != -1 && jetllIndex != -1 ){
-
       
-      
-          float ll_dRmin = 1001;
-          float lt_dRmin = 1001;
-          float llJet_dRmin = 1001;
-          float ltJet_dRmin = 1001;
+      for ( int i = 0; i < genps_p4().size(); i++ ){
 
-          for ( int i = 0; i < genps_p4().size(); i++ ){
+          if (i == llGenerated) continue;
 
-              float deltaR = DeltaR(genps_p4().at(i), hyp_ll_p4().at(index));
+          float deltaR = DeltaR(genps_p4().at(i), hyp_lt_p4().at(index));
           
-              if (deltaR < ll_dRmin) {
-                  ll_dRmin = deltaR;
-                  llGenerated = i;
-              }
+          if (deltaR < lt_dRmin) {
+              lt_dRmin = deltaR;
+              ltGenerated = i;
           }
-      
-          for ( int i = 0; i < genps_p4().size(); i++ ){
+      }
 
-              if (i == llGenerated) continue;
+      for ( int i = 0; i < genps_p4().size(); i++ ){
 
-              float deltaR = DeltaR(genps_p4().at(i), hyp_lt_p4().at(index));
+          if (i == llGenerated || i == ltGenerated) continue;
+
+          float deltaR = DeltaR(genps_p4().at(i), pfjets_p4().at(jetllIndex));
           
-              if (deltaR < lt_dRmin) {
-                  lt_dRmin = deltaR;
-                  ltGenerated = i;
-              }
+          if (deltaR < llJet_dRmin) {
+              llJet_dRmin = deltaR;
+              jetllGenerated = i;
           }
-
-          for ( int i = 0; i < genps_p4().size(); i++ ){
-
-              if (i == llGenerated || i == ltGenerated) continue;
-
-              float deltaR = DeltaR(genps_p4().at(i), pfjets_p4().at(jetllIndex));
-          
-              if (deltaR < llJet_dRmin) {
-                  llJet_dRmin = deltaR;
-                  jetllGenerated = i;
-              }
-          }
+      }
   
-          for ( int i = 0; i < genps_p4().size(); i++ ){
+      for ( int i = 0; i < genps_p4().size(); i++ ){
 
-              if (i == llGenerated || i == ltGenerated || i == jetllGenerated) continue;
+          if (i == llGenerated || i == ltGenerated || i == jetllGenerated) continue;
 
-              float deltaR = DeltaR(genps_p4().at(i), pfjets_p4().at(jetltIndex));
+          float deltaR = DeltaR(genps_p4().at(i), pfjets_p4().at(jetltIndex));
           
-              if (deltaR < ltJet_dRmin) {
-                  ltJet_dRmin = deltaR;
-                  jetltGenerated = i;
-              }
-          }    
+          if (deltaR < ltJet_dRmin) {
+              ltJet_dRmin = deltaR;
+              jetltGenerated = i;
+          }
+      }    
+
+      if (llGenerated != -1 && ltGenerated != -1 && jetllGenerated != -1 && jetltGenerated != -1){
+
+          if (isValidPair(llGenerated, jetllGenerated))
+              generatedVal1 = (genps_p4().at(llGenerated) + genps_p4().at(jetllGenerated)).mass();
 
 
-
-          if (llGenerated != -1 && ltGenerated != -1 && jetllGenerated != -1 && jetltGenerated != -1){
-
-              if (isValidPair(llGenerated, jetllGenerated))
-                  generatedVal1 = (genps_p4().at(llGenerated) + genps_p4().at(jetllGenerated)).mass();
-
-
-              if (isValidPair(ltGenerated, jetltGenerated))
-                  generatedVal2 = (genps_p4().at(ltGenerated) + genps_p4().at(jetltGenerated)).mass();
+          if (isValidPair(ltGenerated, jetltGenerated))
+              generatedVal2 = (genps_p4().at(ltGenerated) + genps_p4().at(jetltGenerated)).mass();
      
-          }
-
-          // Progress
-          CMS2::progress( nEventsTotal, nEventsChain );
-
-          InitBabyNtuple();
-
-          //analysis
-          met = evt_pfmet_type1cor();;
-
-          nBtags = _nBtags;
-
-          maxPt = _maxPt;
-
-          ll_iso = muonCorIsoValue(hyp_ll_index().at(index), false);
-          // lt_iso = muonCorIsoValue(hyp_lt_index().at(index), false);
-
-          cout << muonCorIsoValue(hyp_ll_index().at(index), false) << endl;
-
-          jets_p4 = pfjets_p4();
-          jets_p4Correction = pfjets_corL1FastL2L3();
-      
-          jets_p4_min = _jets_p4_min;
-          jets_p4_minCorrection = _jets_p4_minCorrection;
-
-          type = hyp_type().at(index);
-
-          ll_p4 = hyp_ll_p4().at(index);
-          ll_id = hyp_ll_id().at(index);
-          total_p4 = hyp_p4().at(index);
-          ll_charge = hyp_ll_charge().at(index);
-          ll_index = hyp_ll_index().at(index);
-
-          lt_p4 = hyp_lt_p4().at(index);
-          lt_charge = hyp_lt_charge().at(index);
-          lt_id = hyp_lt_id().at(index);
-          lt_index = hyp_lt_index().at(index);
-
-          btagDiscriminant = pfjets_combinedSecondaryVertexBJetTag();
-          scale_1fb = evt_scale1fb();
-          numEvents = tree->GetEntries();
-          file = Form("%s", currentFile->GetTitle());
-
-          eventNumber = evt_event();
-          runNumber = evt_run();
-          lumiBlock = evt_lumiBlock();
-
-          if (generatedVal2 != -1 && generatedVal1 != -1){
-              generatedAvgMass = (generatedVal2 + generatedVal1)/2;
-              generatedDeltaMass = (generatedVal2 - generatedVal1)/2;
-          }
-
-          FillBabyNtuple();
       }
+
+
+      // Progress
+      CMS2::progress( nEventsTotal, nEventsChain );
+
+      InitBabyNtuple();
+
+      //analysis
+      met = evt_pfmet_type1cor();;
+
+      nBtags = _nBtags;
+
+      maxPt = _maxPt;
+
+      ll_iso = muonCorIsoValue(hyp_ll_index().at(index), false);
+      //lt_iso = muonCorIsoValue(hyp_lt_index().at(index), false);
+
+      jets_p4 = pfjets_p4();
+      jets_p4Correction = pfjets_corL1FastL2L3();
+      
+      jets_p4_min = _jets_p4_min;
+      jets_p4_minCorrection = _jets_p4_minCorrection;
+
+      type = hyp_type().at(index);
+
+      ll_p4 = hyp_ll_p4().at(index);
+      ll_id = hyp_ll_id().at(index);
+      total_p4 = hyp_p4().at(index);
+      ll_charge = hyp_ll_charge().at(index);
+      ll_index = hyp_ll_index().at(index);
+
+      lt_p4 = hyp_lt_p4().at(index);
+      lt_charge = hyp_lt_charge().at(index);
+      lt_id = hyp_lt_id().at(index);
+      lt_index = hyp_lt_index().at(index);
+
+      btagDiscriminant = pfjets_combinedSecondaryVertexBJetTag();
+      scale_1fb = evt_scale1fb();
+      numEvents = tree->GetEntries();
+      file = Form("%s", currentFile->GetTitle());
+
+      eventNumber = evt_event();
+      runNumber = evt_run();
+      lumiBlock = evt_lumiBlock();
+
+      if (generatedVal2 != -1 && generatedVal1 != -1){
+          generatedAvgMass = (generatedVal2 + generatedVal1)/2;
+          generatedDeltaMass = (generatedVal2 - generatedVal1)/2;
+      }
+
+      FillBabyNtuple();
 
 
     } // end of loop over events in file
@@ -428,8 +379,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
   cout << nDuplicates << " duplicate events were skipped." << endl;
 
   CloseBabyNtuple();
-
-  float expectedN = _eventsCounter * scale_1fb * 19.5;  
 
   ofstream stream;
   stream.open("cutflow.txt", ios::app);
@@ -452,8 +401,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
   stream << "-" << endl;
   stream << Form("# of hypothesis passing ID/ISO: %.0f (%.2f)",(_muonIsoCounter + _electronIsoCounter), (_muonIsoCounter + _electronIsoCounter)/hypCounter * 100) << endl;
   stream << Form("# of events passing ID/ISO: %.0f (%.2f)",(_eventsCounter), (_eventsCounter)/eventHypCounter * 100) << endl;
-  stream << Form("# of expected events: %.0f ",expectedN) << endl;
-  
 //stream << Form("Muon Events: %.0f (%.2f)", muonCounter, muonCounter/nEventsMini * 100) << endl;
   stream << "--------------------------------" << endl;
 

@@ -78,3 +78,43 @@ Muon Id/Iso-
 # of events passing ID/ISO: 241188 (20.81)
 # of expected events: 5946 
 --------------------------------
+ttjets: 
+Source (Events): 6923750
+Events with Hypothesis: 2040030 (29.46)
+Source (Hypotheses): 3704021
+Hypothesis Pt > 20: 1464825 (39.55, 0.60)
+Oppositely Charged: 868811 (23.46, 0.41)
+Ignoring ee events: 567194 (15.31, 0.35)
+Eta < 2.4: 559926 (15.12, 0.01)
+Electron Id/Iso-
+e/mu passing ID: 169828 (4.58, 0.70)
+e/mu passing ISO: 96612 (2.61, 0.43)
+Muon Id/Iso-
+# of muons : 160632 (4.34)
+# muons passing ID: 49606 (1.34, 0.91)
+# muons passing ISO: 43763 (1.18, 0.12)
+-
+# of hypothesis passing ID/ISO: 140375 (3.79)
+# of events passing ID/ISO: 139853 (6.86)
+# of expected events: 92168 
+--------------------------------
+dy: 
+Source (Events): 27137253
+Events with Hypothesis: 12276702 (45.24)
+Source (Hypotheses): 16818558
+Hypothesis Pt > 20: 9376858 (55.75, 0.44)
+Oppositely Charged: 8998709 (53.50, 0.04)
+Ignoring ee events: 4727799 (28.11, 0.47)
+Eta < 2.4: 4633481 (27.55, 0.02)
+Electron Id/Iso-
+e/mu passing ID: 59315 (0.35, 0.99)
+e/mu passing ISO: 36567 (0.22, 0.38)
+Muon Id/Iso-
+# of muons : 4488042 (26.69)
+# muons passing ID: 3734066 (22.20, 0.19)
+# muons passing ISO: 3433020 (20.41, 0.08)
+-
+# of hypothesis passing ID/ISO: 3469587 (20.63)
+# of events passing ID/ISO: 3467574 (28.25)
+# of expected events: 7842570 
+--------------------------------

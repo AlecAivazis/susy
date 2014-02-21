@@ -1,4 +1,4 @@
-doSignal(std::string suffix ="", int numEvents=0)
+doSignal(int numEvents=0, std::string suffix ="")
 {
 
   gSystem->AddIncludePath(Form("-I%s/CORE", gSystem->Getenv("HOME")));
