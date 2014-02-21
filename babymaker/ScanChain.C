@@ -182,7 +182,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
               _electronIsoCounter++;
           }
 
-          // select the highest pt hypothesis - Alex does the pt of the sum. Can't those cancel before you take the measurement?
+          // select the highest pt hypothesis
           float sumPt = hyp_lt_p4().at(i).pt() + hyp_ll_p4().at(i).pt();
          
           if (sumPt > _maxPt){
