@@ -113,13 +113,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       int index = -1;
       float _maxPt = 0.0;
 
-      std::vector<LorentzVector> _jets_p4_min ;
-      std::vector<float> _jets_p4_minCorrection ;
-      
-      vector<float> _deltaM;
-      vector<float> _avgM;
-      vector<float> _minJetPt;
-      
       if (hyp_p4().size() != 0) eventHypCounter++;
 
       hypCounter = hypCounter + hyp_p4().size();
@@ -284,9 +277,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
       jets_p4 = pfjets_p4();
       jets_p4Correction = pfjets_corL1FastL2L3();
-      
-      jets_p4_min = _jets_p4_min;
-      jets_p4_minCorrection = _jets_p4_minCorrection;
 
       type = hyp_type().at(index);
 
