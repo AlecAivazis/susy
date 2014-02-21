@@ -12,7 +12,6 @@
 
 // CMS2
 #include "CMS2.h"
-
 #include "/home/users/aaivazis/CORE/electronSelections.h"
 #include "/home/users/aaivazis/CORE/muonSelections.h"
 #include "/home/users/aaivazis/CORE/ssSelections.h"
@@ -31,7 +30,7 @@ using namespace ROOT::Math::VectorUtil;
 
 bool isValidPair(int hypIndex, int jetIndex){
 
-    // require the pair to be either mu- b or mu+ bbar
+    // require the generated pair to be either mu- b or mu+ bbar
     // 
  
     // if(genps_id().at(hypIndex) * genps_id().at(jetIndex) ) return false;
@@ -78,10 +77,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
   double hypCounter = 0;
   double eventHypCounter = 0;
 
-  // double CR1counter = 0;
-  //double CR2counter = 0;
-  //double CR3counter = 0;
-
   while ( (currentFile = (TFile*)fileIter.Next()) ) {
 
     fileCounter++;
@@ -109,14 +104,14 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       cms2.GetEntry(event);
       ++nEventsTotal;
 
-      // float maxPt = 0;
       int index = -1;
       float _maxPt = 0.0;
 
+      // count number of hypotheses
       if (hyp_p4().size() != 0) eventHypCounter++;
 
       hypCounter = hypCounter + hyp_p4().size();
-
+      
       // apply cuts to hypotheses
       for (unsigned int i = 0; i< hyp_p4().size(); i++){
 
@@ -124,7 +119,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           if (hyp_lt_p4().at(i).pt() < 20) continue;
           _hypPt20Counter++;
           
-          // oppositely charged leptons
+          // oppositely charged leptons - NOTE: NOT WHAT ALEX DOES (uses id voodoo hoodoo)
           if (hyp_ll_charge().at(i)*hyp_lt_charge().at(i) > 0) continue;
           _osCounter++;
 
@@ -137,39 +132,52 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           if (fabs(hyp_lt_p4().at(i).eta()) > 2.4) continue;
           _etaCounter++;
 
-
           /* This iso is too tight. Saving in case they change their mind....
              if(!samesign2011::isGoodLepton(hyp_lt_id().at(i), hyp_lt_index().at(i))) continue;
              if(!samesign2011::isGoodLepton(hyp_ll_id().at(i), hyp_ll_index().at(i))) continue;
           */
+
+          // count number of muons before ID/iso
+          if (abs(hyp_ll_id().at(i)) == 13 && abs(hyp_lt_id().at(i)) == 13) {
+	      _muonCounter++;
+          }
 
           // electron id
           if (abs(hyp_ll_id().at(i) == 11) && !passElectronSelection_ZMet2012_v3_Iso(hyp_ll_index().at(i))) continue;
           if (abs(hyp_lt_id().at(i) == 11) && !passElectronSelection_ZMet2012_v3_Iso(hyp_lt_index().at(i))) continue;
           _electronIdCounter++;
 
-
-          // electron iso
-          if(!samesign2011::isIsolatedLepton(hyp_lt_id().at(i), hyp_lt_index().at(i))) continue;
-          if(!samesign2011::isIsolatedLepton(hyp_ll_id().at(i), hyp_ll_index().at(i))) continue;
-          _electronIsoCounter++;
-          
- 
-          // count number of muons before ID/iso
-          if (abs(hyp_ll_id().at(i)) == 13 && abs(hyp_lt_id().at(i)) == 13) {
-	      _muonCounter++;
-          }
-
           // muon id
           if (abs(hyp_ll_id().at(i)) == 13 && !muonId(hyp_ll_index().at(i), ZMet2012_v1)) continue;
           if (abs(hyp_lt_id().at(i)) == 13 && !muonId(hyp_lt_index().at(i), ZMet2012_v1)) continue;
           _muonIdCounter++;
 
-          // muon iso
-          if(!samesign2011::isIsolatedLepton(hyp_lt_id().at(i), hyp_lt_index().at(i))) continue;
-          if(!samesign2011::isIsolatedLepton(hyp_ll_id().at(i), hyp_ll_index().at(i))) continue;
-          _muonIsoCounter++;
+          // isolation - variables
+          double chiso_ll = mus_isoR03_pf_ChargedHadronPt().at(hyp_ll_index().at(i));
+          double nhiso_ll = mus_isoR03_pf_NeutralHadronEt().at(hyp_ll_index().at(i));
+          double emiso_ll = mus_isoR03_pf_PhotonEt().at(hyp_ll_index().at(i));
+          double dbeta_ll = mus_isoR03_pf_PUPt().at(hyp_ll_index().at(i));
+          double iso_ll = (chiso_ll + max(0.0, nhiso_ll + emiso_ll - 0.5 * dbeta_ll)) / hyp_ll_p4().at(i).pt();
 
+          double chiso_lt = mus_isoR03_pf_ChargedHadronPt().at(hyp_lt_index().at(i));
+          double nhiso_lt = mus_isoR03_pf_NeutralHadronEt().at(hyp_lt_index().at(i));
+          double emiso_lt = mus_isoR03_pf_PhotonEt().at(hyp_lt_index().at(i));
+          double dbeta_lt = mus_isoR03_pf_PUPt().at(hyp_lt_index().at(i));
+          double iso_lt = (chiso_lt + max(0.0, nhiso_lt + emiso_lt - 0.5 * dbeta_lt)) / hyp_lt_p4().at(i).pt();
+         
+          // isolation - cuts
+          if (abs(hyp_ll_id().at(i)) == 11 && iso_ll > 0.15) continue;
+          if (abs(hyp_lt_id().at(i)) == 11 && iso_lt > 0.15) continue;
+          if (abs(hyp_ll_id().at(i)) == 13 && iso_ll > 0.2) continue;
+          if (abs(hyp_lt_id().at(i)) == 13 && iso_lt > 0.2) continue;
+
+          // count the number of electrons and muons that pass
+          // if it's not a mu/mu then it's an e/mu
+          if (hyp_lt_id().at(i) == 13 && hyp_ll_id().at(i) == 13){
+              _muonIsoCounter++;
+          } else {
+              _electronIsoCounter++;
+          }
 
           // select the highest pt hypothesis
           float sumPt = hyp_lt_p4().at(i).pt() + hyp_ll_p4().at(i).pt();
@@ -183,7 +191,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
       if (index == -1) continue;
       _eventsCounter++;
-      
+
       /*
       now that we've selected a hypothesis, loop over the generated p4
       and find the matching particle, store its index and value
