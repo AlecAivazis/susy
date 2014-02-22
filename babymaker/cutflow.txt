@@ -156,3 +156,22 @@ Muon Id/Iso-
 # of hypothesis passing ID/ISO: 8207 (10.38)
 # of events passing ID/ISO: 8206 (22.81)
 --------------------------------
+test: 
+Source (Events): 55025
+Events with Hypothesis: 35980 (65.39)
+Source (Hypotheses): 79069
+Hypothesis Pt > 20: 26970 (34.11, 0.66)
+Oppositely Charged: 23409 (29.61, 0.13)
+Ignoring ee events: 10849 (13.72, 0.54)
+Eta < 2.4: 10700 (13.53, 0.01)
+Electron Id/Iso-
+e/mu passing ID: 10700 (13.53, 0.00)
+e/mu passing ISO: 8207 (10.38, 0.23)
+Muon Id/Iso-
+# of muons : 10700 (13.53)
+# muons passing ID: 8207 (10.38, 0.23)
+# muons passing ISO: 0 (0.00, 1.00)
+-
+# of hypothesis passing ID/ISO: 8207 (10.38)
+# of events passing ID/ISO: 8206 (22.81)
+--------------------------------
