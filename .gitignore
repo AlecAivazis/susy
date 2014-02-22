@@ -3,3 +3,5 @@
 *~
 *.root
 analysis/images/
+analysis/cutflow.txt
+babymaker/cutflow.txt
