@@ -337,7 +337,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
   stream << Form("Source (Hypotheses): %.0f", hypCounter) << endl;
   stream << Form("Hypothesis Pt > 20: %.0f (%.2f, %.2f)",_hypPt20Counter, _hypPt20Counter/hypCounter * 100, 1-(_hypPt20Counter/hypCounter)) << endl;
   stream << Form("Oppositely Charged: %.0f (%.2f, %.2f)",_osCounter, _osCounter/hypCounter * 100, 1-(_osCounter/_hypPt20Counter)) << endl;
-  stream << Form("Ignoring ee events: %.0f (%.2f, %.2f)",_typeCounter, _typeCounter/hypCounter * 100, 1-(_typeCounter/_osCounter)) << endl;
+  stream << Form("Requiring one muon: %.0f (%.2f, %.2f)",_typeCounter, _typeCounter/hypCounter * 100, 1-(_typeCounter/_osCounter)) << endl;
   stream << Form("Eta < 2.4: %.0f (%.2f, %.2f)",_etaCounter, _etaCounter/hypCounter * 100, 1-(_etaCounter/_typeCounter)) << endl;
   stream << "Electron Id/Iso-" << endl; 
   stream << Form("e/mu passing ID: %.0f (%.2f, %.2f)", _electronIdCounter, _electronIdCounter/hypCounter * 100, 1-(_electronIdCounter/_etaCounter)) << endl;
