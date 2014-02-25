@@ -127,7 +127,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           _osCounter++;
 
           // ignoring ee
-          if (abs(hyp_ll_id().at(i)) != 13 || abs(hyp_lt_id().at(i)) != 13) continue;
+          if (abs(hyp_ll_id().at(i)) == 11 && abs(hyp_lt_id().at(i)) == 11) continue;
           _typeCounter++;
 
           // eta < 2.4
