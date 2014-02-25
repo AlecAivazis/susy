@@ -1,2 +1,2 @@
 #!/bin/bash
-root -b -q "doZZ.C(1, \"test\")"
+root -b -q "doTTbar.C(1, \"test\")"
