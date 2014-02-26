@@ -155,24 +155,36 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           if (abs(hyp_lt_id().at(i)) == 13 && !muonId(hyp_lt_index().at(i), ZMet2012_v1)) continue;
           _muonIdCounter++;
 
-          // isolation - variables
-          double chiso_ll = mus_isoR03_pf_ChargedHadronPt().at(hyp_ll_index().at(i));
-          double nhiso_ll = mus_isoR03_pf_NeutralHadronEt().at(hyp_ll_index().at(i));
-          double emiso_ll = mus_isoR03_pf_PhotonEt().at(hyp_ll_index().at(i));
-          double dbeta_ll = mus_isoR03_pf_PUPt().at(hyp_ll_index().at(i));
-          double iso_ll = (chiso_ll + max(0.0, nhiso_ll + emiso_ll - 0.5 * dbeta_ll)) / hyp_ll_p4().at(i).pt();
+          // ll muon isolation
+          if (abs(hyp_ll_id().at(i)) == 13){
+              double chiso_ll = mus_isoR03_pf_ChargedHadronPt().at(hyp_ll_index().at(i));
+              double nhiso_ll = mus_isoR03_pf_NeutralHadronEt().at(hyp_ll_index().at(i));
+              double emiso_ll = mus_isoR03_pf_PhotonEt().at(hyp_ll_index().at(i));
+              double dbeta_ll = mus_isoR03_pf_PUPt().at(hyp_ll_index().at(i));
+              double iso_ll = (chiso_ll + max(0.0, nhiso_ll + emiso_ll - 0.5 * dbeta_ll)) / hyp_ll_p4().at(i).pt();
 
-          double chiso_lt = mus_isoR03_pf_ChargedHadronPt().at(hyp_lt_index().at(i));
-          double nhiso_lt = mus_isoR03_pf_NeutralHadronEt().at(hyp_lt_index().at(i));
-          double emiso_lt = mus_isoR03_pf_PhotonEt().at(hyp_lt_index().at(i));
-          double dbeta_lt = mus_isoR03_pf_PUPt().at(hyp_lt_index().at(i));
-          double iso_lt = (chiso_lt + max(0.0, nhiso_lt + emiso_lt - 0.5 * dbeta_lt)) / hyp_lt_p4().at(i).pt();
+              if (iso_ll > 0.2) continue; 
+          }
+          
+          // lt muon isolation
+          if (abs(hyp_lt_id().at(i)) == 13){
+              double chiso_lt = mus_isoR03_pf_ChargedHadronPt().at(hyp_lt_index().at(i));
+              double nhiso_lt = mus_isoR03_pf_NeutralHadronEt().at(hyp_lt_index().at(i));
+              double emiso_lt = mus_isoR03_pf_PhotonEt().at(hyp_lt_index().at(i));
+              double dbeta_lt = mus_isoR03_pf_PUPt().at(hyp_lt_index().at(i));
+              double iso_lt = (chiso_lt + max(0.0, nhiso_lt + emiso_lt - 0.5 * dbeta_lt)) / hyp_lt_p4().at(i).pt();
+
+              if (iso_lt > 0.2) continue;
+          }
          
-          // isolation - cuts
-          if (abs(hyp_ll_id().at(i)) == 11 && iso_ll > 0.15) continue;
-          if (abs(hyp_lt_id().at(i)) == 11 && iso_lt > 0.15) continue;
-          if (abs(hyp_ll_id().at(i)) == 13 && iso_ll > 0.2) continue;
-          if (abs(hyp_lt_id().at(i)) == 13 && iso_lt > 0.2) continue;
+          // electron isolation 
+          if (abs(hyp_ll_id().at(i)) == 11){
+              if(!samesign2011::isGoodLepton(hyp_ll_id().at(i), hyp_ll_index().at(i))) continue;
+          };
+
+          if (abs(hyp_lt_id().at(i)) == 11){
+              if(!samesign2011::isGoodLepton(hyp_lt_id().at(i), hyp_lt_index().at(i))) continue;
+          };
 
           // count the number of electrons and muons that pass
           // if it's not a mu/mu then it's an e/mu
