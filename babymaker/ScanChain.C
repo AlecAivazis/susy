@@ -176,7 +176,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
           // count the number of electrons and muons that pass
           // if it's not a mu/mu then it's an e/mu
-          if (hyp_lt_id().at(i) == 13 && hyp_ll_id().at(i) == 13){
+          if (abs(hyp_lt_id().at(i)) == 13 && abs(hyp_ll_id().at(i)) == 13){
               _muonIsoCounter++;
           } else {
               _electronIsoCounter++;
