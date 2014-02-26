@@ -126,7 +126,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           if (hyp_ll_charge().at(i)*hyp_lt_charge().at(i) > 0) continue;
           _osCounter++;
 
-          // require one muon
+          // ignoring ee
           if (abs(hyp_ll_id().at(i)) == 11 && abs(hyp_lt_id().at(i)) == 11) continue;
           _typeCounter++;
 
