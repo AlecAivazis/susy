@@ -19,6 +19,10 @@
 #include "/home/users/aaivazis/CORE/eventSelections.h"
 #include "/home/users/aaivazis/CORE/susySelections.h"
 
+
+#include "/home/users/jgran/CMSSW_5_3_2_patch4_V05-03-23/src/CMS2/NtupleMacros/Tools/goodrun.cc"
+#include "Include.C"
+
 // header
 #include "ScanChain.h"
 
@@ -92,6 +96,9 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
     tree->SetCacheSize(128*1024*1024);
     cms2.Init(tree);
     
+    //Set Good Run List
+    if (evt_isRealData()) set_goodrun_file("/home/users/jgran/analysis/sswh/fakes/json/final_19p49fb_cms2.txt");
+
     // Event Loop
     unsigned int nEventsTree = tree->GetEntriesFast();
 
@@ -104,6 +111,16 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       cms2.GetEntry(event);
       ++nEventsTotal;
       
+       // Select Good Runs
+      if(evt_isRealData() && !goodrun(evt_run(), evt_lumiBlock())) continue;
+
+      if(evt_isRealData()){
+        DorkyEventIdentifier id = {evt_run(), evt_event(), evt_lumiBlock()};
+        if (is_duplicate(id)){
+          continue;
+        }
+      }
+
       // Progress
       CMS2::progress( nEventsTotal, nEventsChain );
 
