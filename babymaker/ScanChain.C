@@ -46,7 +46,9 @@ bool isValidPair(int hypIndex, int jetIndex){
 
 }
 
-void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int numEvent){
+void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int numEvent, float customScale){
+
+    cout << customScale << endl;
 
 
     if (numEvent != 0 ){
@@ -322,7 +324,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       lt_index = hyp_lt_index().at(index);
 
       btagDiscriminant = pfjets_combinedSecondaryVertexBJetTag();
-      scale_1fb = evt_scale1fb();
+
       numEvents = tree->GetEntries();
       file = Form("%s", currentFile->GetTitle());
 
@@ -330,7 +332,12 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       runNumber = evt_run();
       lumiBlock = evt_lumiBlock();
 
-      /*
+      if (customScale == -1){
+          scale_1fb = evt_scale1fb();
+      } else {
+          scale_1fb = customScale; 
+      } 
+    /*
       if (generatedVal2 != -1 && generatedVal1 != -1){
           generatedAvgMass = (generatedVal2 + generatedVal1)/2;
           generatedDeltaMass = (generatedVal2 - generatedVal1)/2;
