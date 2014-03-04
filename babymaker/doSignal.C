@@ -14,7 +14,7 @@ doSignal(int numEvents=0, std::string suffix ="")
   // 600 - 0.0248009
   // 800 - 0.00289588
 
-  // number of events in LHE file (use macro)
+  // number of events in LHE file (use macro to generate)
   // 200 - 42140
   // 600 - 40262
   // 800 - 40403
@@ -26,4 +26,9 @@ doSignal(int numEvents=0, std::string suffix ="")
   TChain *signal600 = new TChain("Events"); 
   signal600->Add("/home/users/aaivazis/susy/signals/raw/600/*.root");
   looper->ScanChain(signal600, "signal600" + suffix, numEvents, 25.0/40262.0); 
+  
+  TChain *signal800 = new TChain("Events"); 
+  signal800->Add("/home/users/aaivazis/susy/signals/raw/800/*.root");
+  looper->ScanChain(signal800, "signal800" + suffix, numEvents, 2.896/40403.0); 
+
 }
