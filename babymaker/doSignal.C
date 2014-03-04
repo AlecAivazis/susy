@@ -8,6 +8,17 @@ doSignal(int numEvents=0, std::string suffix ="")
 
   babyMaker *looper = new babyMaker();
   
+
+  // cross sections in pb
+  // 200 - 18.5245
+  // 600 - 0.0248009
+  // 800 - 0.00289588
+
+  // number of events in LHE file (use macro)
+  // 200 - 42140
+  // 600 - 40262
+  // 800 - 40403
+
   TChain *signal200 = new TChain("Events"); 
   signal200->Add("/home/users/aaivazis/susy/signals/raw/200/*.root");
   looper->ScanChain(signal200, "signal200" + suffix, numEvents, 18500.0/42140.0); 
