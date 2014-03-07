@@ -98,22 +98,22 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
     tree->SetCacheSize(128*1024*1024);
     cms2.Init(tree);
     
-    //Set Good Run List
+    // set good run list
     if (evt_isRealData()) set_goodrun_file("/home/users/jgran/analysis/sswh/fakes/json/final_19p49fb_cms2.txt");
 
-    // Event Loop
+    // event Loop
     unsigned int nEventsTree = tree->GetEntriesFast();
 
     nEventsMini = nEventsMini + nEventsTree;
 
     for(unsigned int event = 0; event < nEventsTree; ++event) {
 
-      // Get Event Content
+      // get event content
       tree->LoadTree(event);
       cms2.GetEntry(event);
       ++nEventsTotal;
       
-       // Select Good Runs
+       // select good vagina
       if(evt_isRealData() && !goodrun(evt_run(), evt_lumiBlock())) continue;
 
       if(evt_isRealData()){
