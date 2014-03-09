@@ -164,7 +164,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
              if(!isGoodLepton(hyp_ll_id().at(i), hyp_ll_index().at(i))) continue;
           */
 
-          // electron id
+          // electron id, includes iso
           if (abs(hyp_ll_id().at(i) == 11) && !passElectronSelection_ZMet2012_v3_Iso(hyp_ll_index().at(i))) continue;
           if (abs(hyp_lt_id().at(i) == 11) && !passElectronSelection_ZMet2012_v3_Iso(hyp_lt_index().at(i))) continue;
           _electronIdCounter++;
