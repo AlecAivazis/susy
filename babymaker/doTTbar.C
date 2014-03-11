@@ -8,6 +8,7 @@ doTTbar(int numEvents = 0, std::string file_name = "ttjets")
   babyMaker *looper = new babyMaker();
 
   TChain *ttjets = new TChain("Events"); 
-  ttjets->Add("/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23/*.root");
+  //ttjets->Add("/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23/*.root");
+  ttjets->Add("/hadoop/cms/store/group/snt/papers2012/Summer12_53X_MC/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola_Summer12_DR53X-PU_S10_START53_V7A-v1/V05-03-23/merged_ntuple_1.root");
   looper->ScanChain(ttjets, file_name, numEvents); 
 }

@@ -48,9 +48,6 @@ bool isValidPair(int hypIndex, int jetIndex){
 
 void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int numEvent, float customScale){
 
-    cout << customScale << endl;
-
-
     if (numEvent != 0 ){
         cout << "Processing the first " << numEvent << " file(s)" << endl;
     }
@@ -112,7 +109,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       tree->LoadTree(event);
       cms2.GetEntry(event);
       ++nEventsTotal;
-      
+
        // select good vagina
       if(evt_isRealData() && !goodrun(evt_run(), evt_lumiBlock())) continue;
 
@@ -164,12 +161,12 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
              if(!isGoodLepton(hyp_ll_id().at(i), hyp_ll_index().at(i))) continue;
           */
 
-          // electron id
-          if (abs(hyp_ll_id().at(i) == 11) && !passElectronSelection_ZMet2012_v3_Iso(hyp_ll_index().at(i))) continue;
-          if (abs(hyp_lt_id().at(i) == 11) && !passElectronSelection_ZMet2012_v3_Iso(hyp_lt_index().at(i))) continue;
+          // electron id and iso
+          if (abs(hyp_ll_id().at(i)) == 11 && !passElectronSelection_ZMet2012_v3_Iso(hyp_ll_index().at(i))) continue;
+          if (abs(hyp_lt_id().at(i)) == 11 && !passElectronSelection_ZMet2012_v3_Iso(hyp_lt_index().at(i))) continue;
           _electronIdCounter++;
 
-          // muon id
+          // muon id and iso
           if (abs(hyp_ll_id().at(i)) == 13 && !muonId(hyp_ll_index().at(i), ZMet2012_v1)) continue;
           if (abs(hyp_lt_id().at(i)) == 13 && !muonId(hyp_lt_index().at(i), ZMet2012_v1)) continue;
           _muonIdCounter++;
@@ -373,15 +370,10 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
   stream << Form("Source (Hypotheses): %.0f", hypCounter) << endl;
   stream << Form("Hypothesis Pt > 20: %.0f (%.2f, %.2f)",_hypPt20Counter, _hypPt20Counter/hypCounter * 100, 1-(_hypPt20Counter/hypCounter)) << endl;
   stream << Form("Oppositely Charged: %.0f (%.2f, %.2f)",_osCounter, _osCounter/hypCounter * 100, 1-(_osCounter/_hypPt20Counter)) << endl;
-  stream << Form("Requiring one muon: %.0f (%.2f, %.2f)",_typeCounter, _typeCounter/hypCounter * 100, 1-(_typeCounter/_osCounter)) << endl;
   stream << Form("Eta < 2.4: %.0f (%.2f, %.2f)",_etaCounter, _etaCounter/hypCounter * 100, 1-(_etaCounter/_typeCounter)) << endl;
-  stream << "Electron Id/Iso-" << endl; 
   stream << Form("e/mu passing ID: %.0f (%.2f, %.2f)", _electronIdCounter, _electronIdCounter/hypCounter * 100, 1-(_electronIdCounter/_etaCounter)) << endl;
-  stream << Form("e/mu passing ISO: %.0f (%.2f, %.2f)",_electronIsoCounter, _electronIsoCounter/hypCounter * 100, 1-(_electronIsoCounter/_electronIdCounter)) << endl;
-  stream << "Muon Id/Iso-" << endl; 
   stream << Form("# of muons : %.0f (%.2f)",_muonCounter, _muonCounter/hypCounter * 100) << endl;
   stream << Form("# muons passing ID: %.0f (%.2f, %.2f)",_muonIdCounter, _muonIdCounter/hypCounter * 100, 1-(_muonIdCounter/_etaCounter)) << endl;
-  stream << Form("# muons passing ISO: %.0f (%.2f, %.2f)",_muonIsoCounter, _muonIsoCounter/hypCounter * 100, 1-(_muonIsoCounter/_muonIdCounter)) << endl;
   stream << "-" << endl;
   stream << Form("# of hypothesis passing ID/ISO: %.0f (%.2f)",(_muonIsoCounter + _electronIsoCounter), (_muonIsoCounter + _electronIsoCounter)/hypCounter * 100) << endl;
   stream << Form("# of events passing ID/ISO: %.0f (%.2f)",(_eventsCounter), (_eventsCounter)/eventHypCounter * 100) << endl;
