@@ -4,4 +4,5 @@
 *.root
 analysis/images/
 analysis/cutflow.txt
+analysis/eventsList.txt
 babymaker/cutflow.txt
