@@ -6,3 +6,4 @@ analysis/images/
 analysis/cutflow.txt
 analysis/dataEventList.txt
 babymaker/cutflow.txt
+tmp/
