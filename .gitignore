@@ -7,3 +7,5 @@ analysis/cutflow.txt
 analysis/dataEventList.txt
 babymaker/cutflow.txt
 tmp/
+signals/
+/*.txt
