@@ -39,7 +39,7 @@ diffSet = list(diffSet)
 
 # check if the two sets were the same
 if len(diffSet) == 0:
-    print "They're the same (order doesn't matter)"
+    print "They're the same"
 
 # if the difference is non zero, then iterate over the difference and print
 else:
