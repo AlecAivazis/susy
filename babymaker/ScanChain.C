@@ -150,6 +150,9 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           if (fabs(hyp_ll_p4().at(i).eta()) > 2.4) continue;
           if (fabs(hyp_lt_p4().at(i).eta()) > 2.4) continue;
           _etaCounter++;
+            
+          // invariant mass > 20
+          if ((hyp_ll_p4().at(i)+hyp_lt_p4().at(i)).M() < 20) continue;
 
           // count number of muons before ID/iso
           if (abs(hyp_ll_id().at(i)) == 13 && abs(hyp_lt_id().at(i)) == 13) {

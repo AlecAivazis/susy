@@ -18,7 +18,7 @@ doSignal(int numEvents=0, std::string suffix ="")
   // 200 - 42140
   // 600 - 40262
   // 800 - 40403
-
+  
   TChain *signal200 = new TChain("Events"); 
   signal200->Add("/home/users/aaivazis/susy/signals/raw/200/*.root");
   looper->ScanChain(signal200, "signal200" + suffix, numEvents, 18500.0/42140.0); 
@@ -30,5 +30,9 @@ doSignal(int numEvents=0, std::string suffix ="")
   TChain *signal800 = new TChain("Events"); 
   signal800->Add("/home/users/aaivazis/susy/signals/raw/800/*.root");
   looper->ScanChain(signal800, "signal800" + suffix, numEvents, 2.896/40403.0); 
+  
+  TChain *signal1000 = new TChain("Events"); 
+  signal1000->Add("/home/users/aaivazis/susy/signals/raw/1000/*.root");
+  looper->ScanChain(signal1000, "signal1000" + suffix, numEvents, 0.416/100000.0); 
 
 }
