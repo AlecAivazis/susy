@@ -1,3 +1,3 @@
 #!/bin/bash
-root -b -q "doData.C(1, \"test(one)\")"
+root -b -q "doData.C(1, \"test\")"
 

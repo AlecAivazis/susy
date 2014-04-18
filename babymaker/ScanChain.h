@@ -43,6 +43,7 @@ class babyMaker {
 
   //baby ntuple variables
   float met;
+  float metPhi;
 
   //std::vector<LorentzVector> jets_p4;
   std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > jets_p4;
@@ -89,6 +90,7 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_ = new TTree("tree", "A Baby Ntuple");
 
   BabyTree_->Branch("met", &met );
+  BabyTree_->Branch("metPhi", &metPhi );
   BabyTree_->Branch("jets_p4", &jets_p4 );
   BabyTree_->Branch("jets_p4Correction", &jets_p4Correction );
   BabyTree_->Branch("type", &type);
@@ -125,6 +127,7 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
 void babyMaker::InitBabyNtuple () {
 
   met = -999.0;
+  metPhi = 0;
 
   type = -1;
 
