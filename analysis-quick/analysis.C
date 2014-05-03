@@ -23,7 +23,7 @@ bool isGoodJet(int index) {
     return true;
 }
 
-int fillPlot(TChain* samples, TH1F* plot, int useJetCorrection){
+int fillPlot(TChain* samples, TH1F* plot, bool useJetCorrection=false){
 
     // get the list of files from the chain
     TObjArray* files = samples->GetListOfFiles();
@@ -79,27 +79,35 @@ int fillPlot(TChain* samples, TH1F* plot, int useJetCorrection){
                     if (k == j) continue;
                     // make sure the second jet is good too
                     if (! isGoodJet(k)) continue;
-                    
-                    // if it is, compute the corrections from the system of equation
-                    
-                    // Ex = alpha*ja_x + beta*jb_x
-                    // Ey = alpha*ja_y + beta*jb_y
-                    
-                    // save values that are used for the jet met correction
-                    float metx = met()*cos(metPhi());
-                    float mety = met()*sin(metPhi());
-                    float ja_x = jets_p4().at(j).X()*jets_p4Correction().at(j);
-                    float ja_y = jets_p4().at(j).Y()*jets_p4Correction().at(j);
-                    float jb_x = jets_p4().at(k).X()*jets_p4Correction().at(k);
-                    float jb_y = jets_p4().at(k).Y()*jets_p4Correction().at(k);
 
-                    // save the corrected values (solution was found using Mathematica).
-                    float alpha = (mety*jb_x - metx*jb_y) / (ja_y*jb_x - ja_x*jb_y);  
-                    float beta = (mety*ja_x - metx*ja_y) / (ja_x*jb_y - ja_y*jb_x); 
+                    // default jet correction = 0
+                    float alpha =0;
+                    float beta = 0;
+
+                    // is {useJetCorrection} set to true?
+                    if (useJetCorrection){
+                    
+                        // if it is, compute the corrections from the system of equation
+                    
+                        // Ex = alpha*ja_x + beta*jb_x
+                        // Ey = alpha*ja_y + beta*jb_y
+                    
+                        // save values that are used for the jet met correction
+                        float metx = met()*cos(metPhi());
+                        float mety = met()*sin(metPhi());
+                        float ja_x = jets_p4().at(j).X()*jets_p4Correction().at(j);
+                        float ja_y = jets_p4().at(j).Y()*jets_p4Correction().at(j);
+                        float jb_x = jets_p4().at(k).X()*jets_p4Correction().at(k);
+                        float jb_y = jets_p4().at(k).Y()*jets_p4Correction().at(k);
+
+                        // save the corrected values (solution was found using Mathematica).
+                        alpha = (mety*jb_x - metx*jb_y) / (ja_y*jb_x - ja_x*jb_y);  
+                        beta = (mety*ja_x - metx*ja_y) / (ja_x*jb_y - ja_y*jb_x); 
+                    }
 
                     // compute the corrected masses
-                    mass1 = (ll_p4()+( (1- alpha)*jets_p4().at(j)*jets_p4Correction().at(j) )).M();
-                    mass2 = (lt_p4()+( (1 - beta)*jets_p4().at(k)*jets_p4Correction().at(k) )).M();
+                    mass1 = (ll_p4()+( (1-alpha)*jets_p4().at(j)*jets_p4Correction().at(j) )).M();
+                    mass2 = (lt_p4()+( (1-beta)*jets_p4().at(k)*jets_p4Correction().at(k) )).M();
 
                     // minimize the delta mass
                     if (fabs(mass1-mass2) < fabs(deltaMass)){
@@ -123,7 +131,7 @@ int fillPlot(TChain* samples, TH1F* plot, int useJetCorrection){
             stream << runNumber() << " " << lumiBlock() << " " <<  eventNumber() << endl;
             stream.close();
 
-            // fill the given plot
+            // fill the given plot with average mass
             plot->Fill(avgMass);
         }
     }
@@ -133,12 +141,26 @@ int fillPlot(TChain* samples, TH1F* plot, int useJetCorrection){
 
 void performAnalysis(){
 
+    printf("running perform....\n");
+
+    // add the files to their respective chains
     TChain* signal = new TChain("tree");
     signal->Add("/home/users/aaivazis/susy/babymaker/babies/signal600.root");
 
-    TH1F* plot = new TH1F("plot", "signal 600 Avg Mass", 240, 0, 1200);
+    printf("added signal\n");
+    
+    // create the histograms to fill
+    TH1F* before = new TH1F("plot", "signal 600 Avg Mass (Before Correction)", 240, 0, 1200);
+    TH1F* after = new TH1F("plot", "signal 600 Avg Mass (After Correction)", 240, 0, 1200);
 
-    fillPlot(signal, plot);
+    // use the jet correction
+    fillPlot(signal, after, true);
+    // dont
+    fillPlot(signal, before, false);
 
-    plot->Draw();
+    printf("Filled plots\n");
+
+    // draw the histograms on the same canvas
+    before->Draw();
+    after->Draw("same");
 }
