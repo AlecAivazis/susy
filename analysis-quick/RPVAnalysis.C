@@ -91,7 +91,7 @@ void RPVAnalysis::fillPlot(TChain* samples, TH1F* plot, bool useJetCorrection){
                     // minimize the delta mass
                     if (fabs(mass1-mass2) < fabs(deltaMass)){
                         // save the delta and average mass of the minimized pair
-                        deltaMass = fabs(mass1-mass2);
+                        deltaMass = mass1-mass2;
                         avgMass = (mass1+mass2)/2;
                     }
                 }
@@ -103,7 +103,7 @@ void RPVAnalysis::fillPlot(TChain* samples, TH1F* plot, bool useJetCorrection){
             if (type == 0 && fabs((ll_p4()+lt_p4()).M() - 91) < 15) continue;
             if (nBtags < 1) continue; 
             if (nJets < 2) continue;
-            if (deltaMass > 50) continue; 
+            if (deltaMass > fabs(50)) continue; 
 
             // make eventList
             stream.open("eventList.txt", ios::app);
