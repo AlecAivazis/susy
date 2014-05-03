@@ -1,29 +1,7 @@
-#include "TChain.h"
-#include "TFile.h"
-#include "TROOT.h"
-#include "Math/VectorUtil.h"
-#include <fstream>
+#include "RPVAnalysis.h"
 
-#include "RPV.h"
 
-using namespace hak;
-using namespace std;
-
-bool isGoodJet(int index) {
-    // pt > 30
-    if (jets_p4().at(index).pt()*jets_p4Correction().at(index) < 30) return false;
-    // btagged (loose)
-    if (btagDiscriminant().at(index) < .244) return false;
-    // eta < 2.5
-    if (fabs(jets_p4().at(index).eta()) > 2.5)  return false;
-    // dR > 0.4
-    if (ROOT::Math::VectorUtil::DeltaR(jets_p4().at(index), ll_p4()) < 0.4) return false;
-    if (ROOT::Math::VectorUtil::DeltaR(jets_p4().at(index), lt_p4()) < 0.4) return false;
-
-    return true;
-}
-
-int fillPlot(TChain* samples, TH1F* plot, bool useJetCorrection=false){
+void RPVAnalysis::fillPlot(TChain* samples, TH1F* plot, bool useJetCorrection){
 
     // get the list of files from the chain
     TObjArray* files = samples->GetListOfFiles();
@@ -136,29 +114,39 @@ int fillPlot(TChain* samples, TH1F* plot, bool useJetCorrection=false){
         }
     }
     
-    return 0;
+    return ;
 }
 
-void performAnalysis(){
+// check if the requested jet is "good"
+bool RPVAnalysis::isGoodJet(int index) {
+    // pt > 30
+    if (jets_p4().at(index).pt()*jets_p4Correction().at(index) < 30) return false;
+    // btagged (loose)
+    if (btagDiscriminant().at(index) < .244) return false;
+    // eta < 2.5
+    if (fabs(jets_p4().at(index).eta()) > 2.5)  return false;
+    // dR > 0.4
+    if (ROOT::Math::VectorUtil::DeltaR(jets_p4().at(index), ll_p4()) < 0.4) return false;
+    if (ROOT::Math::VectorUtil::DeltaR(jets_p4().at(index), lt_p4()) < 0.4) return false;
 
-    printf("running perform....\n");
+    return true;
+}
+
+// run the analysis
+void RPVAnalysis::run(){
 
     // add the files to their respective chains
     TChain* signal = new TChain("tree");
     signal->Add("/home/users/aaivazis/susy/babymaker/babies/signal600.root");
-
-    printf("added signal\n");
     
     // create the histograms to fill
-    TH1F* before = new TH1F("plot", "signal 600 Avg Mass (Before Correction)", 240, 0, 1200);
-    TH1F* after = new TH1F("plot", "signal 600 Avg Mass (After Correction)", 240, 0, 1200);
+    TH1F* before = new TH1F("before", "signal 600 Avg Mass (Before Correction)", 240, 0, 1200);
+    TH1F* after = new TH1F("after", "signal 600 Avg Mass (After Correction)", 240, 0, 1200);
 
     // use the jet correction
     fillPlot(signal, after, true);
     // dont
     fillPlot(signal, before, false);
-
-    printf("Filled plots\n");
 
     // draw the histograms on the same canvas
     before->Draw();
