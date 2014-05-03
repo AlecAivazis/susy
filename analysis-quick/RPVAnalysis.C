@@ -23,7 +23,7 @@ void RPVAnalysis::fillPlot(TChain* samples, TH1F* plot, bool useJetCorrection){
         cms2.Init(tree);
 
         // loop over events in the tree
-        for (unsigned int event; event < tree->GetEntriesFast(); ++event) {
+        for (unsigned int event = 0; event < tree->GetEntriesFast(); ++event) {
 
             // load the event into the branches
             cms2.GetEntry(event);
@@ -84,8 +84,9 @@ void RPVAnalysis::fillPlot(TChain* samples, TH1F* plot, bool useJetCorrection){
                     }
 
                     // compute the corrected masses
-                    mass1 = (ll_p4()+( (1-alpha)*jets_p4().at(j)*jets_p4Correction().at(j) )).M();
-                    mass2 = (lt_p4()+( (1-beta)*jets_p4().at(k)*jets_p4Correction().at(k) )).M();
+                    mass1 = (ll_p4()+( (1+alpha)*jets_p4().at(j)*jets_p4Correction().at(j) )).M();
+                    mass2 = (lt_p4()+( (1+beta)*jets_p4().at(k)*jets_p4Correction().at(k) )).M();
+
 
                     // minimize the delta mass
                     if (fabs(mass1-mass2) < fabs(deltaMass)){
@@ -149,6 +150,6 @@ void RPVAnalysis::run(){
     fillPlot(signal, before, false);
 
     // draw the histograms on the same canvas
-    before->Draw();
-    after->Draw("same");
+    after->Draw();
+    before->Draw("same");
 }

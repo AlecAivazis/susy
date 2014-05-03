@@ -19,14 +19,6 @@ using namespace std;
 class RPVAnalysis {
 
  public:
-    RPVAnalysis(float lum){
-        lumi = lum;
-    };
-
-
-    RPVAnalysis(){
-        lumi = 19.5;
-    };
 
     // run the analysis
     void run();
@@ -34,13 +26,13 @@ class RPVAnalysis {
  private: 
     
     // fill the plots associated with a given signal
-    void fillPlot(TChain* samples, TH1F* plot, bool useJetCorrection = false);
+    void fillPlot(TChain* samples, TH1F* plot, bool useJetCorrection = true);
     // check if the given jetIndex represents a "good" jet
     bool isGoodJet(int index);
 
     // save the various one dimensional plots in maps for each signal
     map<string, TH1F*> signal200;
     // store the analysis luminosity
-    float lumi;
+    const static float lumi = 19.5;
 };
 #endif
