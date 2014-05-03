@@ -1,7 +1,7 @@
 #include "RPVAnalysis.h"
 
 
-void RPVAnalysis::fillPlot(TChain* samples, map<string, TH1F*> sample, bool useJetCorrection){
+void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool useJetCorrection){
 
     // get the list of files from the chain
     TObjArray* files = samples->GetListOfFiles();
@@ -122,7 +122,6 @@ void RPVAnalysis::fillPlot(TChain* samples, map<string, TH1F*> sample, bool useJ
 // run the analysis
 void RPVAnalysis::run(){
 
-
     // add the files to their respective chains
     TChain* signal = new TChain("tree");
     signal->Add("/home/users/aaivazis/susy/babymaker/babies/signal600.root");
@@ -131,9 +130,12 @@ void RPVAnalysis::run(){
     createHistograms();
     
     // use the jet correction for this sample
-    fillPlot(signal, signal200, true);
+    fillPlots(signal, signal200, true);
     // dont for this one
-    fillPlot(signal, signal200Before, false);
+    fillPlots(signal, signal200Before, false);
+
+    // prepare the histograms to plot
+    prepareHistograms();
 
     // plot the average mass of both on the same canvas
     signal200["avgMass"]->Draw();
@@ -156,11 +158,31 @@ bool RPVAnalysis::isGoodJet(int index) {
     return true;
 }
 
-// fill the signal dictionaries 
+// fill the sample dictionaries 
 void RPVAnalysis::createHistograms() {
+   
+    // create signal200 plots - after jet correction
+    signal200["avgMass"] = new TH1F("avgMass_after", "signal 600 Avg Mass (Before Correction)", 240, 0, 1200);
 
-   signal200["avgMass"] = new TH1F("before", "signal 600 Avg Mass (Before Correction)", 240, 0, 1200);
-
-   signal200Before["avgMass"] = new TH1F("before", "signal 600 Avg Mass (Before Correction)", 240, 0, 1200);
+    // create signal200 plots - before jet correction
+    signal200Before["avgMass"] = new TH1F("avgMass_before", "signal 600 Avg Mass (Before Correction)", 240, 0, 1200);
 }
 
+
+// give the histograms color,overflow, etc.
+void RPVAnalysis::prepareHistograms(){
+
+    // color the histograms
+    signal200["avgMass"]->SetLineColor(kBlack);
+    signal200Before["avgMass"]->SetLineColor(kRed);
+
+    // set the overflow bins
+    overflow(signal200["avgMass"], 1200);
+    overflow(signal200Before["avgMass"], 1200);
+
+}
+
+// set the bin corresponding to {overflowValue} as the histograms overflow bin
+void RPVAnalysis::overflow(TH1F *histo, float overflowValue){
+    histo->SetBinContent(histo->GetXaxis()->FindBin(overflowValue), histo->GetBinContent((histo->GetXaxis()->FindBin(overflowValue)))+histo->GetBinContent((histo->GetXaxis()->FindBin(overflowValue))+1));
+}
