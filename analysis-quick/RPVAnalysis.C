@@ -103,7 +103,7 @@ void RPVAnalysis::fillPlot(TChain* samples, TH1F* plot, bool useJetCorrection){
             if (type == 0 && fabs((ll_p4()+lt_p4()).M() - 91) < 15) continue;
             if (nBtags < 1) continue; 
             if (nJets < 2) continue;
-            if (deltaMass > fabs(50)) continue; 
+            if (fabs(deltaMass) > 50) continue; 
 
             // make eventList
             stream.open("eventList.txt", ios::app);
