@@ -47,7 +47,6 @@ class babyMaker {
 
   //std::vector<LorentzVector> jets_p4;
   std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > jets_p4;
-  std::vector<float> jets_p4Correction;
 
   std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > generated;
 
@@ -92,7 +91,6 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("met", &met );
   BabyTree_->Branch("metPhi", &metPhi );
   BabyTree_->Branch("jets_p4", &jets_p4 );
-  BabyTree_->Branch("jets_p4Correction", &jets_p4Correction );
   BabyTree_->Branch("type", &type);
 
   BabyTree_->Branch("ll_p4", &ll_p4);

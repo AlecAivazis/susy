@@ -310,8 +310,13 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
       generated = genps_p4();
 
-      jets_p4 = pfjets_p4();
-      jets_p4Correction = pfjets_corL1FastL2L3();
+      //  correct the jet pt at baby level
+      std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > jets;
+      for (unsigned int i = 0; i<pfjets_p4().size(); i++) {
+          jets.push_back(pfjets_p4().at(i) * pfjets_corL1FastL2L3().at(i));
+      }
+
+      jets_p4 = jets;
 
       type = hyp_type().at(index);
 
