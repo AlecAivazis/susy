@@ -118,6 +118,29 @@ void RPVAnalysis::fillPlot(TChain* samples, map<string, TH1F*> sample, bool useJ
     return ;
 }
 
+
+// run the analysis
+void RPVAnalysis::run(){
+
+
+    // add the files to their respective chains
+    TChain* signal = new TChain("tree");
+    signal->Add("/home/users/aaivazis/susy/babymaker/babies/signal600.root");
+    
+    // fill the sample dictionaries with the empty histograms
+    createHistograms();
+    
+    // use the jet correction for this sample
+    fillPlot(signal, signal200, true);
+    // dont for this one
+    fillPlot(signal, signal200Before, false);
+
+    // plot the average mass of both on the same canvas
+    signal200["avgMass"]->Draw();
+    signal200Before["avgMass"]->Draw("same");
+}
+
+
 // check if the requested jet is "good"
 bool RPVAnalysis::isGoodJet(int index) {
     // pt > 30
@@ -141,23 +164,3 @@ void RPVAnalysis::createHistograms() {
    signal200Before["avgMass"] = new TH1F("before", "signal 600 Avg Mass (Before Correction)", 240, 0, 1200);
 }
 
-// run the analysis
-void RPVAnalysis::run(){
-
-
-    // add the files to their respective chains
-    TChain* signal = new TChain("tree");
-    signal->Add("/home/users/aaivazis/susy/babymaker/babies/signal600.root");
-    
-    // fill the sample dictionaries with the empty histograms
-    createHistograms();
-    
-    // use the jet correction for this sample
-    fillPlot(signal, signal200, true);
-    // dont for this one
-    fillPlot(signal, signal200Before, false);
-
-    // plot the average mass of both on the same canvas
-    signal200["avgMass"]->Draw();
-    signal200Before["avgMass"]->Draw("same");
-}
