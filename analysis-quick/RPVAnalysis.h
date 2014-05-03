@@ -26,12 +26,15 @@ class RPVAnalysis {
  private: 
     
     // fill the plots associated with a given signal
-    void fillPlot(TChain* samples, TH1F* plot, bool useJetCorrection = true);
+    void fillPlot(TChain* samples, map<string, TH1F*> sample, bool useJetCorrection = true);
     // check if the given jetIndex represents a "good" jet
     bool isGoodJet(int index);
+    // fill the sample histograms
+    void createHistograms();
 
     // save the various one dimensional plots in maps for each signal
     map<string, TH1F*> signal200;
+    map<string, TH1F*> signal200Before;
     // store the analysis luminosity
     const static float lumi = 19.5;
 };

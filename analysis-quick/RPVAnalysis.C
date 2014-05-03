@@ -1,7 +1,7 @@
 #include "RPVAnalysis.h"
 
 
-void RPVAnalysis::fillPlot(TChain* samples, TH1F* plot, bool useJetCorrection){
+void RPVAnalysis::fillPlot(TChain* samples, map<string, TH1F*> sample, bool useJetCorrection){
 
     // get the list of files from the chain
     TObjArray* files = samples->GetListOfFiles();
@@ -111,7 +111,7 @@ void RPVAnalysis::fillPlot(TChain* samples, TH1F* plot, bool useJetCorrection){
             stream.close();
 
             // fill the given plot with average mass
-            plot->Fill(avgMass);
+            sample["avgMass"]->Fill(avgMass);
         }
     }
     
@@ -133,23 +133,31 @@ bool RPVAnalysis::isGoodJet(int index) {
     return true;
 }
 
+// fill the signal dictionaries 
+void RPVAnalysis::createHistograms() {
+
+   signal200["avgMass"] = new TH1F("before", "signal 600 Avg Mass (Before Correction)", 240, 0, 1200);
+
+   signal200Before["avgMass"] = new TH1F("before", "signal 600 Avg Mass (Before Correction)", 240, 0, 1200);
+}
+
 // run the analysis
 void RPVAnalysis::run(){
+
 
     // add the files to their respective chains
     TChain* signal = new TChain("tree");
     signal->Add("/home/users/aaivazis/susy/babymaker/babies/signal600.root");
     
-    // create the histograms to fill
-    TH1F* before = new TH1F("before", "signal 600 Avg Mass (Before Correction)", 240, 0, 1200);
-    TH1F* after = new TH1F("after", "signal 600 Avg Mass (After Correction)", 240, 0, 1200);
+    // fill the sample dictionaries with the empty histograms
+    createHistograms();
+    
+    // use the jet correction for this sample
+    fillPlot(signal, signal200, true);
+    // dont for this one
+    fillPlot(signal, signal200Before, false);
 
-    // use the jet correction
-    fillPlot(signal, after, true);
-    // dont
-    fillPlot(signal, before, false);
-
-    // draw the histograms on the same canvas
-    after->Draw();
-    before->Draw("same");
+    // plot the average mass of both on the same canvas
+    signal200["avgMass"]->Draw();
+    signal200Before["avgMass"]->Draw("same");
 }
