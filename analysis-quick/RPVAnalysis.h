@@ -7,8 +7,11 @@
 // root
 #include "TChain.h"
 #include "TFile.h"
+#include "THStack.h"
+#include "TLegend.h"
 #include "TROOT.h"
 #include "Math/VectorUtil.h"
+
 
 // CMS2
 #include "RPV.h"
@@ -27,8 +30,12 @@ class RPVAnalysis {
     
     // fill the plots associated with a given signal
     void fillPlots(TChain* samples, map<string, TH1F*> sample, bool useJetCorrection = true);
+    // draw an individual plot
+    void makePlot(map<string, TH1F*> plots, TH1F* overlay=0);
     // check if the given jetIndex represents a "good" jet
     bool isGoodJet(int index);
+    // check if the generated pair is valid
+    bool isValidPair(int hypIndex, int jetIndex);
     // fill the sample histograms
     void createHistograms();
     // give the histograms color, overflow, etc. 

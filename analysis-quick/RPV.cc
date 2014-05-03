@@ -4,7 +4,6 @@ namespace hak {
 	const float &met() { return cms2.met(); }
 	const float &metPhi() { return cms2.metPhi(); }
 	const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jets_p4() { return cms2.jets_p4(); }
-	const vector<float> &jets_p4Correction() { return cms2.jets_p4Correction(); }
 	const int &type() { return cms2.type(); }
 	const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &ll_p4() { return cms2.ll_p4(); }
 	const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &lt_p4() { return cms2.lt_p4(); }
@@ -20,7 +19,6 @@ namespace hak {
 	const int &lumiBlock() { return cms2.lumiBlock(); }
 	const float &scale_1fb() { return cms2.scale_1fb(); }
 	const vector<float> &btagDiscriminant() { return cms2.btagDiscriminant(); }
-	const float &generatedDeltaMass() { return cms2.generatedDeltaMass(); }
-	const float &generatedAvgMass() { return cms2.generatedAvgMass(); }
+	const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &generated() { return cms2.generated(); }
 	const int &numEvents() { return cms2.numEvents(); }
 }

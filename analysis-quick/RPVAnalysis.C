@@ -1,6 +1,46 @@
 #include "RPVAnalysis.h"
 
 
+// run the analysis
+void RPVAnalysis::run(){
+
+    // add the files to their respective chains
+    TChain* signal = new TChain("tree");
+    signal->Add("/home/users/aaivazis/susy/babymaker/babies/signal600.root");
+    
+    // fill the sample dictionaries with the empty histograms
+    createHistograms();
+    
+    // use the jet correction for this sample
+    fillPlots(signal, signal200, true);
+    // dont for this one
+    fillPlots(signal, signal200Before, false);
+
+    // prepare the histograms to plot
+    prepareHistograms();
+
+    // plot the average mass of both on the same canvas
+    signal200["avgMass"]->Draw();
+    signal200Before["avgMass"]->Draw("same");
+
+    // plot the coeffecients
+    // signal200["alpha"]->Draw();
+    // signal200["beta"]->Draw("same");
+
+    // and a legend
+    TLegend* legend = new TLegend(.73,.9,.89,.6);
+    legend->AddEntry(signal200["avgMass"], "after", "l");
+    legend->AddEntry(signal200Before["avgMass"], "before", "l");
+
+    // style the legend
+    legend->SetFillStyle(0);
+    legend->SetBorderSize(0);
+    legend->SetTextSize(0.04);
+    legend->Draw("same");
+    
+}
+
+// fill the given dictionary with the important quantities
 void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool useJetCorrection){
 
     // get the list of files from the chain
@@ -37,6 +77,14 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
             // counter for nJets 
             float nJets = 0;
             
+            // default jet correction = 0
+            float alphaMin = 0;
+            float betaMin = 0;
+
+            // store the indices of the jets that minimize deltaMass
+            int jetllIndex;
+            int jetltIndex;
+
             // loop over the jets to compute delta mass
             for (unsigned int j=0; j<jets_p4().size() ; j++) {
 
@@ -51,6 +99,7 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
                 float mass1 = 0;
                 float mass2 = 0;
 
+
                 // if it is, loop over the other jets,
                 for (unsigned int k = 0; k<jets_p4().size() - 1 ; k++){
                     // ignore the jet from the first loop
@@ -58,14 +107,14 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
                     // make sure the second jet is good too
                     if (! isGoodJet(k)) continue;
 
-                    // default jet correction = 0
-                    float alpha =0;
+                    // default jet correction is 0
+                    float alpha = 0;
                     float beta = 0;
 
-                    // is {useJetCorrection} set to true?
+                    // should we use the jet correction?
                     if (useJetCorrection){
                     
-                        // if it is, compute the corrections from the system of equation
+                        // if so, compute the corrections from the system of equation
                     
                         // Ex = alpha*ja_x + beta*jb_x
                         // Ey = alpha*ja_y + beta*jb_y
@@ -73,10 +122,10 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
                         // save values that are used for the jet met correction
                         float metx = met()*cos(metPhi());
                         float mety = met()*sin(metPhi());
-                        float ja_x = jets_p4().at(j).X()*jets_p4Correction().at(j);
-                        float ja_y = jets_p4().at(j).Y()*jets_p4Correction().at(j);
-                        float jb_x = jets_p4().at(k).X()*jets_p4Correction().at(k);
-                        float jb_y = jets_p4().at(k).Y()*jets_p4Correction().at(k);
+                        float ja_x = jets_p4().at(j).X();
+                        float ja_y = jets_p4().at(j).Y();
+                        float jb_x = jets_p4().at(k).X();
+                        float jb_y = jets_p4().at(k).Y();
 
                         // save the corrected values (solution was found using Mathematica).
                         alpha = (mety*jb_x - metx*jb_y) / (ja_y*jb_x - ja_x*jb_y);  
@@ -84,26 +133,103 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
                     }
 
                     // compute the corrected masses
-                    mass1 = (ll_p4()+( (1+alpha)*jets_p4().at(j)*jets_p4Correction().at(j) )).M();
-                    mass2 = (lt_p4()+( (1+beta)*jets_p4().at(k)*jets_p4Correction().at(k) )).M();
-
+                    mass1 = (ll_p4()+( (1+alpha)*jets_p4().at(j) )).M();
+                    mass2 = (lt_p4()+( (1+beta)*jets_p4().at(k) )).M();
 
                     // minimize the delta mass
                     if (fabs(mass1-mass2) < fabs(deltaMass)){
                         // save the delta and average mass of the minimized pair
                         deltaMass = mass1-mass2;
                         avgMass = (mass1+mass2)/2;
+                        // save the minimized alpha and beta
+                        alphaMin = alpha;
+                        betaMin = beta;
+                        // save the indices of the jets that minimized delta mass
+                        jetllIndex = j;
+                        jetltIndex = k;
                     }
                 }
             }
-            
+
             // perform cuts
-            if (type() == 3) continue;
-            if (type == 0 && met() < 60) continue;
-            if (type == 0 && fabs((ll_p4()+lt_p4()).M() - 91) < 15) continue;
+            if (type() == 3) continue;   // ignoring ee
+            if (type == 0 && met() < 60) continue; // mumu only
+            if (type == 0 && fabs((ll_p4()+lt_p4()).M() - 91) < 15) continue; // mumu only z-veto
             if (nBtags < 1) continue; 
             if (nJets < 2) continue;
             if (fabs(deltaMass) > 50) continue; 
+
+            /* // DOES NOT WORK - root can't see ROOT::MATH::DeltaR here but it can in isGoodJet....
+
+            // loop through the generated vectors
+            // now that we've selected a hypothesis, loop over the generated p4
+            //  and find the matching particle, store its index and value
+            float generatedVal1 = -1;
+            float generatedVal2 = -1;
+            int llGenerated = -1;
+            int ltGenerated = -1;
+            int jetllGenerated = -1;
+            int jetltGenerated =-1;
+
+            float ll_dRmin = 1001;
+            float lt_dRmin = 1001;
+            float llJet_dRmin = 1001;
+            float ltJet_dRmin = 1001;
+
+            for (unsigned int i = 0; i < generated().size(); i++ ){
+
+                float deltaR = ROOT::MATH::VectorUtil::DeltaR(generated().at(i), ll_p4());
+                if (deltaR < ll_dRmin) {
+                    ll_dRmin = deltaR;
+                    llGenerated = i;
+                }
+            }
+      
+            for (unsigned int i = 0; i < generated().size(); i++ ){
+
+                if (i == llGenerated) continue;
+
+                float deltaR = ROOT::MATH::VectorUtil::DeltaR(generated().at(i), lt_p4());
+                if (deltaR < lt_dRmin) {
+                    lt_dRmin = deltaR;
+                    ltGenerated = i;
+                }
+            }
+
+            for (unsigned int i = 0; i < generated().size(); i++ ){
+
+                if (i == llGenerated || i == ltGenerated) continue;
+
+                float deltaR = ROOT::MATH::VectorUtil::DeltaR(generated().at(i), jets_p4().at(jetllIndex));
+                if (deltaR < llJet_dRmin) {
+                    llJet_dRmin = deltaR;
+                    jetllGenerated = i;
+                }
+            }
+  
+            for (unsigned int i = 0; i < generated().size(); i++ ){
+
+                if (i == llGenerated || i == ltGenerated || i == jetllGenerated) continue;
+
+                float deltaR = ROOT::MATH::VectorUtil::DeltaR(generated().at(i), jets_p4().at(jetltIndex));
+          
+                if (deltaR < ltJet_dRmin) {
+                    ltJet_dRmin = deltaR;
+                    jetltGenerated = i;
+                }
+            }    
+
+            // calculate the combined mass of the two pairs
+            if (llGenerated != -1 && ltGenerated != -1 && jetllGenerated != -1 && jetltGenerated != -1){
+                if (isValidPair(llGenerated, jetllGenerated))
+                    generatedVal1 = (generated().at(llGenerated) + generated().at(jetllGenerated)).mass();
+                if (isValidPair(ltGenerated, jetltGenerated))
+                    generatedVal2 = (generated().at(ltGenerated) + generated().at(jetltGenerated)).mass();
+            }
+
+            cout << generatedVal1 << endl;
+            
+            */
 
             // make eventList
             stream.open("eventList.txt", ios::app);
@@ -112,41 +238,25 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
 
             // fill the given plot with average mass
             sample["avgMass"]->Fill(avgMass);
+
+            // if the plot isnt using the jet correction, don't fill the following plots
+            if (! useJetCorrection) continue;
+
+            sample["alpha"]->Fill(alphaMin);
+            sample["beta"]->Fill(betaMin);
         }
     }
     
-    return ;
+    return;
 }
 
 
-// run the analysis
-void RPVAnalysis::run(){
-
-    // add the files to their respective chains
-    TChain* signal = new TChain("tree");
-    signal->Add("/home/users/aaivazis/susy/babymaker/babies/signal600.root");
-    
-    // fill the sample dictionaries with the empty histograms
-    createHistograms();
-    
-    // use the jet correction for this sample
-    fillPlots(signal, signal200, true);
-    // dont for this one
-    fillPlots(signal, signal200Before, false);
-
-    // prepare the histograms to plot
-    prepareHistograms();
-
-    // plot the average mass of both on the same canvas
-    signal200["avgMass"]->Draw();
-    signal200Before["avgMass"]->Draw("same");
-}
-
+// utility/background functions
 
 // check if the requested jet is "good"
 bool RPVAnalysis::isGoodJet(int index) {
     // pt > 30
-    if (jets_p4().at(index).pt()*jets_p4Correction().at(index) < 30) return false;
+    if (jets_p4().at(index).pt() < 30) return false;
     // btagged (loose)
     if (btagDiscriminant().at(index) < .244) return false;
     // eta < 2.5
@@ -158,14 +268,66 @@ bool RPVAnalysis::isGoodJet(int index) {
     return true;
 }
 
+bool RPVAnalysis::isValidPair(int hypIndex, int jetIndex){
+
+    // require the generated pair to be either mu- b or mu+ bbar
+    // 
+ 
+    // if(genps_id().at(hypIndex) * genps_id().at(jetIndex) ) return false;
+    
+    // muons have id = 13
+    // b's have id = 5
+    // i need bbar and muon (or opposite)
+    //return generated_id().at(hypIndex) * genps_id().at(jetIndex) == -65;
+
+    return true;
+
+}
+
 // fill the sample dictionaries 
 void RPVAnalysis::createHistograms() {
    
-    // create signal200 plots - after jet correction
-    signal200["avgMass"] = new TH1F("avgMass_after", "signal 600 Avg Mass (Before Correction)", 240, 0, 1200);
+    // create signal200 plots
+    signal200["avgMass"] = new TH1F("avgMass_after", "signal 600 Avg Mass", 240, 0, 1200);
+    signal200["alpha"] = new TH1F("avgMass_alpha", "signal 600 Correction Coefficients", 100, -1, 1);
+    signal200["beta"] = new TH1F("avgMass_beta", "signal 600 Correction Coefficients", 100, -1, 1);
 
     // create signal200 plots - before jet correction
-    signal200Before["avgMass"] = new TH1F("avgMass_before", "signal 600 Avg Mass (Before Correction)", 240, 0, 1200);
+    signal200Before["avgMass"] = new TH1F("avgMass_before", "signal 600 Avg", 240, 0, 1200);
+
+    return;
+}
+
+// do this with a vector and get the names dynamically instead of using a map
+void RPVAnalysis::makePlot(map<string, TH1F*> plots, TH1F* overlay){
+
+    // create a TStack for the plots
+    THStack* stack = new THStack("stack", "");
+    // and a legend
+    TLegend* legend = new TLegend(.73,.9,.89,.6);
+
+    // create a typedef for the iterator
+    typedef map<string, TH1F*>::iterator iter;
+    //iterate over the map
+    for (iter iterator = plots.begin(); iterator != plots.end(); iterator++) {
+        
+        string name = iterator->first;
+        TH1F * plot = iterator->second;
+
+        // add the plot to the legend
+        //  legend->AddEntry(plot, name, "f") ;
+        // and to the stack
+        stack->Add(plot);
+    }
+    
+
+    // if we were asked to plot the stack, do so
+    stack->Draw();
+    // if we were given an overlay, draw it
+    if (overlay) overlay->Draw("same");
+
+    // draw the legend
+    legend->Draw("same");
 }
 
 
@@ -175,14 +337,18 @@ void RPVAnalysis::prepareHistograms(){
     // color the histograms
     signal200["avgMass"]->SetLineColor(kBlack);
     signal200Before["avgMass"]->SetLineColor(kRed);
+    
+    signal200["alpha"]->SetLineColor(kBlack);
+    signal200["beta"]->SetLineColor(kRed);
 
     // set the overflow bins
     overflow(signal200["avgMass"], 1200);
     overflow(signal200Before["avgMass"], 1200);
 
+    return;
 }
 
 // set the bin corresponding to {overflowValue} as the histograms overflow bin
 void RPVAnalysis::overflow(TH1F *histo, float overflowValue){
-    histo->SetBinContent(histo->GetXaxis()->FindBin(overflowValue), histo->GetBinContent((histo->GetXaxis()->FindBin(overflowValue)))+histo->GetBinContent((histo->GetXaxis()->FindBin(overflowValue))+1));
+    return histo->SetBinContent(histo->GetXaxis()->FindBin(overflowValue), histo->GetBinContent((histo->GetXaxis()->FindBin(overflowValue)))+histo->GetBinContent((histo->GetXaxis()->FindBin(overflowValue))+1));
 }

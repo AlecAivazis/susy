@@ -28,9 +28,6 @@ protected:
 	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *jets_p4_;
 	TBranch *jets_p4_branch;
 	bool jets_p4_isLoaded;
-	vector<float> *jets_p4Correction_;
-	TBranch *jets_p4Correction_branch;
-	bool jets_p4Correction_isLoaded;
 	int	type_;
 	TBranch *type_branch;
 	bool type_isLoaded;
@@ -76,12 +73,9 @@ protected:
 	vector<float> *btagDiscriminant_;
 	TBranch *btagDiscriminant_branch;
 	bool btagDiscriminant_isLoaded;
-	float	generatedDeltaMass_;
-	TBranch *generatedDeltaMass_branch;
-	bool generatedDeltaMass_isLoaded;
-	float	generatedAvgMass_;
-	TBranch *generatedAvgMass_branch;
-	bool generatedAvgMass_isLoaded;
+	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *generated_;
+	TBranch *generated_branch;
+	bool generated_isLoaded;
 	int	numEvents_;
 	TBranch *numEvents_branch;
 	bool numEvents_isLoaded;
@@ -107,6 +101,11 @@ void Init(TTree *tree) {
 		total_p4_branch = tree->GetBranch("total_p4");
 		if (total_p4_branch) {total_p4_branch->SetAddress(&total_p4_);}
 	}
+	generated_branch = 0;
+	if (tree->GetBranch("generated") != 0) {
+		generated_branch = tree->GetBranch("generated");
+		if (generated_branch) {generated_branch->SetAddress(&generated_);}
+	}
   tree->SetMakeClass(1);
 	met_branch = 0;
 	if (tree->GetBranch("met") != 0) {
@@ -117,11 +116,6 @@ void Init(TTree *tree) {
 	if (tree->GetBranch("metPhi") != 0) {
 		metPhi_branch = tree->GetBranch("metPhi");
 		if (metPhi_branch) {metPhi_branch->SetAddress(&metPhi_);}
-	}
-	jets_p4Correction_branch = 0;
-	if (tree->GetBranch("jets_p4Correction") != 0) {
-		jets_p4Correction_branch = tree->GetBranch("jets_p4Correction");
-		if (jets_p4Correction_branch) {jets_p4Correction_branch->SetAddress(&jets_p4Correction_);}
 	}
 	type_branch = 0;
 	if (tree->GetBranch("type") != 0) {
@@ -183,16 +177,6 @@ void Init(TTree *tree) {
 		btagDiscriminant_branch = tree->GetBranch("btagDiscriminant");
 		if (btagDiscriminant_branch) {btagDiscriminant_branch->SetAddress(&btagDiscriminant_);}
 	}
-	generatedDeltaMass_branch = 0;
-	if (tree->GetBranch("generatedDeltaMass") != 0) {
-		generatedDeltaMass_branch = tree->GetBranch("generatedDeltaMass");
-		if (generatedDeltaMass_branch) {generatedDeltaMass_branch->SetAddress(&generatedDeltaMass_);}
-	}
-	generatedAvgMass_branch = 0;
-	if (tree->GetBranch("generatedAvgMass") != 0) {
-		generatedAvgMass_branch = tree->GetBranch("generatedAvgMass");
-		if (generatedAvgMass_branch) {generatedAvgMass_branch->SetAddress(&generatedAvgMass_);}
-	}
 	numEvents_branch = 0;
 	if (tree->GetBranch("numEvents") != 0) {
 		numEvents_branch = tree->GetBranch("numEvents");
@@ -207,7 +191,6 @@ void GetEntry(unsigned int idx)
 		met_isLoaded = false;
 		metPhi_isLoaded = false;
 		jets_p4_isLoaded = false;
-		jets_p4Correction_isLoaded = false;
 		type_isLoaded = false;
 		ll_p4_isLoaded = false;
 		lt_p4_isLoaded = false;
@@ -223,8 +206,7 @@ void GetEntry(unsigned int idx)
 		lumiBlock_isLoaded = false;
 		scale_1fb_isLoaded = false;
 		btagDiscriminant_isLoaded = false;
-		generatedDeltaMass_isLoaded = false;
-		generatedAvgMass_isLoaded = false;
+		generated_isLoaded = false;
 		numEvents_isLoaded = false;
 	}
 
@@ -234,7 +216,6 @@ void LoadAllBranches()
 	if (met_branch != 0) met();
 	if (metPhi_branch != 0) metPhi();
 	if (jets_p4_branch != 0) jets_p4();
-	if (jets_p4Correction_branch != 0) jets_p4Correction();
 	if (type_branch != 0) type();
 	if (ll_p4_branch != 0) ll_p4();
 	if (lt_p4_branch != 0) lt_p4();
@@ -250,8 +231,7 @@ void LoadAllBranches()
 	if (lumiBlock_branch != 0) lumiBlock();
 	if (scale_1fb_branch != 0) scale_1fb();
 	if (btagDiscriminant_branch != 0) btagDiscriminant();
-	if (generatedDeltaMass_branch != 0) generatedDeltaMass();
-	if (generatedAvgMass_branch != 0) generatedAvgMass();
+	if (generated_branch != 0) generated();
 	if (numEvents_branch != 0) numEvents();
 }
 
@@ -307,27 +287,6 @@ void LoadAllBranches()
 			jets_p4_isLoaded = true;
 		}
 		return *jets_p4_;
-	}
-	const vector<float> &jets_p4Correction()
-	{
-		if (not jets_p4Correction_isLoaded) {
-			if (jets_p4Correction_branch != 0) {
-				jets_p4Correction_branch->GetEntry(index);
-				#ifdef PARANOIA
-				for (vector<float>::const_iterator i = jets_p4Correction_->begin(); i != jets_p4Correction_->end(); ++i) {
-					if (not isfinite(*i)) {
-						printf("branch jets_p4Correction_branch contains a bad float: %f\n", *i);
-						exit(1);
-					}
-				}
-				#endif // #ifdef PARANOIA
-			} else { 
-				printf("branch jets_p4Correction_branch does not exist!\n");
-				exit(1);
-			}
-			jets_p4Correction_isLoaded = true;
-		}
-		return *jets_p4Correction_;
 	}
 	int &type()
 	{
@@ -578,35 +537,28 @@ void LoadAllBranches()
 		}
 		return *btagDiscriminant_;
 	}
-	float &generatedDeltaMass()
+	const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &generated()
 	{
-		if (not generatedDeltaMass_isLoaded) {
-			if (generatedDeltaMass_branch != 0) {
-				generatedDeltaMass_branch->GetEntry(index);
+		if (not generated_isLoaded) {
+			if (generated_branch != 0) {
+				generated_branch->GetEntry(index);
 				#ifdef PARANOIA
+				for (vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > >::const_iterator i = generated_->begin(); i != generated_->end(); ++i) {
+					int e;
+					frexp(i->pt(), &e);
+					if (not isfinite(i->pt()) || e > 30) {
+						printf("branch generated_branch contains a bad float: %f\n", i->pt());
+						exit(1);
+					}
+				}
 				#endif // #ifdef PARANOIA
 			} else { 
-				printf("branch generatedDeltaMass_branch does not exist!\n");
+				printf("branch generated_branch does not exist!\n");
 				exit(1);
 			}
-			generatedDeltaMass_isLoaded = true;
+			generated_isLoaded = true;
 		}
-		return generatedDeltaMass_;
-	}
-	float &generatedAvgMass()
-	{
-		if (not generatedAvgMass_isLoaded) {
-			if (generatedAvgMass_branch != 0) {
-				generatedAvgMass_branch->GetEntry(index);
-				#ifdef PARANOIA
-				#endif // #ifdef PARANOIA
-			} else { 
-				printf("branch generatedAvgMass_branch does not exist!\n");
-				exit(1);
-			}
-			generatedAvgMass_isLoaded = true;
-		}
-		return generatedAvgMass_;
+		return *generated_;
 	}
 	int &numEvents()
 	{
@@ -654,7 +606,6 @@ namespace hak {
 	const float &met();
 	const float &metPhi();
 	const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &jets_p4();
-	const vector<float> &jets_p4Correction();
 	const int &type();
 	const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &ll_p4();
 	const ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > &lt_p4();
@@ -670,8 +621,7 @@ namespace hak {
 	const int &lumiBlock();
 	const float &scale_1fb();
 	const vector<float> &btagDiscriminant();
-	const float &generatedDeltaMass();
-	const float &generatedAvgMass();
+	const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &generated();
 	const int &numEvents();
 }
 #endif
