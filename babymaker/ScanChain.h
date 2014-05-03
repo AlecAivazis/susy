@@ -49,6 +49,8 @@ class babyMaker {
   std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > jets_p4;
   std::vector<float> jets_p4Correction;
 
+  std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > generated;
+
   int type;
 
   LorentzVector ll_p4;
@@ -74,8 +76,6 @@ class babyMaker {
 
   string file;
 
-  float generatedAvgMass;
-  float generatedDeltaMass;
 };
 
 #endif
@@ -113,8 +113,7 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("scale_1fb", &scale_1fb);
   BabyTree_->Branch("btagDiscriminant", &btagDiscriminant);
 
-  BabyTree_->Branch("generatedDeltaMass", &generatedDeltaMass);
-  BabyTree_->Branch("generatedAvgMass", &generatedAvgMass);
+  BabyTree_->Branch("generated", &generated);
   
   BabyTree_->Branch("numEvents", &numEvents);
 
@@ -146,8 +145,6 @@ void babyMaker::InitBabyNtuple () {
 
   numEvents = 0;
 
-  generatedDeltaMass = 999;
-  generatedAvgMass = 0;
 
   return;
 }

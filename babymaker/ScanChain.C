@@ -308,6 +308,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       met = evt_pfmet_type1cor();
       metPhi = evt_pfmetPhi();
 
+      generated = genps_p4();
+
       jets_p4 = pfjets_p4();
       jets_p4Correction = pfjets_corL1FastL2L3();
 
