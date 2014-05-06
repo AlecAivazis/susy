@@ -3,6 +3,7 @@
 
 // C++
 #include <fstream>
+#include <set>
 
 // root
 #include "TChain.h"
@@ -18,6 +19,8 @@
 
 using namespace hak;
 using namespace std;
+
+typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
 
 class RPVAnalysis {
 
@@ -42,6 +45,8 @@ class RPVAnalysis {
     void prepareHistograms();
     // set the bin located at {overflowValue} to the overflow of the histograms
     void overflow(TH1F *histo, float overflowValue);
+    //find the index that matches to generated value
+    int matchingGeneratedIndex(LorentzVector candidate, set<int> indices);
 
     // save the various one dimensional plots in maps for each signal
     map<string, TH1F*> signal200;

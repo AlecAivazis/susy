@@ -170,53 +170,18 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
             int jetllGenerated = -1;
             int jetltGenerated =-1;
 
-            float ll_dRmin = 1001;
-            float lt_dRmin = 1001;
-            float llJet_dRmin = 1001;
-            float ltJet_dRmin = 1001;
+            set<int> indices;
 
-            for (unsigned int i = 0; i < generated_p4().size(); i++ ){
+            llGenerated = matchingGeneratedIndex(ll_p4(), indices);
+            indices.insert(llGenerated);
 
-                float deltaR = ROOT::Math::VectorUtil::DeltaR(generated_p4().at(i), ll_p4());
-                if (deltaR < ll_dRmin) {
-                    ll_dRmin = deltaR;
-                    llGenerated = i;
-                }
-            }
-      
-            for (unsigned int i = 0; i < generated_p4().size(); i++ ){
+            ltGenerated = matchingGeneratedIndex(lt_p4(), indices);
+            indices.insert(ltGenerated);
 
-                if (i == llGenerated) continue;
+            jetllGenerated = matchingGeneratedIndex(jets_p4().at(jetllIndex) , indices);
+            indices.insert(jetllGenerated);
 
-                float deltaR = ROOT::Math::VectorUtil::DeltaR(generated_p4().at(i), lt_p4());
-                if (deltaR < lt_dRmin) {
-                    lt_dRmin = deltaR;
-                    ltGenerated = i;
-                }
-            }
-
-            for (unsigned int i = 0; i < generated_p4().size(); i++ ){
-
-                if (i == llGenerated || i == ltGenerated) continue;
-
-                float deltaR = ROOT::Math::VectorUtil::DeltaR(generated_p4().at(i), jets_p4().at(jetllIndex));
-                if (deltaR < llJet_dRmin) {
-                    llJet_dRmin = deltaR;
-                    jetllGenerated = i;
-                }
-            }
-  
-            for (unsigned int i = 0; i < generated_p4().size(); i++ ){
-
-                if (i == llGenerated || i == ltGenerated || i == jetllGenerated) continue;
-
-                float deltaR = ROOT::Math::VectorUtil::DeltaR(generated_p4().at(i), jets_p4().at(jetltIndex));
-          
-                if (deltaR < ltJet_dRmin) {
-                    ltJet_dRmin = deltaR;
-                    jetltGenerated = i;
-                }
-            }    
+            jetltGenerated = matchingGeneratedIndex(jets_p4().at(jetltIndex) , indices);
 
             // calculate the combined mass of the two pairs
             if (llGenerated != -1 && ltGenerated != -1 && jetllGenerated != -1 && jetltGenerated != -1){
@@ -271,6 +236,24 @@ bool RPVAnalysis::isValidPair(int hypIndex, int jetIndex){
     // b's have id = 5
     // i need bbar and muon (or opposite)
     return generated_id().at(hypIndex) * generated_id().at(jetIndex) == -65;
+}
+
+int RPVAnalysis::matchingGeneratedIndex(const LorentzVector candidate, set<int> indices){
+
+    float deltaMin = 9999;
+    int index = -1;
+
+    for( int i = 0; i < generated_p4().size(); ++i){
+        
+        if ( indices.find(i) != indices.end() ) continue;
+
+        float deltaR = ROOT::Math::VectorUtil::DeltaR(generated_p4().at(i), candidate);
+        if (deltaR < deltaMin )  {
+            index = i;
+        }
+    }  
+
+    return index;
 }
 
 // fill the sample dictionaries 
