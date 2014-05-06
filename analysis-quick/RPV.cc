@@ -19,6 +19,7 @@ namespace hak {
 	const int &lumiBlock() { return cms2.lumiBlock(); }
 	const float &scale_1fb() { return cms2.scale_1fb(); }
 	const vector<float> &btagDiscriminant() { return cms2.btagDiscriminant(); }
-	const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &generated() { return cms2.generated(); }
+	const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &generated_p4() { return cms2.generated_p4(); }
+	const vector<int> &generated_id() { return cms2.generated_id(); }
 	const int &numEvents() { return cms2.numEvents(); }
 }

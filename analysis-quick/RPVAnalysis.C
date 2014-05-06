@@ -6,7 +6,8 @@ void RPVAnalysis::run(){
 
     // add the files to their respective chains
     TChain* signal = new TChain("tree");
-    signal->Add("/home/users/aaivazis/susy/babymaker/babies/signal600.root");
+    //signal->Add("/home/users/aaivazis/susy/babymaker/babies/signal600.root");
+    signal->Add("/hadoop/cms/store/user/jgran/forUndergrads/babies/signal600.root");
     
     // fill the sample dictionaries with the empty histograms
     createHistograms();
@@ -176,42 +177,42 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
             float llJet_dRmin = 1001;
             float ltJet_dRmin = 1001;
 
-            for (unsigned int i = 0; i < generated().size(); i++ ){
+            for (unsigned int i = 0; i < generated_p4().size(); i++ ){
 
-                float deltaR = ROOT::MATH::VectorUtil::DeltaR(generated().at(i), ll_p4());
+                float deltaR = ROOT::MATH::VectorUtil::DeltaR(generated_p4().at(i), ll_p4());
                 if (deltaR < ll_dRmin) {
                     ll_dRmin = deltaR;
                     llGenerated = i;
                 }
             }
       
-            for (unsigned int i = 0; i < generated().size(); i++ ){
+            for (unsigned int i = 0; i < generated_p4().size(); i++ ){
 
                 if (i == llGenerated) continue;
 
-                float deltaR = ROOT::MATH::VectorUtil::DeltaR(generated().at(i), lt_p4());
+                float deltaR = ROOT::MATH::VectorUtil::DeltaR(generated_p4().at(i), lt_p4());
                 if (deltaR < lt_dRmin) {
                     lt_dRmin = deltaR;
                     ltGenerated = i;
                 }
             }
 
-            for (unsigned int i = 0; i < generated().size(); i++ ){
+            for (unsigned int i = 0; i < generated_p4().size(); i++ ){
 
                 if (i == llGenerated || i == ltGenerated) continue;
 
-                float deltaR = ROOT::MATH::VectorUtil::DeltaR(generated().at(i), jets_p4().at(jetllIndex));
+                float deltaR = ROOT::MATH::VectorUtil::DeltaR(generated_p4().at(i), jets_p4().at(jetllIndex));
                 if (deltaR < llJet_dRmin) {
                     llJet_dRmin = deltaR;
                     jetllGenerated = i;
                 }
             }
   
-            for (unsigned int i = 0; i < generated().size(); i++ ){
+            for (unsigned int i = 0; i < generated_p4().size(); i++ ){
 
                 if (i == llGenerated || i == ltGenerated || i == jetllGenerated) continue;
 
-                float deltaR = ROOT::MATH::VectorUtil::DeltaR(generated().at(i), jets_p4().at(jetltIndex));
+                float deltaR = ROOT::MATH::VectorUtil::DeltaR(generated_p4().at(i), jets_p4().at(jetltIndex));
           
                 if (deltaR < ltJet_dRmin) {
                     ltJet_dRmin = deltaR;
@@ -271,17 +272,11 @@ bool RPVAnalysis::isGoodJet(int index) {
 bool RPVAnalysis::isValidPair(int hypIndex, int jetIndex){
 
     // require the generated pair to be either mu- b or mu+ bbar
-    // 
  
-    // if(genps_id().at(hypIndex) * genps_id().at(jetIndex) ) return false;
-    
     // muons have id = 13
     // b's have id = 5
     // i need bbar and muon (or opposite)
-    //return generated_id().at(hypIndex) * genps_id().at(jetIndex) == -65;
-
-    return true;
-
+    return generated_id().at(hypIndex) * generated_id().at(jetIndex) == -65;
 }
 
 // fill the sample dictionaries 

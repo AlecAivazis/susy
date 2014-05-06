@@ -73,9 +73,12 @@ protected:
 	vector<float> *btagDiscriminant_;
 	TBranch *btagDiscriminant_branch;
 	bool btagDiscriminant_isLoaded;
-	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *generated_;
-	TBranch *generated_branch;
-	bool generated_isLoaded;
+	vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > *generated_p4_;
+	TBranch *generated_p4_branch;
+	bool generated_p4_isLoaded;
+	vector<int> *generated_id_;
+	TBranch *generated_id_branch;
+	bool generated_id_isLoaded;
 	int	numEvents_;
 	TBranch *numEvents_branch;
 	bool numEvents_isLoaded;
@@ -101,10 +104,10 @@ void Init(TTree *tree) {
 		total_p4_branch = tree->GetBranch("total_p4");
 		if (total_p4_branch) {total_p4_branch->SetAddress(&total_p4_);}
 	}
-	generated_branch = 0;
-	if (tree->GetBranch("generated") != 0) {
-		generated_branch = tree->GetBranch("generated");
-		if (generated_branch) {generated_branch->SetAddress(&generated_);}
+	generated_p4_branch = 0;
+	if (tree->GetBranch("generated_p4") != 0) {
+		generated_p4_branch = tree->GetBranch("generated_p4");
+		if (generated_p4_branch) {generated_p4_branch->SetAddress(&generated_p4_);}
 	}
   tree->SetMakeClass(1);
 	met_branch = 0;
@@ -177,6 +180,11 @@ void Init(TTree *tree) {
 		btagDiscriminant_branch = tree->GetBranch("btagDiscriminant");
 		if (btagDiscriminant_branch) {btagDiscriminant_branch->SetAddress(&btagDiscriminant_);}
 	}
+	generated_id_branch = 0;
+	if (tree->GetBranch("generated_id") != 0) {
+		generated_id_branch = tree->GetBranch("generated_id");
+		if (generated_id_branch) {generated_id_branch->SetAddress(&generated_id_);}
+	}
 	numEvents_branch = 0;
 	if (tree->GetBranch("numEvents") != 0) {
 		numEvents_branch = tree->GetBranch("numEvents");
@@ -206,7 +214,8 @@ void GetEntry(unsigned int idx)
 		lumiBlock_isLoaded = false;
 		scale_1fb_isLoaded = false;
 		btagDiscriminant_isLoaded = false;
-		generated_isLoaded = false;
+		generated_p4_isLoaded = false;
+		generated_id_isLoaded = false;
 		numEvents_isLoaded = false;
 	}
 
@@ -231,7 +240,8 @@ void LoadAllBranches()
 	if (lumiBlock_branch != 0) lumiBlock();
 	if (scale_1fb_branch != 0) scale_1fb();
 	if (btagDiscriminant_branch != 0) btagDiscriminant();
-	if (generated_branch != 0) generated();
+	if (generated_p4_branch != 0) generated_p4();
+	if (generated_id_branch != 0) generated_id();
 	if (numEvents_branch != 0) numEvents();
 }
 
@@ -537,28 +547,43 @@ void LoadAllBranches()
 		}
 		return *btagDiscriminant_;
 	}
-	const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &generated()
+	const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &generated_p4()
 	{
-		if (not generated_isLoaded) {
-			if (generated_branch != 0) {
-				generated_branch->GetEntry(index);
+		if (not generated_p4_isLoaded) {
+			if (generated_p4_branch != 0) {
+				generated_p4_branch->GetEntry(index);
 				#ifdef PARANOIA
-				for (vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > >::const_iterator i = generated_->begin(); i != generated_->end(); ++i) {
+				for (vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > >::const_iterator i = generated_p4_->begin(); i != generated_p4_->end(); ++i) {
 					int e;
 					frexp(i->pt(), &e);
 					if (not isfinite(i->pt()) || e > 30) {
-						printf("branch generated_branch contains a bad float: %f\n", i->pt());
+						printf("branch generated_p4_branch contains a bad float: %f\n", i->pt());
 						exit(1);
 					}
 				}
 				#endif // #ifdef PARANOIA
 			} else { 
-				printf("branch generated_branch does not exist!\n");
+				printf("branch generated_p4_branch does not exist!\n");
 				exit(1);
 			}
-			generated_isLoaded = true;
+			generated_p4_isLoaded = true;
 		}
-		return *generated_;
+		return *generated_p4_;
+	}
+	const vector<int> &generated_id()
+	{
+		if (not generated_id_isLoaded) {
+			if (generated_id_branch != 0) {
+				generated_id_branch->GetEntry(index);
+				#ifdef PARANOIA
+				#endif // #ifdef PARANOIA
+			} else { 
+				printf("branch generated_id_branch does not exist!\n");
+				exit(1);
+			}
+			generated_id_isLoaded = true;
+		}
+		return *generated_id_;
 	}
 	int &numEvents()
 	{
@@ -621,7 +646,8 @@ namespace hak {
 	const int &lumiBlock();
 	const float &scale_1fb();
 	const vector<float> &btagDiscriminant();
-	const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &generated();
+	const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &generated_p4();
+	const vector<int> &generated_id();
 	const int &numEvents();
 }
 #endif
