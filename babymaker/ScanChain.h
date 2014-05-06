@@ -48,7 +48,10 @@ class babyMaker {
   //std::vector<LorentzVector> jets_p4;
   std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > jets_p4;
 
-  std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > generated;
+  std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > generated_p4;
+
+  std::vector<int> generated_id;
+
 
   int type;
 
@@ -111,7 +114,8 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("scale_1fb", &scale_1fb);
   BabyTree_->Branch("btagDiscriminant", &btagDiscriminant);
 
-  BabyTree_->Branch("generated", &generated);
+  BabyTree_->Branch("generated_p4", &generated_p4);
+  BabyTree_->Branch("generated_id", &generated_id);
   
   BabyTree_->Branch("numEvents", &numEvents);
 

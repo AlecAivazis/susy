@@ -308,7 +308,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       met = evt_pfmet_type1cor();
       metPhi = evt_pfmetPhi();
 
-      generated = genps_p4();
+      generated_p4 = genps_p4();
+      generated_id = genps_id();
 
       //  correct the jet pt at baby level
       std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > jets;
