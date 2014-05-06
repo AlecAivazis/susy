@@ -175,6 +175,7 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
             float llJet_dRmin = 1001;
             float ltJet_dRmin = 1001;
 
+            // find the generated particle associated with ll_p4
             for (unsigned int i = 0; i < generated_p4().size(); i++ ){
 
                 float deltaR = ROOT::Math::VectorUtil::DeltaR(generated_p4().at(i), ll_p4());
@@ -184,6 +185,7 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
                 }
             }
       
+            // find the generated particle associated with lt_p4
             for (unsigned int i = 0; i < generated_p4().size(); i++ ){
 
                 if (i == llGenerated) continue;
@@ -195,6 +197,7 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
                 }
             }
 
+            // find the generated particle associated with the jet paired with ll_p4
             for (unsigned int i = 0; i < generated_p4().size(); i++ ){
 
                 if (i == llGenerated || i == ltGenerated) continue;
@@ -206,6 +209,7 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
                 }
             }
   
+            // find the generated particle associated with the jet paired with ll_p4
             for (unsigned int i = 0; i < generated_p4().size(); i++ ){
 
                 if (i == llGenerated || i == ltGenerated || i == jetllGenerated) continue;
