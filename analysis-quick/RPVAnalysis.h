@@ -46,11 +46,12 @@ class RPVAnalysis {
     // set the bin located at {overflowValue} to the overflow of the histograms
     void overflow(TH1F *histo, float overflowValue);
     //find the index that matches to generated value
-    int matchingGeneratedIndex(LorentzVector candidate, set<int> indices);
+    int getMatchingGeneratedIndex(LorentzVector candidate, set<int> indices);
 
     // save the various one dimensional plots in maps for each signal
     map<string, TH1F*> signal200;
     map<string, TH1F*> signal200Before;
+    map<string, TH1F*> ttjets;
     // store the analysis luminosity
     const static float lumi = 19.5;
 };

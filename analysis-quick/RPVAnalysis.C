@@ -5,29 +5,29 @@
 void RPVAnalysis::run(){
 
     // add the files to their respective chains
-    TChain* signal = new TChain("tree");
-    //signal->Add("/home/users/aaivazis/susy/babymaker/babies/signal600.root");
-    signal->Add("/hadoop/cms/store/user/jgran/forUndergrads/babies/signal600.root");
+    TChain* signal200Chain = new TChain("tree");
+    signal200Chain->Add("/hadoop/cms/store/user/jgran/forUndergrads/babies/signal600.root");
+
+    // add the ttjets file to a chain
+    TChain* ttjetsChain = new TChain("tree");
+    ttjetsChain->Add("/hadoop/cms/store/user/jgran/forUndergrads/babies/ttjets.root");
     
     // fill the sample dictionaries with the empty histograms
     createHistograms();
     
     // use the jet correction for this sample
-    fillPlots(signal, signal200, true);
+    fillPlots(signal200Chain, signal200, true);
     // dont for this one
-    fillPlots(signal, signal200Before, false);
+    fillPlots(signal200Chain, signal200Before, false);
+    // fill the tt plots
+    fillPlots(ttjetsChain, ttjets);
 
     // prepare the histograms to plot
-    prepareHistograms();
+    // prepareHistograms();
 
-    // plot the average mass of both on the same canvas
-    signal200["avgMass"]->Draw();
-    signal200Before["avgMass"]->Draw("same");
-
-    // plot the coeffecients
-    // signal200["alpha"]->Draw();
-    // signal200["beta"]->Draw("same");
-
+    // signal200["genMinusReco"]->Draw();
+    
+    /*
     // and a legend
     TLegend* legend = new TLegend(.73,.9,.89,.6);
     legend->AddEntry(signal200["avgMass"], "after", "l");
@@ -38,7 +38,7 @@ void RPVAnalysis::run(){
     legend->SetBorderSize(0);
     legend->SetTextSize(0.04);
     legend->Draw("same");
-    
+    */
 }
 
 // fill the given dictionary with the important quantities
@@ -62,6 +62,10 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
         TTree* tree = (TTree*)file->Get("tree");
         // tell cms2 about the tree
         cms2.Init(tree);
+
+        // declare mumu and emu counters
+        int mumuCounter = 0;
+        int emuCounter = 0;
 
         // loop over events in the tree
         for (unsigned int event = 0; event < tree->GetEntriesFast(); ++event) {
@@ -154,17 +158,19 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
 
             // perform cuts
             if (type() == 3) continue;   // ignoring ee
-            if (type == 0 && met() < 60) continue; // mumu only
-            if (type == 0 && fabs((ll_p4()+lt_p4()).M() - 91) < 15) continue; // mumu only z-veto
+            if (type() == 0 && met() < 60) continue; // mumu only
+            if (type() == 0 && fabs((ll_p4()+lt_p4()).M() - 91) < 15) continue; // mumu only z-veto
             if (nBtags < 1) continue; 
             if (nJets < 2) continue;
             if (fabs(deltaMass) > 50) continue; 
 
+            // if (type() == 0) mumuCounter++;
+            // if (type() == 1 || type() == 2) emuCounter++;
             // loop through the generated vectors
             // now that we've selected a hypothesis, loop over the generated p4
             // and find the matching particle, store its index and value
-            float generatedVal1 = -1;
-            float generatedVal2 = -1;
+            float generatedMass1 = -1;
+            float generatedMass2 = -1;
             int llGenerated = -1;
             int ltGenerated = -1;
             int jetllGenerated = -1;
@@ -172,24 +178,37 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
 
             set<int> indices;
 
-            llGenerated = matchingGeneratedIndex(ll_p4(), indices);
+            llGenerated = getMatchingGeneratedIndex(ll_p4(), indices);
             indices.insert(llGenerated);
 
-            ltGenerated = matchingGeneratedIndex(lt_p4(), indices);
+            ltGenerated = getMatchingGeneratedIndex(lt_p4(), indices);
             indices.insert(ltGenerated);
 
-            jetllGenerated = matchingGeneratedIndex(jets_p4().at(jetllIndex) , indices);
+            jetllGenerated = getMatchingGeneratedIndex(jets_p4().at(jetllIndex) , indices);
             indices.insert(jetllGenerated);
 
-            jetltGenerated = matchingGeneratedIndex(jets_p4().at(jetltIndex) , indices);
+            jetltGenerated = getMatchingGeneratedIndex(jets_p4().at(jetltIndex) , indices);
+
+            // save if the mass pair is valid
+            bool genMassGood = true;
 
             // calculate the combined mass of the two pairs
             if (llGenerated != -1 && ltGenerated != -1 && jetllGenerated != -1 && jetltGenerated != -1){
                 if (isValidPair(llGenerated, jetllGenerated))
-                    generatedVal1 = (generated_p4().at(llGenerated) + generated_p4().at(jetllGenerated)).mass();
+                    generatedMass1 = (generated_p4().at(llGenerated)
+                                      + generated_p4().at(jetllGenerated)).M();
+                else
+                    genMassGood = false;
+
                 if (isValidPair(ltGenerated, jetltGenerated))
-                    generatedVal2 = (generated_p4().at(ltGenerated) + generated_p4().at(jetltGenerated)).mass();
+                    generatedMass2 = (generated_p4().at(ltGenerated)
+                                      + generated_p4().at(jetltGenerated)).M();
+                else
+                    genMassGood = false;
             }
+
+            // calculate the generated average mass
+            float genMass = (generatedMass2 + generatedMass1)/2;
 
             // make eventList
             stream.open("eventList.txt", ios::app);
@@ -204,7 +223,17 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
 
             sample["alpha"]->Fill(alphaMin);
             sample["beta"]->Fill(betaMin);
+            if (genMassGood) sample["genMinusReco"]->Fill(genMass - avgMass);
+
+
         }
+        
+        cout << "finished event loop" << endl;
+
+        // print the event counters
+        cout << "number of mumu events: " << mumuCounter << endl;
+        cout << "number of emu events: " << emuCounter << endl;
+
     }
     
     return;
@@ -238,21 +267,26 @@ bool RPVAnalysis::isValidPair(int hypIndex, int jetIndex){
     return generated_id().at(hypIndex) * generated_id().at(jetIndex) == -65;
 }
 
-int RPVAnalysis::matchingGeneratedIndex(const LorentzVector candidate, set<int> indices){
+int RPVAnalysis::getMatchingGeneratedIndex(const LorentzVector candidate, set<int> indices){
 
     float deltaMin = 9999;
     int index = -1;
 
     for( int i = 0; i < generated_p4().size(); ++i){
         
+        // check if i is in indices
         if ( indices.find(i) != indices.end() ) continue;
 
+        // compute deltaR
         float deltaR = ROOT::Math::VectorUtil::DeltaR(generated_p4().at(i), candidate);
+        // grab the minimum
         if (deltaR < deltaMin )  {
             index = i;
+            deltaMin = deltaR;
         }
     }  
 
+    // return the index of the generated particle that matches
     return index;
 }
 
@@ -261,6 +295,7 @@ void RPVAnalysis::createHistograms() {
    
     // create signal200 plots
     signal200["avgMass"] = new TH1F("avgMass_after", "signal 600 Avg Mass", 240, 0, 1200);
+    signal200["genMinusReco"] = new TH1F("GenMinusReco", "generated - reco mass", 100, -75, 75);
     signal200["alpha"] = new TH1F("avgMass_alpha", "signal 600 Correction Coefficients", 100, -1, 1);
     signal200["beta"] = new TH1F("avgMass_beta", "signal 600 Correction Coefficients", 100, -1, 1);
 
@@ -312,6 +347,7 @@ void RPVAnalysis::prepareHistograms(){
     signal200["avgMass"]->SetLineColor(kBlack);
     signal200Before["avgMass"]->SetLineColor(kRed);
     
+    signal200["genMinusReco"]->SetLineColor(kBlack);
     signal200["alpha"]->SetLineColor(kBlack);
     signal200["beta"]->SetLineColor(kRed);
 
