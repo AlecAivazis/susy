@@ -144,6 +144,13 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
                         // save the corrected values (solution was found using Mathematica).
                         alpha = (mety*jb_x - metx*jb_y) / (ja_y*jb_x - ja_x*jb_y);  
                         beta = (mety*ja_x - metx*ja_y) / (ja_x*jb_y - ja_y*jb_x); 
+
+                        if (alpha == beta) {
+                            cout << "fuck you" << endl;
+                        }
+
+                        sample["alpha"]->Fill(alpha);
+                        sample["beta"]->Fill(beta);
                     }
 
                     // compute the corrected masses
@@ -167,7 +174,7 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
 
             // perform cuts
             if (type() == 3) continue;   // ignoring ee
-            if (met() < 60) continue; // mumu only
+            if (type() ==0 && met() < 60) continue; // mumu only
             if (type() == 0 &&  fabs((ll_p4()+lt_p4()).M() - 91) < 15) continue; // mumu only z-veto
             if (nBtags < 1) continue; 
             if (nJets < 2) continue;
@@ -217,10 +224,6 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
             // fill the appopriate plots
             sample["avgMass"]->Fill(avgMass);
 
-            if (useJetCorrection) {
-                sample["alpha"]->Fill(alphaMin);
-                sample["beta"]->Fill(betaMin);
-            }
 
             if (genMassGood) sample["genMinusReco"]->Fill(genMass - avgMass);
 
@@ -392,10 +395,12 @@ void RPVAnalysis::plotHistograms(){
     prepareHistograms();
 
     /* stacked plots */
-    THStack *stack = new THStack("stack","");
+    //  THStack *stack = new THStack("stack","");
 
+    signal600["beta"]->Draw();
+
+    TCanvas *c2 = new TCanvas("c2","Graph Example",200,10,700,500);
     signal600["alpha"]->Draw();
-    signal600["beta"]->Draw("same");
 
     leg->Draw("same");
 }

@@ -20,19 +20,19 @@ doSignal(int numEvents=0, std::string suffix ="")
   // 800 - 40403
   
   TChain *signal200 = new TChain("Events"); 
-  signal200->Add("/home/users/aaivazis/susy/signals/raw/200/*.root");
+  signal200->Add("/hadoop/cms/store/user/jgran/forUndergrads/signals/raw/200/*.root");
   looper->ScanChain(signal200, "signal200" + suffix, numEvents, 18500.0/42140.0); 
 
   TChain *signal600 = new TChain("Events"); 
-  signal600->Add("/home/users/aaivazis/susy/signals/raw/600/*.root");
+  signal600->Add("/hadoop/cms/store/user/jgran/forUndergrads/signals/raw/600/*.root");
   looper->ScanChain(signal600, "signal600" + suffix, numEvents, 25.0/40262.0); 
   
   TChain *signal800 = new TChain("Events"); 
-  signal800->Add("/home/users/aaivazis/susy/signals/raw/800/*.root");
+  signal800->Add("/hadoop/cms/store/user/jgran/forUndergrads/signals/raw/800/*.root");
   looper->ScanChain(signal800, "signal800" + suffix, numEvents, 2.896/40403.0); 
   
   TChain *signal1000 = new TChain("Events"); 
-  signal1000->Add("/home/users/aaivazis/susy/signals/raw/1000/*.root");
+  signal1000->Add("/hadoop/cms/store/user/jgran/forUndergrads/signals/raw/1000/*.root");
   looper->ScanChain(signal1000, "signal1000" + suffix, numEvents, 0.416/100000.0); 
 
 }
