@@ -1,44 +1,39 @@
 #include "RPVAnalysis.h"
 
-
 // run the analysis
 void RPVAnalysis::run(){
 
     // add the files to their respective chains
-    TChain* signal200Chain = new TChain("tree");
-    signal200Chain->Add("/hadoop/cms/store/user/jgran/forUndergrads/babies/signal600.root");
+    TChain* signal600Chain = new TChain("tree");
+    signal600Chain->Add("/hadoop/cms/store/user/jgran/forUndergrads/babies/signal600.root");
 
     // add the ttjets file to a chain
     TChain* ttjetsChain = new TChain("tree");
     ttjetsChain->Add("/hadoop/cms/store/user/jgran/forUndergrads/babies/ttjets.root");
     
-    // fill the sample dictionaries with the empty histograms
+    // add the dy file to a chain
+    TChain* dyChain = new TChain("tree");
+    dyChain->Add("/hadoop/cms/store/user/jgran/forUndergrads/babies/dy.root");
+    
+    // add the dy file to a chain
+    TChain* zzChain = new TChain("tree");
+    zzChain->Add("/hadoop/cms/store/user/jgran/forUndergrads/babies/zz.root");
+    
+    // fill the dictionaries with empty histograms
     createHistograms();
     
     // use the jet correction for this sample
-    fillPlots(signal200Chain, signal200, true);
-    // dont for this one
-    fillPlots(signal200Chain, signal200Before, false);
+    fillPlots(signal600Chain, signal600, true);
     // fill the tt plots
-    fillPlots(ttjetsChain, ttjets);
+    //fillPlots(ttjetsChain, ttjets);
+    // fill the dy plots
+    //fillPlots(dyChain, dy);
 
-    // prepare the histograms to plot
-    // prepareHistograms();
+    // fill the zz plots
+    // fillPlots(zzChain, zz);
 
-    // signal200["genMinusReco"]->Draw();
-    
-    /*
-    // and a legend
-    TLegend* legend = new TLegend(.73,.9,.89,.6);
-    legend->AddEntry(signal200["avgMass"], "after", "l");
-    legend->AddEntry(signal200Before["avgMass"], "before", "l");
-
-    // style the legend
-    legend->SetFillStyle(0);
-    legend->SetBorderSize(0);
-    legend->SetTextSize(0.04);
-    legend->Draw("same");
-    */
+    // draw the histograms
+    plotHistograms();
 }
 
 // fill the given dictionary with the important quantities
@@ -52,7 +47,8 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
     TFile* currentFile = 0;
 
     // stream to write the event list    
-    ofstream stream;
+    ofstream eventList;
+    // open the eventList stream
 
     // loop over the files to fill plots
     while(( currentFile = (TFile*)fileIter.Next() )) {
@@ -89,6 +85,19 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
             // store the indices of the jets that minimize deltaMass
             int jetllIndex;
             int jetltIndex;
+
+            // counters and indices for the gen_ps loop
+            float generatedMass1 = -1;
+            float generatedMass2 = -1;
+            int llGenerated = -1;
+            int ltGenerated = -1;
+            int jetllGenerated = -1;
+            int jetltGenerated =-1;
+            // store the list of known good indices for the gen_ps loop
+            set<int> indices;
+            // save if the mass pair is valid
+            bool genMassGood = true;
+
 
             // loop over the jets to compute delta mass
             for (unsigned int j=0; j<jets_p4().size() ; j++) {
@@ -158,26 +167,18 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
 
             // perform cuts
             if (type() == 3) continue;   // ignoring ee
-            if (type() == 0 && met() < 60) continue; // mumu only
-            if (type() == 0 && fabs((ll_p4()+lt_p4()).M() - 91) < 15) continue; // mumu only z-veto
+            if (met() < 60) continue; // mumu only
+            if (type() == 0 &&  fabs((ll_p4()+lt_p4()).M() - 91) < 15) continue; // mumu only z-veto
             if (nBtags < 1) continue; 
             if (nJets < 2) continue;
             if (fabs(deltaMass) > 50) continue; 
+            
+            // increment eventCounters
+            if (type() == 0) mumuCounter++;
+            if (type() == 1 || type() == 2) emuCounter++;
 
-            // if (type() == 0) mumuCounter++;
-            // if (type() == 1 || type() == 2) emuCounter++;
-            // loop through the generated vectors
-            // now that we've selected a hypothesis, loop over the generated p4
-            // and find the matching particle, store its index and value
-            float generatedMass1 = -1;
-            float generatedMass2 = -1;
-            int llGenerated = -1;
-            int ltGenerated = -1;
-            int jetllGenerated = -1;
-            int jetltGenerated =-1;
 
-            set<int> indices;
-
+            // find the gen_ps particles corresponding to our p4s
             llGenerated = getMatchingGeneratedIndex(ll_p4(), indices);
             indices.insert(llGenerated);
 
@@ -188,9 +189,6 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
             indices.insert(jetllGenerated);
 
             jetltGenerated = getMatchingGeneratedIndex(jets_p4().at(jetltIndex) , indices);
-
-            // save if the mass pair is valid
-            bool genMassGood = true;
 
             // calculate the combined mass of the two pairs
             if (llGenerated != -1 && ltGenerated != -1 && jetllGenerated != -1 && jetltGenerated != -1){
@@ -211,24 +209,23 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
             float genMass = (generatedMass2 + generatedMass1)/2;
 
             // make eventList
-            stream.open("eventList.txt", ios::app);
-            stream << runNumber() << " " << lumiBlock() << " " <<  eventNumber() << endl;
-            stream.close();
+            eventList.open("eventList.txt", ios::app);
+            eventList << runNumber() << " " << lumiBlock() << " " <<  eventNumber() << endl;
+            eventList.close();
 
-            // fill the given plot with average mass
+            
+            // fill the appopriate plots
             sample["avgMass"]->Fill(avgMass);
 
-            // if the plot isnt using the jet correction, don't fill the following plots
-            if (! useJetCorrection) continue;
+            if (useJetCorrection) {
+                sample["alpha"]->Fill(alphaMin);
+                sample["beta"]->Fill(betaMin);
+            }
 
-            sample["alpha"]->Fill(alphaMin);
-            sample["beta"]->Fill(betaMin);
             if (genMassGood) sample["genMinusReco"]->Fill(genMass - avgMass);
 
 
         }
-        
-        cout << "finished event loop" << endl;
 
         // print the event counters
         cout << "number of mumu events: " << mumuCounter << endl;
@@ -294,13 +291,19 @@ int RPVAnalysis::getMatchingGeneratedIndex(const LorentzVector candidate, set<in
 void RPVAnalysis::createHistograms() {
    
     // create signal200 plots
-    signal200["avgMass"] = new TH1F("avgMass_after", "signal 600 Avg Mass", 240, 0, 1200);
-    signal200["genMinusReco"] = new TH1F("GenMinusReco", "generated - reco mass", 100, -75, 75);
-    signal200["alpha"] = new TH1F("avgMass_alpha", "signal 600 Correction Coefficients", 100, -1, 1);
-    signal200["beta"] = new TH1F("avgMass_beta", "signal 600 Correction Coefficients", 100, -1, 1);
+    signal600["avgMass"] = new TH1F("signal600_avgMass", "signal 600 Avg Mass", 240, 0, 1200);
+    signal600["genMinusReco"] = new TH1F("signal600_genMinusReco", "generated - reco mass", 100, -75, 75);
+    signal600["alpha"] = new TH1F("signal600_alpha", "signal 600 Correction Coefficients", 100, -1, 1);
+    signal600["beta"] = new TH1F("signal600_beta", "signal 600 Correction Coefficients", 100, -1, 1);
 
-    // create signal200 plots - before jet correction
-    signal200Before["avgMass"] = new TH1F("avgMass_before", "signal 600 Avg", 240, 0, 1200);
+    // create ttjets plots
+    ttjets["avgMass"] = new TH1F("ttjets_avgMass", "ttjets Avg Mass", 240, 0, 1200);
+    ttjets["genMinusReco"] = new TH1F("ttjets_genMinusReco", "ttjets generated - reco mass", 100, -75, 75);
+
+    // create data plots
+    dy["avgMass"] = new TH1F("dy_avgMass", "dy Avg Mass", 240, 0, 1200);
+    dy["genMinusReco"] = new TH1F("dy_genMinusReco", "dy generated - reco mass", 100, -75, 75);
+
 
     return;
 }
@@ -343,17 +346,15 @@ void RPVAnalysis::makePlot(vector<TH1F*> plots, TH1F* overlay){
 // give the histograms color,overflow, etc.
 void RPVAnalysis::prepareHistograms(){
 
-    // color the histograms
-    signal200["avgMass"]->SetLineColor(kBlack);
-    signal200Before["avgMass"]->SetLineColor(kRed);
-    
-    signal200["genMinusReco"]->SetLineColor(kBlack);
-    signal200["alpha"]->SetLineColor(kBlack);
-    signal200["beta"]->SetLineColor(kRed);
 
+    // color the histograms
+    signal600["avgMass"]->SetLineColor(kBlack);
+    signal600["genMinusReco"]->SetLineColor(kBlack);
+    signal600["alpha"]->SetLineColor(kBlack);
+    signal600["beta"]->SetLineColor(kRed);
+    
     // set the overflow bins
-    overflow(signal200["avgMass"], 1200);
-    overflow(signal200Before["avgMass"], 1200);
+    overflow(signal600["avgMass"], 1200);
 
     return;
 }
@@ -362,3 +363,41 @@ void RPVAnalysis::prepareHistograms(){
 void RPVAnalysis::overflow(TH1F *histo, float overflowValue){
     return histo->SetBinContent(histo->GetXaxis()->FindBin(overflowValue), histo->GetBinContent((histo->GetXaxis()->FindBin(overflowValue)))+histo->GetBinContent((histo->GetXaxis()->FindBin(overflowValue))+1));
 }
+
+void RPVAnalysis::plotHistograms(){
+
+    // set up canvas and legend 
+    TCanvas *c1 = new TCanvas("c1","Graph Example",200,10,700,500);
+    //c1->SetLogy();
+    
+    // create the legend
+    TLegend *leg = new TLegend(.73,.9,.89,.6);
+
+    /*
+    // add entries to the legend
+    leg->AddEntry(ttjets["avgMass"], "ttbar", "f");
+    leg->AddEntry(dy["avgMass"] , "dy", "f");
+    leg->AddEntry(zz["avgMass"], "zz", "f");
+    leg->AddEntry(signal600["avgMass"], "signal600", "l");
+    */
+    leg->AddEntry(signal600["alpha"], "alpha", "l");
+    leg->AddEntry(signal600["beta"], "beta", "l");
+
+    // style the legend
+    leg->SetFillStyle(0);
+    leg->SetBorderSize(0);
+    leg->SetTextSize(0.04);
+
+    // prepare the histograms
+    prepareHistograms();
+
+    /* stacked plots */
+    THStack *stack = new THStack("stack","");
+
+    signal600["alpha"]->Draw();
+    signal600["beta"]->Draw("same");
+
+    leg->Draw("same");
+}
+
+    
