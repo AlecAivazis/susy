@@ -37,10 +37,10 @@ void RPVAnalysis::run(){
 }
 
 // fill the given dictionary with the important quantities
-void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool useJetCorrection){
+void RPVAnalysis::fillPlots(TChain* data, map<string, TH1F*> sample, bool useJetCorrection){
 
     // get the list of files from the chain
-    TObjArray* files = samples->GetListOfFiles();
+    TObjArray* files = data->GetListOfFiles();
     // create an iterator over the fiels
     TIter fileIter(files);
     // store the current file data
@@ -145,12 +145,10 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
                         alpha = (mety*jb_x - metx*jb_y) / (ja_y*jb_x - ja_x*jb_y);  
                         beta = (mety*ja_x - metx*ja_y) / (ja_x*jb_y - ja_y*jb_x); 
 
-                        if (alpha == beta) {
-                            cout << "fuck you" << endl;
-                        }
-
                         sample["alpha"]->Fill(alpha);
                         sample["beta"]->Fill(beta);
+
+
                     }
 
                     // compute the corrected masses
@@ -158,9 +156,9 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
                     mass2 = (lt_p4()+( (1+beta)*jets_p4().at(k) )).M();
 
                     // minimize the delta mass
-                    if (fabs(mass1-mass2) < fabs(deltaMass)){
+                    if (fabs(mass2-mass1) < fabs(deltaMass)){
                         // save the delta and average mass of the minimized pair
-                        deltaMass = mass1-mass2;
+                        deltaMass = mass2-mass1;
                         avgMass = (mass1+mass2)/2;
                         // save the minimized alpha and beta
                         alphaMin = alpha;
@@ -174,7 +172,7 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
 
             // perform cuts
             if (type() == 3) continue;   // ignoring ee
-            if (type() ==0 && met() < 60) continue; // mumu only
+            if (type() ==0 && met() > 60) continue; // mumu only
             if (type() == 0 &&  fabs((ll_p4()+lt_p4()).M() - 91) < 15) continue; // mumu only z-veto
             if (nBtags < 1) continue; 
             if (nJets < 2) continue;
@@ -217,9 +215,8 @@ void RPVAnalysis::fillPlots(TChain* samples, map<string, TH1F*> sample, bool use
 
             // make eventList
             eventList.open("eventList.txt", ios::app);
-            eventList << runNumber() << " " << lumiBlock() << " " <<  eventNumber() << endl;
+            eventList << runNumber() << " " << lumiBlock() << " " <<  eventNumber() << " " << event << " " << deltaMass << endl;
             eventList.close();
-
             
             // fill the appopriate plots
             sample["avgMass"]->Fill(avgMass);
@@ -311,41 +308,6 @@ void RPVAnalysis::createHistograms() {
     return;
 }
 
-// do this with a vector and get the names dynamically instead of using a map
-void RPVAnalysis::makePlot(vector<TH1F*> plots, TH1F* overlay){
-
-    /*
-    // create a TStack for the plots
-    THStack* stack = new THStack("stack", "");
-    // and a legend
-    TLegend* legend = new TLegend(.73,.9,.89,.6);
-
-    // create a typedef for the iterator
-    typedef map<string, TH1F*>::iterator iter;
-    //iterate over the map
-    for (iter iterator = plots.begin(); iterator != plots.end(); iterator++) {
-        
-        string name = iterator->first;
-        TH1F * plot = iterator->second;
-
-        // add the plot to the legend
-        //  legend->AddEntry(plot, name, "f") ;
-        // and to the stack
-        stack->Add(plot);
-    }
-    
-
-    // if we were asked to plot the stack, do so
-    stack->Draw();
-    // if we were given an overlay, draw it
-    if (overlay) overlay->Draw("same");
-
-    // draw the legend
-    legend->Draw("same");
-    */
-}
-
-
 // give the histograms color,overflow, etc.
 void RPVAnalysis::prepareHistograms(){
 
@@ -353,6 +315,7 @@ void RPVAnalysis::prepareHistograms(){
     // color the histograms
     signal600["avgMass"]->SetLineColor(kBlack);
     signal600["genMinusReco"]->SetLineColor(kBlack);
+    //  signal600before["genMinusReco"]->SetLineColor(kRed);
     signal600["alpha"]->SetLineColor(kBlack);
     signal600["beta"]->SetLineColor(kRed);
     
@@ -397,10 +360,8 @@ void RPVAnalysis::plotHistograms(){
     /* stacked plots */
     //  THStack *stack = new THStack("stack","");
 
-    signal600["beta"]->Draw();
-
     TCanvas *c2 = new TCanvas("c2","Graph Example",200,10,700,500);
-    signal600["alpha"]->Draw();
+    signal600["avgMass"]->Draw();
 
     leg->Draw("same");
 }
