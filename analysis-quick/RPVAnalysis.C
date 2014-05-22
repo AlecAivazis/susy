@@ -49,6 +49,14 @@ void RPVAnalysis::fillPlots(TChain* data, map<string, TH1F*> sample, TH2F* plot)
     // stream to write the event list    
     ofstream stream;
 
+    // definitions for signal region calc
+    int mets[6]= {0, 20, 40, 60, 80, 100};
+    int jets[4] = {0, 1, 2, 3};
+
+    int counters[6][4] = {0};
+    int metnumber = sizeof(mets)/sizeof(mets[0]);
+    int jetnumber = sizeof(jets)/sizeof(jets[0]);
+
     // loop over the files to fill plots
     while(( currentFile = (TFile*)fileIter.Next() )) {
         
@@ -135,10 +143,21 @@ void RPVAnalysis::fillPlots(TChain* data, map<string, TH1F*> sample, TH2F* plot)
             }
 
             // perform cuts
-            if (type() == 3) continue;   // ignoring ee
-            if (type() ==0 && met() > 60) continue; // mumu only
+            if (type() != 0) continue;   // only mumu
             if (type() == 0 &&  fabs((ll_p4()+lt_p4()).M() - 91) < 15) continue; // mumu only z-veto
             if (nBtags < 1) continue; 
+            
+            for (int i =0; i < metnumber; i++){
+                // cout << "minimum met: " << mets.at(i) << endl;
+                for (int k = 0; k < jetnumber; k++){
+                    // cout << "minimum nJets: " << jets.at(k) << endl;
+                    if (met() >= mets[i] && nJets >= jets[k]){  
+                        counters[i][k]++;
+                    }
+                }
+            }
+
+            if (type() ==0 && met() > 60) continue; // mumu only
             if (nJets < 2) continue;
             // if (fabs(deltaMass) > 50) continue; 
             
@@ -187,7 +206,21 @@ void RPVAnalysis::fillPlots(TChain* data, map<string, TH1F*> sample, TH2F* plot)
         cout << "number of emu events: " << emuCounter << endl;
 
     }
+
+    int counterSize = sizeof(counters)/sizeof(counters[0]);
     
+    stream.open("signalregion.txt", ios::app);
+    for (int i = 0; i< metnumber; i++){
+        for (int k =0; k < jetnumber; k++){
+            stream << counters[i][k] << " ";
+        }
+    }
+    stream << endl;
+    stream.close();
+
+    cout << counters[0][0] << endl;
+    cout << counters[0][1] << endl;
+
     return;
 }
 
