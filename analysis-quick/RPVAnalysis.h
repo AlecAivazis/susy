@@ -34,7 +34,7 @@ class RPVAnalysis {
  private: 
     
     // fill the plots associated with a given signal
-    void fillPlots(TChain* samples, map<string, TH1F*> sample, TH2F* plot = 0);
+    void fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot = 0);
     // draw an individual plot
     void makePlot(vector<TH1*> plots, TH1F* overlay=0);
     // check if the given jetIndex represents a "good" jet
@@ -54,11 +54,13 @@ class RPVAnalysis {
 
     // save the various one dimensional plots in maps for each signal
     map<string, TH1F*> signal600;
+    map<string, TH1F*> data;
     map<string, TH1F*> ttjets;
     map<string, TH1F*> dy;
     map<string, TH1F*> zz;
 
     TH2F * signalDel;
+    TH2F * dataDel;
     TH2F * ttDel;
     TH2F * zzDel;
     TH2F * dyDel;

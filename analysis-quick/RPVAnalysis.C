@@ -7,6 +7,10 @@ void RPVAnalysis::run(){
     TChain* signal600Chain = new TChain("tree");
     signal600Chain->Add("/home/users/aaivazis/susy/babymaker/babies/signal600.root");
 
+    // add the data file to a chain
+    TChain* dataChain = new TChain("tree");
+    dataChain->Add("/home/users/aaivazis/susy/babymaker/babies/data.root");
+
     // add the ttjets file to a chain
     TChain* ttjetsChain = new TChain("tree");
     ttjetsChain->Add("/home/users/aaivazis/susy/babymaker/babies/ttjets.root");
@@ -21,26 +25,27 @@ void RPVAnalysis::run(){
     
     // fill the dictionaries with empty histograms
     createHistograms();
-    
 
     // use the jet correction for this sample
-    fillPlots(signal600Chain, signal600, signalDel);
+    // fillPlots(signal600Chain, signal600, signalDel);
+    // fill the data plots
+    // fillPlots(dataChain, data, dataDel);
     // fill the tt plots
-    fillPlots(ttjetsChain, ttjets, ttDel);
+    // fillPlots(ttjetsChain, ttjets, ttDel);
     // fill the dy plots
     fillPlots(dyChain, dy, dyDel);
     // fill the zz plots
-    fillPlots(zzChain, zz, zzDel);
+    // fillPlots(zzChain, zz, zzDel);
 
     // draw the histograms
-    plotHistograms();
+    // plotHistograms();
 }
 
 // fill the given dictionary with the important quantities
-void RPVAnalysis::fillPlots(TChain* data, map<string, TH1F*> sample, TH2F* plot){
+void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot){
 
     // get the list of files from the chain
-    TObjArray* files = data->GetListOfFiles();
+    TObjArray* files = chain->GetListOfFiles();
     // create an iterator over the fiels
     TIter fileIter(files);
     // store the current file data
@@ -50,7 +55,7 @@ void RPVAnalysis::fillPlots(TChain* data, map<string, TH1F*> sample, TH2F* plot)
     ofstream stream;
 
     // definitions for signal region calc
-    int mets[6]= {0, 20, 40, 60, 80, 100};
+    int mets[6]= {20, 40, 60, 80, 100, 1000};
     int jets[4] = {0, 1, 2, 3};
 
     int counters[6][4] = {0};
@@ -125,7 +130,7 @@ void RPVAnalysis::fillPlots(TChain* data, map<string, TH1F*> sample, TH2F* plot)
                     if (k == j) continue;
                     // make sure the second jet is good too
                     if (! isGoodJet(k)) continue;
-                    if (btagDiscriminant().at(k) < 0.244) continue; 
+                    //if (btagDiscriminant().at(k) < 0.244) continue; Alex doesnt have this 2x 
 
                     mass1 = (ll_p4() + jets_p4().at(j)).M();
                     mass2 = (lt_p4() + jets_p4().at(k)).M();
@@ -143,23 +148,24 @@ void RPVAnalysis::fillPlots(TChain* data, map<string, TH1F*> sample, TH2F* plot)
             }
 
             // perform cuts
-            if (type() != 0) continue;   // only mumu
-            if (type() == 0 &&  fabs((ll_p4()+lt_p4()).M() - 91) < 15) continue; // mumu only z-veto
+            if (type() != 0) continue; //ignore ee
+            if (/*type() == 0 && */ fabs((ll_p4()+lt_p4()).M() - 91) < 15) continue; // mumu only z-veto
             if (nBtags < 1) continue; 
             
             for (int i =0; i < metnumber; i++){
                 // cout << "minimum met: " << mets.at(i) << endl;
                 for (int k = 0; k < jetnumber; k++){
                     // cout << "minimum nJets: " << jets.at(k) << endl;
-                    if (met() >= mets[i] && nJets >= jets[k]){  
+                    if (met() <= mets[i] && nJets >= jets[k]){  
                         counters[i][k]++;
                     }
                 }
             }
 
-            if (type() ==0 && met() > 60) continue; // mumu only
+            //if (type() ==0 && met() > 60) continue; // mumu only
             if (nJets < 2) continue;
-            // if (fabs(deltaMass) > 50) continue; 
+            if (fabs(deltaMass) > 100) continue; 
+            if (fabs(avgMass) > 250) continue; 
             
 
             // find the gen_ps particles corresponding to our p4s
@@ -199,10 +205,14 @@ void RPVAnalysis::fillPlots(TChain* data, map<string, TH1F*> sample, TH2F* plot)
             if (type() == 0) mumuCounter++;
             if (type() == 1 || type() == 2) emuCounter++;
 
+            stream.open("eventList.txt", ios::app);
+            stream << event << endl;
+            stream.close();
+
         }
 
         // print the event counters
-        cout << "number of mumu events: " << mumuCounter << endl;
+        cout << "number of mumu events: " << mumuCounter * lumi * scale_1fb() << endl;
         cout << "number of emu events: " << emuCounter << endl;
 
     }
@@ -212,14 +222,12 @@ void RPVAnalysis::fillPlots(TChain* data, map<string, TH1F*> sample, TH2F* plot)
     stream.open("signalregion.txt", ios::app);
     for (int i = 0; i< metnumber; i++){
         for (int k =0; k < jetnumber; k++){
-            stream << counters[i][k] << " ";
+            stream << counters[i][k] * lumi * scale_1fb() << " ";
         }
     }
     stream << endl;
     stream.close();
 
-    cout << counters[0][0] << endl;
-    cout << counters[0][1] << endl;
 
     return;
 }
@@ -282,31 +290,28 @@ void RPVAnalysis::createHistograms() {
     // create signal200 plots
     signal600["avgMass"] = new TH1F("signal600_avgMass", "signal 600 Avg Mass", 240, 0, 1200);
     signal600["genMinusReco"] = new TH1F("signal600_genMinusReco", "generated - reco mass", 100, -75, 75);
-    signal600["alpha"] = new TH1F("signal600_alpha", "signal 600 Correction Coefficients", 100, -1, 1);
-    signal600["beta"] = new TH1F("signal600_beta", "signal 600 Correction Coefficients", 100, -1, 1);
 
     signalDel = new TH2F("signal", "zz", 100, 0, 1200, 100, -200, 200);
     zzDel = new TH2F("zz", "zz", 100, 0, 1200, 100, -200, 200);
     dyDel = new TH2F("dy", "zz", 100, 0, 1200, 100, -200, 200);
     ttDel = new TH2F("tt", "zz", 100, 0, 1200, 100, -200, 200);
+    dataDel = new TH2F("data", "zz", 100, 0, 1200, 100, -200, 200);
 
     // create ttjets plots
     ttjets["avgMass"] = new TH1F("ttjets_avgMass", "ttjets Avg Mass", 240, 0, 1200);
     ttjets["genMinusReco"] = new TH1F("ttjets_genMinusReco", "ttjets generated - reco mass", 100, -75, 75);
-    ttjets["alpha"] = new TH1F("ttjets_alpha", "signal 600 Correction Coefficients", 100, -1, 1);
-    ttjets["beta"] = new TH1F("ttjets_beta", "signal 600 Correction Coefficients", 100, -1, 1);
 
-    // create data plots
+    // create dy plots
     dy["avgMass"] = new TH1F("dy_avgMass", "dy Avg Mass", 240, 0, 1200);
     dy["genMinusReco"] = new TH1F("dy_genMinusReco", "dy generated - reco mass", 100, -75, 75);
-    dy["alpha"] = new TH1F("dy_alpha", "signal 600 Correction Coefficients", 100, -1, 1);
-    dy["beta"] = new TH1F("dy_beta", "signal 600 Correction Coefficients", 100, -1, 1);
 
-    // create data plots
+    // create zz plots
     zz["avgMass"] = new TH1F("zz_avgMass", "dy Avg Mass", 240, 0, 1200);
     zz["genMinusReco"] = new TH1F("zz_genMinusReco", "dy generated - reco mass", 100, -75, 75);
-    zz["alpha"] = new TH1F("zz_alpha", "signal 600 Correction Coefficients", 100, -1, 1);
-    zz["beta"] = new TH1F("zz_beta", "signal 600 Correction Coefficients", 100, -1, 1);
+
+    // create data plots
+    data["avgMass"] = new TH1F("data_avgMass", "data Avg Mass", 240, 0, 1200);
+    data["genMinusReco"] = new TH1F("data_genMinusReco", "data generated - reco mass", 100, -75, 75);
 
     return;
 }
@@ -320,8 +325,6 @@ void RPVAnalysis::prepareHistograms(){
     ttjets["avgMass"]->SetLineColor(kRed);
     signal600["genMinusReco"]->SetLineColor(kBlack);
     //  signal600before["genMinusReco"]->SetLineColor(kRed);
-    signal600["alpha"]->SetLineColor(kBlack);
-    signal600["beta"]->SetLineColor(kRed);
 
     signalDel->SetFillColor(kBlack);
     dyDel->SetFillColor(kRed);
@@ -355,8 +358,6 @@ void RPVAnalysis::plotHistograms(){
     leg->AddEntry(zz["avgMass"], "zz", "f");
     leg->AddEntry(signal600["avgMass"], "signal600", "l");
     */
-    leg->AddEntry(signal600["alpha"], "alpha", "l");
-    leg->AddEntry(signal600["beta"], "beta", "l");
 
     // style the legend
     leg->SetFillStyle(0);
@@ -374,8 +375,6 @@ void RPVAnalysis::plotHistograms(){
     /* stacked plots 
     //  THStack *stack = new THStack("stack","");
 
-    signal600["alpha"]->Draw();
-    signal600["beta"]->Draw("same");
     
     leg->Draw("same");
     c1->SaveAs("coeff_g2.png");
