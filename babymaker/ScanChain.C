@@ -46,11 +46,11 @@ bool isValidPair(int hypIndex, int jetIndex){
 
 }
 
-void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int numEvent, float customScale){
+void babyMaker::ScanChain(TChain* chain, std::string baby_name, int numFiles, float customScale, bool isData){
 
-    if (numEvent != 0 ){
-        cout << "Processing the first " << numEvent << " file(s)" << endl;
-    }
+  if (numFiles != -1 ){
+      cout << "Processing the first " << numFiles << " file(s)" << endl;
+  }
 
   MakeBabyNtuple( Form("babies/%s.root", baby_name.c_str()) );
 
@@ -84,8 +84,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
 
     fileCounter++;
     
-    
-    if (fileCounter > numEvent && numEvent !=0) {
+    if (numFiles != -1 && fileCounter > numFiles) {
         break;
     }
     // Get File Content
@@ -96,12 +95,13 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
     cms2.Init(tree);
     
     // set good run list
-    if (evt_isRealData()) set_goodrun_file("/home/users/jgran/analysis/sswh/fakes/json/final_19p49fb_cms2.txt");
+    if (evt_isRealData()) 
+        set_goodrun_file("/home/users/jgran/analysis/sswh/fakes/json/final_19p49fb_cms2.txt");
 
     // event Loop
     unsigned int nEventsTree = tree->GetEntriesFast();
 
-    nEventsMini = nEventsMini + nEventsTree;
+    nEventsMini +=  nEventsTree;
 
     for(unsigned int event = 0; event < nEventsTree; ++event) {
 
@@ -142,10 +142,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           if (hyp_ll_charge().at(i)*hyp_lt_charge().at(i) > 0) continue;
           _osCounter++;
 
-          // ignoring ee
-          //          if (abs(hyp_ll_id().at(i)) == 11 && abs(hyp_lt_id().at(i)) == 11) continue;
-          //_typeCounter++;
-
           // eta < 2.4
           if (fabs(hyp_ll_p4().at(i).eta()) > 2.4) continue;
           if (fabs(hyp_lt_p4().at(i).eta()) > 2.4) continue;
@@ -165,13 +161,17 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
           */
 
           // electron id and iso
-          if (abs(hyp_ll_id().at(i)) == 11 && !passElectronSelection_ZMet2012_v3_Iso(hyp_ll_index().at(i))) continue;
-          if (abs(hyp_lt_id().at(i)) == 11 && !passElectronSelection_ZMet2012_v3_Iso(hyp_lt_index().at(i))) continue;
+          if (abs(hyp_ll_id().at(i)) == 11 && 
+              !passElectronSelection_ZMet2012_v3_Iso(hyp_ll_index().at(i))) continue;
+          if (abs(hyp_lt_id().at(i)) == 11 && 
+              !passElectronSelection_ZMet2012_v3_Iso(hyp_lt_index().at(i))) continue;
           _electronIdCounter++;
 
           // muon id and iso
-          if (abs(hyp_ll_id().at(i)) == 13 && !muonId(hyp_ll_index().at(i), ZMet2012_v1)) continue;
-          if (abs(hyp_lt_id().at(i)) == 13 && !muonId(hyp_lt_index().at(i), ZMet2012_v1)) continue;
+          if (abs(hyp_ll_id().at(i)) == 13 && 
+              !muonId(hyp_ll_index().at(i), ZMet2012_v1)) continue;
+          if (abs(hyp_lt_id().at(i)) == 13 && 
+              !muonId(hyp_lt_index().at(i), ZMet2012_v1)) continue;
           _muonIdCounter++;
           /*          
           // ll muon isolation
@@ -180,7 +180,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
               double nhiso_ll = mus_isoR03_pf_NeutralHadronEt().at(hyp_ll_index().at(i));
               double emiso_ll = mus_isoR03_pf_PhotonEt().at(hyp_ll_index().at(i));
               double dbeta_ll = mus_isoR03_pf_PUPt().at(hyp_ll_index().at(i));
-              double iso_ll = (chiso_ll + max(0.0, nhiso_ll + emiso_ll - 0.5 * dbeta_ll)) / hyp_ll_p4().at(i).pt();
+              double iso_ll = (chiso_ll + max(0.0, nhiso_ll + emiso_ll - 0.5 * dbeta_ll))
+              / hyp_ll_p4().at(i).pt();
 
               if (iso_ll > 0.2) continue; 
           }
@@ -191,7 +192,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
               double nhiso_lt = mus_isoR03_pf_NeutralHadronEt().at(hyp_lt_index().at(i));
               double emiso_lt = mus_isoR03_pf_PhotonEt().at(hyp_lt_index().at(i));
               double dbeta_lt = mus_isoR03_pf_PUPt().at(hyp_lt_index().at(i));
-              double iso_lt = (chiso_lt + max(0.0, nhiso_lt + emiso_lt - 0.5 * dbeta_lt)) / hyp_lt_p4().at(i).pt();
+              double iso_lt = (chiso_lt + max(0.0, nhiso_lt + emiso_lt - 0.5 * dbeta_lt)) 
+              / hyp_lt_p4().at(i).pt();
 
               if (iso_lt > 0.2) continue;
           }
@@ -226,81 +228,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       if (index == -1) continue;
       _eventsCounter++;
 
-      /*
-      now that we've selected a hypothesis, loop over the generated p4
-      and find the matching particle, store its index and value
-      float generatedVal1 = -1;
-      float generatedVal2 = -1;
-      int llGenerated = -1;
-      int ltGenerated = -1;
-      int jetllGenerated = -1;
-      int jetltGenerated =-1;
-
-      float ll_dRmin = 1001;
-      float lt_dRmin = 1001;
-      float llJet_dRmin = 1001;
-      float ltJet_dRmin = 1001;
-
-      for ( int i = 0; i < genps_p4().size(); i++ ){
-
-          float deltaR = DeltaR(genps_p4().at(i), hyp_ll_p4().at(index));
-          
-          if (deltaR < ll_dRmin) {
-              ll_dRmin = deltaR;
-              llGenerated = i;
-          }
-      }
-      
-      for ( int i = 0; i < genps_p4().size(); i++ ){
-
-          if (i == llGenerated) continue;
-
-          float deltaR = DeltaR(genps_p4().at(i), hyp_lt_p4().at(index));
-          
-          if (deltaR < lt_dRmin) {
-              lt_dRmin = deltaR;
-              ltGenerated = i;
-          }
-      }
-
-      for ( int i = 0; i < genps_p4().size(); i++ ){
-
-          if (i == llGenerated || i == ltGenerated) continue;
-
-          float deltaR = DeltaR(genps_p4().at(i), pfjets_p4().at(jetllIndex));
-          
-          if (deltaR < llJet_dRmin) {
-              llJet_dRmin = deltaR;
-              jetllGenerated = i;
-          }
-      }
-  
-      for ( int i = 0; i < genps_p4().size(); i++ ){
-
-          if (i == llGenerated || i == ltGenerated || i == jetllGenerated) continue;
-
-          float deltaR = DeltaR(genps_p4().at(i), pfjets_p4().at(jetltIndex));
-          
-          if (deltaR < ltJet_dRmin) {
-              ltJet_dRmin = deltaR;
-              jetltGenerated = i;
-          }
-      }    
-
-      if (llGenerated != -1 && ltGenerated != -1 && jetllGenerated != -1 && jetltGenerated != -1){
-
-          if (isValidPair(llGenerated, jetllGenerated))
-              generatedVal1 = (genps_p4().at(llGenerated) + genps_p4().at(jetllGenerated)).mass();
-
-
-          if (isValidPair(ltGenerated, jetltGenerated))
-              generatedVal2 = (genps_p4().at(ltGenerated) + genps_p4().at(jetltGenerated)).mass();
-     
-      }
-
-      */
-
-
       // create the ntuple
       InitBabyNtuple();
 
@@ -308,8 +235,10 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       met = evt_pfmet_type1cor();
       metPhi = evt_pfmetPhi();
 
+      if (!isData){
       generated_p4 = genps_p4();
       generated_id = genps_id();
+      }
 
       //  correct the jet pt at baby level
       std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > jets;
@@ -341,11 +270,16 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, unsigned int num
       runNumber = evt_run();
       lumiBlock = evt_lumiBlock();
 
+      // grab the appropriate scale
       if (customScale == -1){
           scale_1fb = evt_scale1fb();
       } else {
           scale_1fb = customScale; 
       } 
+
+      // scale the scale for minis
+      scale_1fb *= (numEvents/nEventsMini);
+
     /*
       if (generatedVal2 != -1 && generatedVal1 != -1){
           generatedAvgMass = (generatedVal2 + generatedVal1)/2;

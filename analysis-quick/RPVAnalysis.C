@@ -8,8 +8,8 @@ void RPVAnalysis::run(){
     signal600Chain->Add("/home/users/aaivazis/susy/babymaker/babies/signal600.root");
 
     // add the data file to a chain
-    TChain* dataChain = new TChain("tree");
-    dataChain->Add("/home/users/aaivazis/susy/babymaker/babies/data.root");
+    //TChain* dataChain = new TChain("tree");
+    //dataChain->Add("/home/users/aaivazis/susy/babymaker/babies/data.root");
 
     // add the ttjets file to a chain
     TChain* ttjetsChain = new TChain("tree");
@@ -21,21 +21,21 @@ void RPVAnalysis::run(){
     
     // add the dy file to a chain
     TChain* zzChain = new TChain("tree");
-    zzChain->Add("/home/users/aaivazis/susy/babymaker/babies/zz.root");
+    zzChain->Add("/home/users/aaivazis/susy/babymaker/babies/zz_2l2q.root");
     
     // fill the dictionaries with empty histograms
     createHistograms();
 
     // use the jet correction for this sample
-    // fillPlots(signal600Chain, signal600, signalDel);
+    fillPlots(signal600Chain, signal600, signalDel);
     // fill the data plots
-    // fillPlots(dataChain, data, dataDel);
+    //fillPlots(dataChain, data, dataDel);
     // fill the tt plots
-    // fillPlots(ttjetsChain, ttjets, ttDel);
+    fillPlots(ttjetsChain, ttjets, ttDel);
     // fill the dy plots
     fillPlots(dyChain, dy, dyDel);
     // fill the zz plots
-    // fillPlots(zzChain, zz, zzDel);
+    fillPlots(zzChain, zz, zzDel);
 
     // draw the histograms
     // plotHistograms();
@@ -43,6 +43,8 @@ void RPVAnalysis::run(){
 
 // fill the given dictionary with the important quantities
 void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot){
+
+    float stopMass = 600;
 
     // get the list of files from the chain
     TObjArray* files = chain->GetListOfFiles();
@@ -81,7 +83,6 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
             // load the event into the branches
             cms2.GetEntry(event);
            
-            //  if (event != 17966) continue;
 
             // save the delta mass between jet/lepton combos (minimized)
             float deltaMass = 9999;
@@ -148,10 +149,14 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
             }
 
             // perform cuts
-            if (type() != 0) continue; //ignore ee
+            if (type() == 3) continue; //ignore ee
             if (/*type() == 0 && */ fabs((ll_p4()+lt_p4()).M() - 91) < 15) continue; // mumu only z-veto
             if (nBtags < 1) continue; 
             
+            //control region
+            if (fabs(deltaMass) > 100) continue; 
+            if (fabs(avgMass) > 250) continue; 
+
             for (int i =0; i < metnumber; i++){
                 // cout << "minimum met: " << mets.at(i) << endl;
                 for (int k = 0; k < jetnumber; k++){
@@ -162,10 +167,8 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
                 }
             }
 
-            //if (type() ==0 && met() > 60) continue; // mumu only
+            //   if (/*type() ==0 &&*/ met() > 40) continue; // mumu only
             if (nJets < 2) continue;
-            if (fabs(deltaMass) > 100) continue; 
-            if (fabs(avgMass) > 250) continue; 
             
 
             // find the gen_ps particles corresponding to our p4s
@@ -204,16 +207,16 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
             // increment eventCounters
             if (type() == 0) mumuCounter++;
             if (type() == 1 || type() == 2) emuCounter++;
-
+            /*
             stream.open("eventList.txt", ios::app);
             stream << event << endl;
             stream.close();
-
+            */
         }
 
         // print the event counters
         cout << "number of mumu events: " << mumuCounter * lumi * scale_1fb() << endl;
-        cout << "number of emu events: " << emuCounter << endl;
+        cout << "number of emu events: " << emuCounter * lumi * scale_1fb() << endl;
 
     }
 

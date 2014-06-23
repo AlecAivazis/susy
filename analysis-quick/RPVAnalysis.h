@@ -65,6 +65,6 @@ class RPVAnalysis {
     TH2F * zzDel;
     TH2F * dyDel;
     // store the analysis luminosity
-    const static float lumi = 19.5;
+    const static float lumi = 5.2;
 };
 #endif
