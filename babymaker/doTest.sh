@@ -1,3 +1,3 @@
 #!/bin/bash
-root -b -q "doData.C(1, \"test\")"
+root -b -q "doSignal.C(1000, \"test\")"
 

@@ -56,14 +56,26 @@ class RPVAnalysis {
     map<string, TH1F*> signal600;
     map<string, TH1F*> data;
     map<string, TH1F*> ttjets;
-    map<string, TH1F*> dy;
-    map<string, TH1F*> zz;
+    map<string, TH1F*> dy_M50;
+    map<string, TH1F*> dy_M10to50;
+    map<string, TH1F*> zz_2l2q;
+    map<string, TH1F*> zz_2l2n;
+    map<string, TH1F*> zz_4l;
+    map<string, TH1F*> ww;
+    map<string, TH1F*> wz_2l2q;
+    map<string, TH1F*> wz_3ln;
 
     TH2F * signalDel;
     TH2F * dataDel;
     TH2F * ttDel;
-    TH2F * zzDel;
-    TH2F * dyDel;
+    TH2F * zz_2l2qDel;
+    TH2F * zz_2l2nDel;
+    TH2F * zz_4lDel;
+    TH2F * wwDel;
+    TH2F * wz_2l2qDel;
+    TH2F * wz_3lnDel;
+    TH2F * dy_M50Del;
+    TH2F * dy_M10to50Del;
     // store the analysis luminosity
     const static float lumi = 5.2;
 };

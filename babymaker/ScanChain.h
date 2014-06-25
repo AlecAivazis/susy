@@ -29,7 +29,7 @@ class babyMaker {
     delete BabyTree_;
   };
 
-  void ScanChain(TChain* chain, std::string baby_name = "testSample", int numFiles = -1, float customScale = -1, bool isData = false);
+  void ScanChain(TChain* chain, std::string baby_name = "testSample", int numEvents = -1, float customScale = -1, bool isData = false);
 
   void MakeBabyNtuple(const char *);
   void InitBabyNtuple();
@@ -70,8 +70,6 @@ class babyMaker {
   float scale_1fb;
   std::vector<float> btagDiscriminant;
   
-  int numEvents;
-
   int eventNumber;
   int runNumber;
   int lumiBlock;
@@ -117,7 +115,6 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
   BabyTree_->Branch("generated_p4", &generated_p4);
   BabyTree_->Branch("generated_id", &generated_id);
   
-  BabyTree_->Branch("numEvents", &numEvents);
 
 
   BabyTree_->Branch("file", &file);
@@ -144,9 +141,6 @@ void babyMaker::InitBabyNtuple () {
   eventNumber = -1;
   runNumber = -1;
   lumiBlock = 1;
-
-  numEvents = 0;
-
 
   return;
 }

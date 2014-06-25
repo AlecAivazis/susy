@@ -46,10 +46,10 @@ bool isValidPair(int hypIndex, int jetIndex){
 
 }
 
-void babyMaker::ScanChain(TChain* chain, std::string baby_name, int numFiles, float customScale, bool isData){
+void babyMaker::ScanChain(TChain* chain, std::string baby_name, int numEvents, float customScale, bool isData){
 
-  if (numFiles != -1 ){
-      cout << "Processing the first " << numFiles << " file(s)" << endl;
+  if (numEvents != -1 ){
+      cout << "Processing the first " << numEvents << " event(s)" << endl;
   }
 
   MakeBabyNtuple( Form("babies/%s.root", baby_name.c_str()) );
@@ -62,9 +62,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, int numFiles, fl
   TObjArray *listOfFiles = chain->GetListOfFiles();
   TIter fileIter(listOfFiles);
   TFile *currentFile = 0;
-  int nEventsMini = 0;
-
-  unsigned int fileCounter = 0;
 
   double _hypPt20Counter = 0;
   double _osCounter = 0;
@@ -80,13 +77,10 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, int numFiles, fl
   double hypCounter = 0;
   double eventHypCounter = 0;
 
-  while ( (currentFile = (TFile*)fileIter.Next()) ) {
+  bool cont = true;
 
-    fileCounter++;
-    
-    if (numFiles != -1 && fileCounter > numFiles) {
-        break;
-    }
+  while ( (currentFile = (TFile*)fileIter.Next()) && cont ) {
+
     // Get File Content
     TFile f( currentFile->GetTitle() );
     TTree *tree = (TTree*)f.Get("Events");
@@ -101,14 +95,20 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, int numFiles, fl
     // event Loop
     unsigned int nEventsTree = tree->GetEntriesFast();
 
-    nEventsMini +=  nEventsTree;
-
     for(unsigned int event = 0; event < nEventsTree; ++event) {
 
       // get event content
       tree->LoadTree(event);
       cms2.GetEntry(event);
+
+      // count the number of events
       ++nEventsTotal;
+
+      // if its less than the max
+      if (numEvents != -1 && nEventsTotal > numEvents) {
+          cont = false;
+          break;
+      }
 
        // select good vagina
       if(evt_isRealData() && !goodrun(evt_run(), evt_lumiBlock())) continue;
@@ -120,8 +120,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, int numFiles, fl
         }
       }
       
-      // Progress
-      CMS2::progress( nEventsTotal, nEventsChain );
 
       int index = -1;
       float _maxPt = 0.0;
@@ -263,7 +261,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, int numFiles, fl
 
       btagDiscriminant = pfjets_combinedSecondaryVertexBJetTag();
 
-      numEvents = tree->GetEntries();
       file = Form("%s", currentFile->GetTitle());
 
       eventNumber = evt_event();
@@ -271,16 +268,21 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, int numFiles, fl
       lumiBlock = evt_lumiBlock();
 
       // grab the appropriate scale
-      if (customScale == -1){
+      if (customScale == -1) {
           scale_1fb = evt_scale1fb();
       } else {
           scale_1fb = customScale; 
-      } 
+      }
+
+      // see if they specified a number
+      if (numEvents == -1)
+          // if they did use the total number
+          numEvents = nEventsChain;
 
       // scale the scale for minis
-      scale_1fb *= (numEvents/nEventsMini);
+      scale_1fb *= (nEventsChain/numEvents);
 
-    /*
+      /*
       if (generatedVal2 != -1 && generatedVal1 != -1){
           generatedAvgMass = (generatedVal2 + generatedVal1)/2;
           generatedDeltaMass = (generatedVal2 - generatedVal1)/2;
@@ -290,6 +292,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, int numFiles, fl
       // fill that sucker
       FillBabyNtuple();
 
+      // track progress
+      CMS2::progress( nEventsTotal, numEvents );
 
     } // end of loop over events in file
 
@@ -302,7 +306,6 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, int numFiles, fl
       cout << "WARNING: The number of events added is not equal to the total number of events!" << endl;
   }
 
-
   cout << nDuplicates << " duplicate events were skipped." << endl;
 
   CloseBabyNtuple();
@@ -311,8 +314,8 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, int numFiles, fl
   stream.open("cutflow.txt", ios::app);
 
   stream << baby_name << ": " << endl;
-  stream << Form("Source (Events): %.0d", nEventsMini) << endl;
-  stream << Form("Events with Hypothesis: %.0f (%.2f)", eventHypCounter, eventHypCounter/nEventsMini * 100) << endl;
+  stream << Form("Source (Events): %.0d", numEvents) << endl;
+  stream << Form("Events with Hypothesis: %.0f (%.2f)", eventHypCounter, eventHypCounter/numEvents * 100) << endl;
   stream << Form("Source (Hypotheses): %.0f", hypCounter) << endl;
   stream << Form("Hypothesis Pt > 20: %.0f (%.2f, %.2f)",_hypPt20Counter, _hypPt20Counter/hypCounter * 100, 1-(_hypPt20Counter/hypCounter)) << endl;
   stream << Form("Oppositely Charged: %.0f (%.2f, %.2f)",_osCounter, _osCounter/hypCounter * 100, 1-(_osCounter/_hypPt20Counter)) << endl;
@@ -323,15 +326,15 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, int numFiles, fl
   stream << "-" << endl;
   stream << Form("# of hypothesis passing ID/ISO: %.0f (%.2f)",(_muonIsoCounter + _electronIsoCounter), (_muonIsoCounter + _electronIsoCounter)/hypCounter * 100) << endl;
   stream << Form("# of events passing ID/ISO: %.0f (%.2f)",(_eventsCounter), (_eventsCounter)/eventHypCounter * 100) << endl;
-//stream << Form("Muon Events: %.0f (%.2f)", muonCounter, muonCounter/nEventsMini * 100) << endl;
+//stream << Form("Muon Events: %.0f (%.2f)", muonCounter, muonCounter/numEvents * 100) << endl;
   stream << "--------------------------------" << endl;
 
   /*
     if (showControlRegions){v
 
-    stream << Form("Control Region 1: %.1f", (CR1counter/nEventsMini) * 100 ) <<  " " << CR1counter/9 << endl; 
-    stream << Form("Control Region 2: %.1f", (CR2counter/nEventsMini) * 100 ) << " " << CR2counter/4 << endl; 
-    stream << Form("Control Region 3: %.1f", (CR3counter/nEventsMini) * 100 ) << " " << CR3counter/1 << endl; 
+    stream << Form("Control Region 1: %.1f", (CR1counter/numEvents) * 100 ) <<  " " << CR1counter/9 << endl; 
+    stream << Form("Control Region 2: %.1f", (CR2counter/numEvents) * 100 ) << " " << CR2counter/4 << endl; 
+    stream << Form("Control Region 3: %.1f", (CR3counter/numEvents) * 100 ) << " " << CR3counter/1 << endl; 
     stream << "--------------------------------" << endl;
     }
   */
