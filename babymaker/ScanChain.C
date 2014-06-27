@@ -233,9 +233,9 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, int numEvents, f
       met = evt_pfmet_type1cor();
       metPhi = evt_pfmetPhi();
 
-      if (!isData){
-      generated_p4 = genps_p4();
-      generated_id = genps_id();
+      if (! isData){
+          generated_p4 = genps_p4();
+          generated_id = genps_id();
       }
 
       //  correct the jet pt at baby level
@@ -248,16 +248,17 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, int numEvents, f
 
       type = hyp_type().at(index);
 
-      ll_p4 = hyp_ll_p4().at(index);
-      ll_id = hyp_ll_id().at(index);
-      total_p4 = hyp_p4().at(index);
       ll_charge = hyp_ll_charge().at(index);
+      ll_id = hyp_ll_id().at(index);
       ll_index = hyp_ll_index().at(index);
+      ll_p4 = hyp_ll_p4().at(index);
 
-      lt_p4 = hyp_lt_p4().at(index);
       lt_charge = hyp_lt_charge().at(index);
       lt_id = hyp_lt_id().at(index);
       lt_index = hyp_lt_index().at(index);
+      lt_p4 = hyp_lt_p4().at(index);
+      
+      total_p4 = hyp_p4().at(index);
 
       btagDiscriminant = pfjets_combinedSecondaryVertexBJetTag();
 
@@ -274,22 +275,15 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, int numEvents, f
           scale_1fb = customScale; 
       }
 
-      // see if they specified a number
+      // if they didn't specify a total number of events to run over
       if (numEvents == -1)
-          // if they did use the total number
+          // use the total number in the chain for the scale
           numEvents = nEventsChain;
 
       // scale the scale for minis
       scale_1fb *= (nEventsChain/numEvents);
 
-      /*
-      if (generatedVal2 != -1 && generatedVal1 != -1){
-          generatedAvgMass = (generatedVal2 + generatedVal1)/2;
-          generatedDeltaMass = (generatedVal2 - generatedVal1)/2;
-      }
-      */
-
-      // fill that sucker
+      // fill it
       FillBabyNtuple();
 
       // track progress
