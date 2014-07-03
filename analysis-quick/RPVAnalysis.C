@@ -84,23 +84,6 @@ void RPVAnalysis::run(){
 // fill the given dictionary with the important quantities
 void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot){
 
-    // fillPlots(signal600Chain, signal600, signalDel);
-    // fill the tt plots
-    fillPlots(dataChain, data, dataDel);
-    // fill the tt plots
-    // fillPlots(ttjetsChain, ttjets, ttDel);
-    // fill the dy plots
-    // fillPlots(dyChain, dy, dyDel);
-    // fill the zz plots
-    // fillPlots(zzChain, zz, zzDel);
-
-    // draw the histograms
-     plotHistograms();
-}
-
-// fill the given dictionary with the important quantities
-void RPVAnalysis::fillPlots(TChain* chain, plotTable_t sample, TH2F* plot){
-
     float stopMass = 600.0;
 
     // get the list of files from the chain
@@ -212,11 +195,8 @@ void RPVAnalysis::fillPlots(TChain* chain, plotTable_t sample, TH2F* plot){
             if (/*type() == 0 && */ fabs((ll_p4()+lt_p4()).M() - 91) < 15) continue; 
 
             if (nBtags < 1) continue; 
-            cout << __LINE__ << endl;
             if (avgMass > 250) continue;
-            cout << __LINE__ << endl;
             if (fabs(deltaMass) > 100) continue; 
-            cout << __LINE__ << endl;
             
             // cuts that define the control region
             if (fabs(deltaMass) > 100) continue; 
@@ -429,9 +409,6 @@ void RPVAnalysis::createHistograms() {
 
     signalDel = new TH2F("signal", "DelVsAvg", 100, 0, 1200, 100, -200, 200);
     dataDel = new TH2F("data", "DelVsAvg", 100, 0, 1200, 100, -200, 200);
-    zzDel = new TH2F("zz", "zz", 100, 0, 1200, 100, -200, 200);
-    dyDel = new TH2F("dy", "zz", 100, 0, 1200, 100, -200, 200);
-    ttDel = new TH2F("tt", "zz", 100, 0, 1200, 100, -200, 200);
     return;
 }
 
@@ -512,7 +489,6 @@ void RPVAnalysis::plotHistograms(){
     wz_2l2qDel->Draw("samebox");
     wz_3lnDel->Draw("samebox");
     ttDel->Draw("samebox");
-<<<<<<< HEAD
     */
 
     c1->SaveAs("DelVsAvgMass>60.png");
@@ -555,6 +531,7 @@ void RPVAnalysis::plotHistograms(){
     //    signal600["met"]->Draw("same");
     leg->Draw("same");
     c1->SaveAs("met.png");
+    */
 }
 
     
