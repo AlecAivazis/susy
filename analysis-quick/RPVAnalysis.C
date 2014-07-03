@@ -4,20 +4,20 @@
 void RPVAnalysis::run(){
 
     // add the files to their respective chains
-    TChain* signal600Chain = new TChain("tree");
-    signal600Chain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal800.root");
+    //TChain* signal600Chain = new TChain("tree");
+    //signal600Chain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal800.root");
 
     // add the data file to a chain
     //TChain* dataChain = new TChain("tree");
     //dataChain->Add("/hadoop/cms/store/user/aaivazis/samples/data/data.root");
 
     // add the files to their respective chains
-    TChain* dataChain = new TChain("tree");
-    dataChain->Add("/home/users/aaivazis/susy/babymaker/babies/data.root");
+    //TChain* dataChain = new TChain("tree");
+    //dataChain->Add("/home/users/aaivazis/susy/babymaker/babies/data.root");
 
     // add the ttjets file to a chain
-    //TChain* ttjetsChain = new TChain("tree");
-    //ttjetsChain->Add("/hadoop/cms/store/user/aaivazis/samples/tt/ttjets.root");
+    TChain* ttjetsChain = new TChain("tree");
+    ttjetsChain->Add("/hadoop/cms/store/user/aaivazis/samples/tt/ttjets.root");
     
     // add the dy (Mass 10 to 50) file to a chain
     //TChain* dy_M10to50Chain = new TChain("tree");
@@ -55,11 +55,11 @@ void RPVAnalysis::run(){
     createHistograms();
 
     // use the jet correction for this sample
-    fillPlots(signal600Chain, signal600, signalDel);
+    //fillPlots(signal600Chain, signal600, signalDel);
     // fill the data plots
     //fillPlots(dataChain, data, dataDel);
     // fill the tt plots
-    //fillPlots(ttjetsChain, ttjets, ttDel);
+    fillPlots(ttjetsChain, ttjets, ttDel);
     // fill the dy plots
     //fillPlots(dy_M10to50Chain, dy_M10to50, dy_M10to50Del);
     // fill the dy plots
@@ -84,7 +84,7 @@ void RPVAnalysis::run(){
 // fill the given dictionary with the important quantities
 void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot){
 
-    float stopMass = 600.0;
+    float stopMass = 800.0;
 
     // get the list of files from the chain
     TObjArray* files = chain->GetListOfFiles();
@@ -195,12 +195,10 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
             if (/*type() == 0 && */ fabs((ll_p4()+lt_p4()).M() - 91) < 15) continue; 
 
             if (nBtags < 1) continue; 
-            if (avgMass > 250) continue;
-            if (fabs(deltaMass) > 100) continue; 
             
             // cuts that define the control region
             if (fabs(deltaMass) > 100) continue; 
-            if (fabs(avgMass - stopMass) > 50) continue; 
+            if (fabs(avgMass) > 250) continue; 
 
             // build the sigma matrix
             for (int i =0; i < metnumber; i++){
