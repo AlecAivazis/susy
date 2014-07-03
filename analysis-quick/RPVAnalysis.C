@@ -11,6 +11,10 @@ void RPVAnalysis::run(){
     //TChain* dataChain = new TChain("tree");
     //dataChain->Add("/hadoop/cms/store/user/aaivazis/samples/data/data.root");
 
+    // add the files to their respective chains
+    TChain* dataChain = new TChain("tree");
+    dataChain->Add("/home/users/aaivazis/susy/babymaker/babies/data.root");
+
     // add the ttjets file to a chain
     //TChain* ttjetsChain = new TChain("tree");
     //ttjetsChain->Add("/hadoop/cms/store/user/aaivazis/samples/tt/ttjets.root");
@@ -51,6 +55,7 @@ void RPVAnalysis::run(){
     createHistograms();
 
     // use the jet correction for this sample
+<<<<<<< HEAD
     fillPlots(signal600Chain, signal600, signalDel);
     // fill the data plots
     //fillPlots(dataChain, data, dataDel);
@@ -81,6 +86,25 @@ void RPVAnalysis::run(){
 void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot){
 
     float stopMass = 800;
+=======
+    // fillPlots(signal600Chain, signal600, signalDel);
+    // fill the tt plots
+    fillPlots(dataChain, data, dataDel);
+    // fill the tt plots
+    // fillPlots(ttjetsChain, ttjets, ttDel);
+    // fill the dy plots
+    // fillPlots(dyChain, dy, dyDel);
+    // fill the zz plots
+    // fillPlots(zzChain, zz, zzDel);
+
+    // draw the histograms
+     plotHistograms();
+}
+
+// fill the given dictionary with the important quantities
+void RPVAnalysis::fillPlots(TChain* chain, plotTable_t sample, TH2F* plot){
+
+    float stopMass = 600.0;
 
     // get the list of files from the chain
     TObjArray* files = chain->GetListOfFiles();
@@ -99,6 +123,8 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
     int counters[6][4] = {0};
     int metnumber = sizeof(mets)/sizeof(mets[0]);
     int jetnumber = sizeof(jets)/sizeof(jets[0]);
+
+    float lumi = 5.2;
 
     // loop over the files to fill plots
     while(( currentFile = (TFile*)fileIter.Next() )) {
@@ -125,7 +151,7 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
             float avgMass = 0;
             // counter for btags
             float nBtags = 0;
-            // counter for nJets 
+            // counter for jets 
             float nJets = 0;
             
             // store the indices of the jets that minimize deltaMass
@@ -184,11 +210,26 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
             }
 
             // perform cuts
+<<<<<<< HEAD
             if (type() == 3) continue;
 
             if (/*type() == 0 && */ fabs((ll_p4()+lt_p4()).M() - 91) < 15) continue; 
 
+=======
+            //if (type() != 0) continue;   // only mumu
+            if (type() == 3) continue; // ignore ee
+            cout << __LINE__ << endl;
+            // mumu only z-veto
+            cout << (ll_p4()+lt_p4()).M() << endl;
+            if (/*type() == 0 && */ fabs((ll_p4()+lt_p4()).M() - 91) < 15) continue;
+            cout << __LINE__ << endl;
+>>>>>>> 8fb734cf9d0c4979ef95ffb90122a47f69c96fcc
             if (nBtags < 1) continue; 
+            cout << __LINE__ << endl;
+            if (avgMass > 250) continue;
+            cout << __LINE__ << endl;
+            if (fabs(deltaMass) > 100) continue; 
+            cout << __LINE__ << endl;
             
             // cuts that define the control region
             if (fabs(deltaMass) > 100) continue; 
@@ -204,9 +245,16 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
                     }
                 }
             }
+<<<<<<< HEAD
 
             if (/*type() ==0 &&*/ met() > 80) continue; 
             if (nJets < 2) continue;
+=======
+            
+            // if (met() > 60) continue;
+            if (nJets < 2) continue;
+            cout << __LINE__ << endl;
+>>>>>>> 8fb734cf9d0c4979ef95ffb90122a47f69c96fcc
 
             // find the gen_ps particles corresponding to our p4s
             llGenerated = getMatchingGeneratedIndex(ll_p4(), indices);
@@ -232,9 +280,11 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
             */
 
             // calculate the combined mass of the two pairs
-            if (llGenerated != -1 && ltGenerated != -1 
-                && jetllGenerated != -1 && jetltGenerated != -1){
-                
+            if (llGenerated != -1
+                && ltGenerated != -1
+                && jetllGenerated != -1
+                && jetltGenerated != -1){
+
                 if (isValidPair(llGenerated, jetllGenerated))
                     generatedMass1 = (generated_p4().at(llGenerated)
                                       + generated_p4().at(jetllGenerated)).M();
@@ -248,6 +298,9 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
                     genMassGood = false;
             }
             
+            stream.open("eventlist.txt", ios::app);
+            stream << event << endl;
+            stream.close();
             
             // fill the appopriate plots
             sample["met"]->Fill(met(), scale_1fb());
@@ -269,11 +322,8 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
         // print the event counters
         cout << "number of mumu events: " << mumuCounter * lumi * scale_1fb() << endl;
         cout << "number of emu events: " << emuCounter * lumi * scale_1fb() << endl;
-        
     }
 
-    int counterSize = sizeof(counters)/sizeof(counters[0]);
-    
     stream.open("signalregion.txt", ios::app);
     for (int i = 0; i< metnumber; i++){
         for (int k =0; k < jetnumber; k++){
@@ -282,7 +332,6 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
     }
     stream << endl;
     stream.close();
-
 
     return;
 }
@@ -339,11 +388,13 @@ int RPVAnalysis::getMatchingGeneratedIndex(const LorentzVector candidate, set<in
     return index;
 }
 
+
 // fill the sample dictionaries 
 void RPVAnalysis::createHistograms() {
    
     // create signal200 plots
     signal600["avgMass"] = new TH1F("signal600_avgMass", "signal 600 Avg Mass", 240, 0, 1200);
+<<<<<<< HEAD
     signal600["met"] = new TH1F("signal600_met", "signal 600 met", 150, 0, 300);
 
     signalDel = new TH2F("signal", "zz", 100, 0, 1200, 100, -200, 200);
@@ -392,7 +443,32 @@ void RPVAnalysis::createHistograms() {
     // create data plots
     data["avgMass"] = new TH1F("data_avgMass", "data Avg Mass", 240, 0, 1200);
     data["met"] = new TH1F("data_met", "data met", 150, 0, 300);
+=======
+    signal600["genMinusReco"] = new TH1F("signal600_genMinusReco", "generated - reco mass", 100, -75, 75);
 
+
+    // create ttjets plots
+    ttjets["avgMass"] = new TH1F("ttjets_avgMass", "ttjets Avg Mass", 240, 0, 1200);
+    ttjets["genMinusReco"] = new TH1F("ttjets_genMinusReco", "ttjets generated - reco mass", 100, -75, 75);
+
+    // create data plots
+    dy["avgMass"] = new TH1F("dy_avgMass", "dy Avg Mass", 240, 0, 1200);
+    dy["genMinusReco"] = new TH1F("dy_genMinusReco", "dy generated - reco mass", 100, -75, 75);
+
+    // create sample plots
+    zz["avgMass"] = new TH1F("zz_avgMass", "dy Avg Mass", 240, 0, 1200);
+    zz["genMinusReco"] = new TH1F("zz_genMinusReco", "dy generated - reco mass", 100, -75, 75);
+>>>>>>> 8fb734cf9d0c4979ef95ffb90122a47f69c96fcc
+
+    // create sample plots
+    data["avgMass"] = new TH1F("data_avgMass", "data Avg Mass", 240, 0, 1200);
+    data["genMinusReco"] = new TH1F("data_genMinusReco", "data generated - reco mass", 100, -75, 75);
+
+    signalDel = new TH2F("signal", "DelVsAvg", 100, 0, 1200, 100, -200, 200);
+    dataDel = new TH2F("data", "DelVsAvg", 100, 0, 1200, 100, -200, 200);
+    zzDel = new TH2F("zz", "zz", 100, 0, 1200, 100, -200, 200);
+    dyDel = new TH2F("dy", "zz", 100, 0, 1200, 100, -200, 200);
+    ttDel = new TH2F("tt", "zz", 100, 0, 1200, 100, -200, 200);
     return;
 }
 
@@ -413,6 +489,8 @@ void RPVAnalysis::prepareHistograms(){
     wz_2l2q["met"]->SetFillColor(kRed+1);
     wz_3ln["met"]->SetFillColor(kRed-4);
     data["met"]->SetMarkerStyle(kFullDotLarge);
+    ttjets["avgMass"]->SetLineColor(kRed);
+    //  signal600before["genMinusReco"]->SetLineColor(kRed);
 
     signalDel->SetFillColor(kBlack);
     dy_M50Del->SetFillColor(kRed);
@@ -471,7 +549,18 @@ void RPVAnalysis::plotHistograms(){
     wz_2l2qDel->Draw("samebox");
     wz_3lnDel->Draw("samebox");
     ttDel->Draw("samebox");
+<<<<<<< HEAD
     */
+=======
+
+    c1->SaveAs("DelVsAvgMass>60.png");
+
+    /* stacked plots 
+    //  THStack *stack = new THStack("stack","");
+
+    signal600["alpha"]->Draw();
+    signal600["beta"]->Draw("same");
+>>>>>>> 8fb734cf9d0c4979ef95ffb90122a47f69c96fcc
     
     // stacked plots 
     THStack *stack = new THStack("stack","");
