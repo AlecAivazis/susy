@@ -55,7 +55,6 @@ void RPVAnalysis::run(){
     createHistograms();
 
     // use the jet correction for this sample
-<<<<<<< HEAD
     fillPlots(signal600Chain, signal600, signalDel);
     // fill the data plots
     //fillPlots(dataChain, data, dataDel);
@@ -85,8 +84,6 @@ void RPVAnalysis::run(){
 // fill the given dictionary with the important quantities
 void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot){
 
-    float stopMass = 800;
-=======
     // fillPlots(signal600Chain, signal600, signalDel);
     // fill the tt plots
     fillPlots(dataChain, data, dataDel);
@@ -210,20 +207,10 @@ void RPVAnalysis::fillPlots(TChain* chain, plotTable_t sample, TH2F* plot){
             }
 
             // perform cuts
-<<<<<<< HEAD
             if (type() == 3) continue;
 
             if (/*type() == 0 && */ fabs((ll_p4()+lt_p4()).M() - 91) < 15) continue; 
 
-=======
-            //if (type() != 0) continue;   // only mumu
-            if (type() == 3) continue; // ignore ee
-            cout << __LINE__ << endl;
-            // mumu only z-veto
-            cout << (ll_p4()+lt_p4()).M() << endl;
-            if (/*type() == 0 && */ fabs((ll_p4()+lt_p4()).M() - 91) < 15) continue;
-            cout << __LINE__ << endl;
->>>>>>> 8fb734cf9d0c4979ef95ffb90122a47f69c96fcc
             if (nBtags < 1) continue; 
             cout << __LINE__ << endl;
             if (avgMass > 250) continue;
@@ -245,17 +232,9 @@ void RPVAnalysis::fillPlots(TChain* chain, plotTable_t sample, TH2F* plot){
                     }
                 }
             }
-<<<<<<< HEAD
 
             if (/*type() ==0 &&*/ met() > 80) continue; 
             if (nJets < 2) continue;
-=======
-            
-            // if (met() > 60) continue;
-            if (nJets < 2) continue;
-            cout << __LINE__ << endl;
->>>>>>> 8fb734cf9d0c4979ef95ffb90122a47f69c96fcc
-
             // find the gen_ps particles corresponding to our p4s
             llGenerated = getMatchingGeneratedIndex(ll_p4(), indices);
             indices.insert(llGenerated);
@@ -267,6 +246,7 @@ void RPVAnalysis::fillPlots(TChain* chain, plotTable_t sample, TH2F* plot){
             indices.insert(jetllGenerated);
 
             jetltGenerated = getMatchingGeneratedIndex(jets_p4().at(jetltIndex) , indices);
+
             /*
             //look at mother of generated lepton
             if (llGenerated != -1 && ltGenerated != -1) {
@@ -394,7 +374,6 @@ void RPVAnalysis::createHistograms() {
    
     // create signal200 plots
     signal600["avgMass"] = new TH1F("signal600_avgMass", "signal 600 Avg Mass", 240, 0, 1200);
-<<<<<<< HEAD
     signal600["met"] = new TH1F("signal600_met", "signal 600 met", 150, 0, 300);
 
     signalDel = new TH2F("signal", "zz", 100, 0, 1200, 100, -200, 200);
@@ -443,22 +422,6 @@ void RPVAnalysis::createHistograms() {
     // create data plots
     data["avgMass"] = new TH1F("data_avgMass", "data Avg Mass", 240, 0, 1200);
     data["met"] = new TH1F("data_met", "data met", 150, 0, 300);
-=======
-    signal600["genMinusReco"] = new TH1F("signal600_genMinusReco", "generated - reco mass", 100, -75, 75);
-
-
-    // create ttjets plots
-    ttjets["avgMass"] = new TH1F("ttjets_avgMass", "ttjets Avg Mass", 240, 0, 1200);
-    ttjets["genMinusReco"] = new TH1F("ttjets_genMinusReco", "ttjets generated - reco mass", 100, -75, 75);
-
-    // create data plots
-    dy["avgMass"] = new TH1F("dy_avgMass", "dy Avg Mass", 240, 0, 1200);
-    dy["genMinusReco"] = new TH1F("dy_genMinusReco", "dy generated - reco mass", 100, -75, 75);
-
-    // create sample plots
-    zz["avgMass"] = new TH1F("zz_avgMass", "dy Avg Mass", 240, 0, 1200);
-    zz["genMinusReco"] = new TH1F("zz_genMinusReco", "dy generated - reco mass", 100, -75, 75);
->>>>>>> 8fb734cf9d0c4979ef95ffb90122a47f69c96fcc
 
     // create sample plots
     data["avgMass"] = new TH1F("data_avgMass", "data Avg Mass", 240, 0, 1200);
@@ -551,7 +514,6 @@ void RPVAnalysis::plotHistograms(){
     ttDel->Draw("samebox");
 <<<<<<< HEAD
     */
-=======
 
     c1->SaveAs("DelVsAvgMass>60.png");
 
@@ -560,7 +522,6 @@ void RPVAnalysis::plotHistograms(){
 
     signal600["alpha"]->Draw();
     signal600["beta"]->Draw("same");
->>>>>>> 8fb734cf9d0c4979ef95ffb90122a47f69c96fcc
     
     // stacked plots 
     THStack *stack = new THStack("stack","");
