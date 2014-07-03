@@ -5,47 +5,47 @@ void RPVAnalysis::run(){
 
     // add the files to their respective chains
     TChain* signal600Chain = new TChain("tree");
-    signal600Chain->Add("/home/users/aaivazis/susy/babymaker/babies/signal600.root");
+    signal600Chain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal800.root");
 
     // add the data file to a chain
-    TChain* dataChain = new TChain("tree");
-    dataChain->Add("/home/users/aaivazis/susy/babymaker/babies/data.root");
+    //TChain* dataChain = new TChain("tree");
+    //dataChain->Add("/hadoop/cms/store/user/aaivazis/samples/data/data.root");
 
     // add the ttjets file to a chain
-    TChain* ttjetsChain = new TChain("tree");
-    ttjetsChain->Add("/home/users/aaivazis/susy/babymaker/babies/ttjets.root");
+    //TChain* ttjetsChain = new TChain("tree");
+    //ttjetsChain->Add("/hadoop/cms/store/user/aaivazis/samples/tt/ttjets.root");
     
     // add the dy (Mass 10 to 50) file to a chain
-    TChain* dy_M10to50Chain = new TChain("tree");
-    dy_M10to50Chain->Add("/home/users/aaivazis/susy/babymaker/babies/dy_M10to50.root");
+    //TChain* dy_M10to50Chain = new TChain("tree");
+    //dy_M10to50Chain->Add("/hadoop/cms/store/user/aaivazis/samples/dy/dy_M10to50.root");
     
     // add the dy (Mass greater than 50) file to a chain
-    TChain* dy_M50Chain = new TChain("tree");
-    dy_M50Chain->Add("/home/users/aaivazis/susy/babymaker/babies/dy_M50.root");
+    //TChain* dy_M50Chain = new TChain("tree");
+    //dy_M50Chain->Add("/hadoop/cms/store/user/aaivazis/samples/dy/dy_M50.root");
     
     // add the zz_2l2q file to a chain
-    TChain* zz_2l2qChain = new TChain("tree");
-    zz_2l2qChain->Add("/home/users/aaivazis/susy/babymaker/babies/zz_2l2q.root");
+    //TChain* zz_2l2qChain = new TChain("tree");
+    //zz_2l2qChain->Add("/hadoop/cms/store/user/aaivazis/samples/zz/zz_2l2q.root");
     
     // add the zz_2l2n file to a chain
-    TChain* zz_2l2nChain = new TChain("tree");
-    zz_2l2nChain->Add("/home/users/aaivazis/susy/babymaker/babies/zz_2l2n.root");
+    //TChain* zz_2l2nChain = new TChain("tree");
+    //zz_2l2nChain->Add("/hadoop/cms/store/user/aaivazis/samples/zz/zz_2l2n.root");
     
     // add the zz_4l file to a chain
-    TChain* zz_4lChain = new TChain("tree");
-    zz_4lChain->Add("/home/users/aaivazis/susy/babymaker/babies/zz_4l.root");
+    //TChain* zz_4lChain = new TChain("tree");
+    //zz_4lChain->Add("/hadoop/cms/store/user/aaivazis/samples/zz/zz_4l.root");
     
     // add the ww file to a chain
-    TChain* wwChain = new TChain("tree");
-    wwChain->Add("/home/users/aaivazis/susy/babymaker/babies/ww.root");
+    //TChain* wwChain = new TChain("tree");
+    //wwChain->Add("/hadoop/cms/store/user/aaivazis/samples/w/ww.root");
 
     // add the wz_2l2q file to a chain
-    TChain* wz_2l2qChain = new TChain("tree");
-    wz_2l2qChain->Add("/home/users/aaivazis/susy/babymaker/babies/wz_2l2q.root");
+    //TChain* wz_2l2qChain = new TChain("tree");
+    //wz_2l2qChain->Add("/hadoop/cms/store/user/aaivazis/samples/w/wz_2l2q.root");
 
     // add the wz_3ln file to a chain
-    TChain* wz_3lnChain = new TChain("tree");
-    wz_3lnChain->Add("/home/users/aaivazis/susy/babymaker/babies/wz_3ln.root");
+    //TChain* wz_3lnChain = new TChain("tree");
+    //wz_3lnChain->Add("/hadoop/cms/store/user/aaivazis/samples/w/wz_3ln.root");
 
     // fill the dictionaries with empty histograms
     createHistograms();
@@ -53,34 +53,34 @@ void RPVAnalysis::run(){
     // use the jet correction for this sample
     fillPlots(signal600Chain, signal600, signalDel);
     // fill the data plots
-    fillPlots(dataChain, data, dataDel);
+    //fillPlots(dataChain, data, dataDel);
     // fill the tt plots
-    fillPlots(ttjetsChain, ttjets, ttDel);
+    //fillPlots(ttjetsChain, ttjets, ttDel);
     // fill the dy plots
-    fillPlots(dy_M10to50Chain, dy_M10to50, dy_M10to50Del);
+    //fillPlots(dy_M10to50Chain, dy_M10to50, dy_M10to50Del);
     // fill the dy plots
-    fillPlots(dy_M50Chain, dy_M50, dy_M50Del);
+    //fillPlots(dy_M50Chain, dy_M50, dy_M50Del);
     // fill the zz plots
-    fillPlots(zz_2l2qChain, zz_2l2q, zz_2l2qDel);
+    //fillPlots(zz_2l2qChain, zz_2l2q, zz_2l2qDel);
     // fill the zz plots
-    fillPlots(zz_2l2nChain, zz_2l2n, zz_2l2nDel);
+    //fillPlots(zz_2l2nChain, zz_2l2n, zz_2l2nDel);
     // fill the zz plots
-    fillPlots(zz_4lChain, zz_4l, zz_4lDel);
+    //fillPlots(zz_4lChain, zz_4l, zz_4lDel);
     // fill the ww plots
-    fillPlots(wwChain, ww, wwDel);
+    //fillPlots(wwChain, ww, wwDel);
     // fill the wz plots
-    fillPlots(wz_2l2qChain, wz_2l2q, wwDel);
+    //fillPlots(wz_2l2qChain, wz_2l2q, wwDel);
     // fill the wz plots
-    fillPlots(wz_3lnChain, wz_3ln, wwDel);
+    //fillPlots(wz_3lnChain, wz_3ln, wwDel);
 
     // draw the histograms
-    plotHistograms();
+   // plotHistograms();
 }
 
 // fill the given dictionary with the important quantities
 void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot){
 
-    float stopMass = 600;
+    float stopMass = 800;
 
     // get the list of files from the chain
     TObjArray* files = chain->GetListOfFiles();
@@ -112,13 +112,6 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
         // declare mumu and emu counters
         int mumuCounter = 0;
         int emuCounter = 0;
-        int sourceCounter = 0;
-        int typeCounter = 0;
-        int vetoCounter = 0;
-        int btagCounter = 0;
-        int deltaMassCounter = 0;
-        int avgMassCounter = 0;
-        int njetsCounter = 0;
 
         // loop over events in the tree
         for (unsigned int event = 0; event < tree->GetEntriesFast(); ++event) {
@@ -146,6 +139,8 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
             int ltGenerated = -1;
             int jetllGenerated = -1;
             int jetltGenerated =-1;
+            int ll_mother = -1;
+            int lt_mother = -1;
             // store the list of known good indices for the gen_ps loop
             set<int> indices;
             // save if the mass pair is valid
@@ -187,20 +182,17 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
                     }
                 }
             }
-            sourceCounter++;
+
             // perform cuts
             if (type() == 3) continue;
-            typeCounter++;
+
             if (/*type() == 0 && */ fabs((ll_p4()+lt_p4()).M() - 91) < 15) continue; 
-            vetoCounter++;
+
             if (nBtags < 1) continue; 
-            btagCounter++;
             
             // cuts that define the control region
             if (fabs(deltaMass) > 100) continue; 
-            deltaMassCounter++;
-            if (fabs(avgMass) > 250) continue; 
-            avgMassCounter++;
+            if (fabs(avgMass - stopMass) > 50) continue; 
 
             // build the sigma matrix
             for (int i =0; i < metnumber; i++){
@@ -213,9 +205,8 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
                 }
             }
 
-            // if (/*type() ==0 &&*/ met() > 80) continue;
+            if (/*type() ==0 &&*/ met() > 80) continue; 
             if (nJets < 2) continue;
-            njetsCounter++;
 
             // find the gen_ps particles corresponding to our p4s
             llGenerated = getMatchingGeneratedIndex(ll_p4(), indices);
@@ -228,11 +219,22 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
             indices.insert(jetllGenerated);
 
             jetltGenerated = getMatchingGeneratedIndex(jets_p4().at(jetltIndex) , indices);
+            /*
+            //look at mother of generated lepton
+            if (llGenerated != -1 && ltGenerated != -1) {
+
+                ll_mother = generated_mother_id().at(llGenerated);
+                lt_mother = generated_mother_id().at(ltGenerated);
+
+                if (fabs(ll_mother) != 24 || fabs(lt_mother) != 24) 
+                    cout << ll_mother << ", " << lt_mother << endl; 
+            }
+            */
 
             // calculate the combined mass of the two pairs
             if (llGenerated != -1 && ltGenerated != -1 
                 && jetllGenerated != -1 && jetltGenerated != -1){
-
+                
                 if (isValidPair(llGenerated, jetllGenerated))
                     generatedMass1 = (generated_p4().at(llGenerated)
                                       + generated_p4().at(jetllGenerated)).M();
@@ -268,15 +270,6 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
         cout << "number of mumu events: " << mumuCounter * lumi * scale_1fb() << endl;
         cout << "number of emu events: " << emuCounter * lumi * scale_1fb() << endl;
         
-        /*
-        cout << "source: " << sourceCounter << endl;
-        cout << "type: " << typeCounter << endl;
-        cout << "veto: " << vetoCounter << endl;
-        cout << "btag: " << btagCounter << endl;
-        cout << "deltaMass: " << deltaMassCounter << endl;
-        cout << "avgMass: " << avgMassCounter << endl;
-        cout << "njets: " << njetsCounter << endl;
-        */
     }
 
     int counterSize = sizeof(counters)/sizeof(counters[0]);

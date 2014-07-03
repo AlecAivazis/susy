@@ -1,4 +1,5 @@
 {
+    gSystem->Load("/home/users/cgeorge/macros/MiniFWLite/libMiniFWLite.so");
     // load CMS2 core
     gSystem->AddIncludePath(Form("-I%s/CORE", gSystem->Getenv("HOME")));
     // load the necessary files
