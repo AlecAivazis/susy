@@ -1,5 +1,6 @@
 doTTbar(int numEvents = -1, std::string file_name = "ttjets")
 {
+  gSystem->Load("/home/users/cgeorge/macros/MiniFWLite/libMiniFWLite.so");
   gSystem->AddIncludePath(Form("-I%s/CORE", gSystem->Getenv("HOME")));
   gSystem->Load(Form("%s/CORE/libCMS2NtupleMacrosCORE.so", gSystem->Getenv("HOME")));
   //gSystem->Load("/home/users/cgeorge/CORE/libCMS2NtupleMacrosCORE.so");

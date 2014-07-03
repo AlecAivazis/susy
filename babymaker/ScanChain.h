@@ -14,8 +14,8 @@
 #include "Math/VectorUtil.h"
 #include "Math/Vector4D.h"
 
-#include "/home/users/aaivazis/CORE/ssSelections.h"
-#include "/home/users/aaivazis/CORE/muonSelections.h"
+#include "CORE/ssSelections.h"
+#include "CORE/muonSelections.h"
 
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
 
@@ -51,6 +51,7 @@ class babyMaker {
   std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > generated_p4;
 
   std::vector<int> generated_id;
+  std::vector<int> generated_mother_id;
 
 
   int type;
@@ -114,6 +115,7 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
 
   BabyTree_->Branch("generated_p4", &generated_p4);
   BabyTree_->Branch("generated_id", &generated_id);
+  BabyTree_->Branch("generated_mother_id", &generated_mother_id);
   
 
 

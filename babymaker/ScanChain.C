@@ -11,16 +11,16 @@
 #include "Math/LorentzVector.h"
 
 // CMS2
-#include "CMS2.h"
-#include "/home/users/aaivazis/CORE/electronSelections.h"
-#include "/home/users/aaivazis/CORE/muonSelections.h"
-#include "/home/users/aaivazis/CORE/ssSelections.h"
-#include "/home/users/aaivazis/CORE/trackSelections.h"
-#include "/home/users/aaivazis/CORE/eventSelections.h"
-#include "/home/users/aaivazis/CORE/susySelections.h"
+#include "CORE/CMS2.h"
+#include "CORE/electronSelections.h"
+#include "CORE/muonSelections.h"
+#include "CORE/ssSelections.h"
+#include "CORE/trackSelections.h"
+#include "CORE/eventSelections.h"
+#include "CORE/susySelections.h"
 
 
-#include "/home/users/jgran/CMSSW_5_3_2_patch4_V05-03-23/src/CMS2/NtupleMacros/Tools/goodrun.cc"
+#include "goodrun.cc"
 #include "Include.C"
 
 // header
@@ -52,7 +52,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, int numEvents, f
       cout << "Processing the first " << numEvents << " event(s)" << endl;
   }
 
-  MakeBabyNtuple( Form("babies/%s.root", baby_name.c_str()) );
+  MakeBabyNtuple( Form("%s.root", baby_name.c_str()) );
 
   // File Loop
   int nDuplicates = 0;
@@ -236,6 +236,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, int numEvents, f
       if (! isData){
           generated_p4 = genps_p4();
           generated_id = genps_id();
+          generated_mother_id = genps_id_mother();
       }
 
       //  correct the jet pt at baby level

@@ -1,3 +1,3 @@
 #!/bin/bash
-root -b -q "doSignal.C(1000, \"test\")"
+root -b -q "doTTbar.C(1000, \"test\")"
 
