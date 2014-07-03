@@ -79,9 +79,9 @@ protected:
 	vector<int> *generated_id_;
 	TBranch *generated_id_branch;
 	bool generated_id_isLoaded;
-	int	numEvents_;
-	TBranch *numEvents_branch;
-	bool numEvents_isLoaded;
+	vector<int> *generated_mother_id_;
+	TBranch *generated_mother_id_branch;
+	bool generated_mother_id_isLoaded;
 public: 
 void Init(TTree *tree) {
 	jets_p4_branch = 0;
@@ -185,10 +185,10 @@ void Init(TTree *tree) {
 		generated_id_branch = tree->GetBranch("generated_id");
 		if (generated_id_branch) {generated_id_branch->SetAddress(&generated_id_);}
 	}
-	numEvents_branch = 0;
-	if (tree->GetBranch("numEvents") != 0) {
-		numEvents_branch = tree->GetBranch("numEvents");
-		if (numEvents_branch) {numEvents_branch->SetAddress(&numEvents_);}
+	generated_mother_id_branch = 0;
+	if (tree->GetBranch("generated_mother_id") != 0) {
+		generated_mother_id_branch = tree->GetBranch("generated_mother_id");
+		if (generated_mother_id_branch) {generated_mother_id_branch->SetAddress(&generated_mother_id_);}
 	}
   tree->SetMakeClass(0);
 }
@@ -216,7 +216,7 @@ void GetEntry(unsigned int idx)
 		btagDiscriminant_isLoaded = false;
 		generated_p4_isLoaded = false;
 		generated_id_isLoaded = false;
-		numEvents_isLoaded = false;
+		generated_mother_id_isLoaded = false;
 	}
 
 void LoadAllBranches() 
@@ -242,7 +242,7 @@ void LoadAllBranches()
 	if (btagDiscriminant_branch != 0) btagDiscriminant();
 	if (generated_p4_branch != 0) generated_p4();
 	if (generated_id_branch != 0) generated_id();
-	if (numEvents_branch != 0) numEvents();
+	if (generated_mother_id_branch != 0) generated_mother_id();
 }
 
 	float &met()
@@ -585,20 +585,20 @@ void LoadAllBranches()
 		}
 		return *generated_id_;
 	}
-	int &numEvents()
+	const vector<int> &generated_mother_id()
 	{
-		if (not numEvents_isLoaded) {
-			if (numEvents_branch != 0) {
-				numEvents_branch->GetEntry(index);
+		if (not generated_mother_id_isLoaded) {
+			if (generated_mother_id_branch != 0) {
+				generated_mother_id_branch->GetEntry(index);
 				#ifdef PARANOIA
 				#endif // #ifdef PARANOIA
 			} else { 
-				printf("branch numEvents_branch does not exist!\n");
+				printf("branch generated_mother_id_branch does not exist!\n");
 				exit(1);
 			}
-			numEvents_isLoaded = true;
+			generated_mother_id_isLoaded = true;
 		}
-		return numEvents_;
+		return *generated_mother_id_;
 	}
 
   static void progress( int nEventsTotal, int nEventsChain ){
@@ -648,6 +648,6 @@ namespace hak {
 	const vector<float> &btagDiscriminant();
 	const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &generated_p4();
 	const vector<int> &generated_id();
-	const int &numEvents();
+	const vector<int> &generated_mother_id();
 }
 #endif

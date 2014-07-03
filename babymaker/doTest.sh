@@ -1,3 +1,3 @@
 #!/bin/bash
-root -b -q "doData.C(1, \"test\")"
+root -b -q "doTTbar.C(1000, \"test\")"
 

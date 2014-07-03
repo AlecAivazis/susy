@@ -2,10 +2,10 @@
 *.d
 *~
 *.root
-analysis/images/
-analysis/cutflow.txt
-analysis/dataEventList.txt
+<<<<<<< HEAD
+analysis/
+=======
+>>>>>>> 8fb734cf9d0c4979ef95ffb90122a47f69c96fcc
 babymaker/cutflow.txt
 tmp/
 signals/
-/*.txt

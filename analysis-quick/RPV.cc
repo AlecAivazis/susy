@@ -21,5 +21,5 @@ namespace hak {
 	const vector<float> &btagDiscriminant() { return cms2.btagDiscriminant(); }
 	const vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > &generated_p4() { return cms2.generated_p4(); }
 	const vector<int> &generated_id() { return cms2.generated_id(); }
-	const int &numEvents() { return cms2.numEvents(); }
+	const vector<int> &generated_mother_id() { return cms2.generated_mother_id(); }
 }

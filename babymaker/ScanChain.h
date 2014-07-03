@@ -14,8 +14,8 @@
 #include "Math/VectorUtil.h"
 #include "Math/Vector4D.h"
 
-#include "/home/users/aaivazis/CORE/ssSelections.h"
-#include "/home/users/aaivazis/CORE/muonSelections.h"
+#include "CORE/ssSelections.h"
+#include "CORE/muonSelections.h"
 
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVector;
 
@@ -29,7 +29,7 @@ class babyMaker {
     delete BabyTree_;
   };
 
-  void ScanChain(TChain* chain, std::string baby_name = "testSample", unsigned int numEvents = 0, float customScale = -1);
+  void ScanChain(TChain* chain, std::string baby_name = "testSample", int numEvents = -1, float customScale = -1, bool isData = false);
 
   void MakeBabyNtuple(const char *);
   void InitBabyNtuple();
@@ -51,6 +51,7 @@ class babyMaker {
   std::vector<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > > generated_p4;
 
   std::vector<int> generated_id;
+  std::vector<int> generated_mother_id;
 
 
   int type;
@@ -70,8 +71,6 @@ class babyMaker {
   float scale_1fb;
   std::vector<float> btagDiscriminant;
   
-  int numEvents;
-
   int eventNumber;
   int runNumber;
   int lumiBlock;
@@ -116,8 +115,8 @@ void babyMaker::MakeBabyNtuple(const char *BabyFilename){
 
   BabyTree_->Branch("generated_p4", &generated_p4);
   BabyTree_->Branch("generated_id", &generated_id);
+  BabyTree_->Branch("generated_mother_id", &generated_mother_id);
   
-  BabyTree_->Branch("numEvents", &numEvents);
 
 
   BabyTree_->Branch("file", &file);
@@ -144,9 +143,6 @@ void babyMaker::InitBabyNtuple () {
   eventNumber = -1;
   runNumber = -1;
   lumiBlock = 1;
-
-  numEvents = 0;
-
 
   return;
 }
