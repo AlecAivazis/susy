@@ -2,9 +2,7 @@
 *.d
 *~
 *.root
-analysis/images/
-analysis/cutflow.txt
-analysis/dataEventList.txt
+analysis/
 babymaker/cutflow.txt
 tmp/
 signals/
