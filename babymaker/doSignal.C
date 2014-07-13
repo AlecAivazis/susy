@@ -2,7 +2,7 @@ doSignal(int numEvents= -1, std::string suffix ="")
 {
   gSystem->Load("/home/users/cgeorge/macros/MiniFWLite/libMiniFWLite.so");
   gSystem->AddIncludePath(Form("-I%s/CORE", gSystem->Getenv("HOME")));
-  gSystem->Load(Form("%s/CORE/libCMS2NtupleMacrosCORE.so", gSystem->Getenv("HOME")));
+  gSystem->Load(Form("CORE/libCMS2NtupleMacrosCORE.so", gSystem->Getenv("HOME")));
   gROOT->ProcessLine(".L ScanChain.C++");
 
   babyMaker *looper = new babyMaker();

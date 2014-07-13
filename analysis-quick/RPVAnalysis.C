@@ -84,7 +84,7 @@ void RPVAnalysis::run(){
     fillPlots(wz_3lnChain, wz_3ln, wwDel);
 
     // draw the histograms
-    plotHistograms();
+    //plotHistograms();
 }
 
 // fill the given dictionary with the important quantities
@@ -204,8 +204,8 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
             if (nBtags < 1) continue; 
             
             // cuts that define the control region
-            //if (fabs(deltaMass) > 100) continue; 
-            //if (fabs(avgMass) > 250) continue; 
+            if (fabs(deltaMass) > 100) continue; 
+            if (fabs(avgMass) > 250) continue; 
 
             // build the sigma matrix
             for (int i =0; i < metnumber; i++){
@@ -218,8 +218,8 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
                 }
             }
 
-            if (/*type() ==0 &&*/ met() > 80) continue; 
-            if (nJets < 2) continue;
+            if (/*type() ==0 &&*/ met() < 60) continue; 
+            if (nJets < 3) continue;
             // find the gen_ps particles corresponding to our p4s
             llGenerated = getMatchingGeneratedIndex(ll_p4(), indices);
             indices.insert(llGenerated);
@@ -285,8 +285,8 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
         }
         
         // print the event counters
-        cout << "number of mumu events: " << mumuCounter * lumi * scale_1fb() << endl;
-        cout << "number of emu events: " << emuCounter * lumi * scale_1fb() << endl;
+        cout << "number of mumu events: " << mumuCounter * lumi * scale_1fb() << ", unweighted: " << mumuCounter << endl;
+        cout << "number of emu events: " << emuCounter * lumi * scale_1fb() << ", unweighted: " << emuCounter << endl;
         cout << " " << endl;
     }
 
@@ -487,7 +487,10 @@ void RPVAnalysis::plotHistograms(){
 
     // prepare the histograms
     prepareHistograms();
-    /* 
+    /*
+    signalDel600->GetYaxis()->SetTitle("Delta Mass (GeV)");
+    signalDel600->GetXaxis()->SetTitle("Average Mass (GeV)");
+
     signalDel600->Draw("box");
     signalDel800->Draw("samebox");
     signalDel1000->Draw("samebox");
@@ -510,7 +513,7 @@ void RPVAnalysis::plotHistograms(){
 
     
     c1 = new TCanvas("c1","Graph Example",200,10,700,500);
-    c1->SetLogy();
+    //c1->SetLogy();
     leg = new TLegend(.73,.9,.89,.6);
     
     leg->AddEntry(ww["met"], "ww", "f");
@@ -534,11 +537,12 @@ void RPVAnalysis::plotHistograms(){
     stack->Add(dy_M10to50["met"]);
     stack->Add(ttjets["met"]);
 
+    //signal600["met"]->GetXaxis()->SetTitle("GeV");
     stack->Draw();
     data["met"]->Draw("sameP");
     signal600["met"]->Draw("same");
     leg->Draw("same");
-    c1->SaveAs("ll_pt.png");
+    c1->SaveAs("met.png");
     
 }
 
