@@ -57,6 +57,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, int numEvents, f
   // File Loop
   int nDuplicates = 0;
   int nEvents = chain->GetEntries();
+  cout << "nEvents: " << nEvents << endl;
   unsigned int nEventsChain = nEvents;
   unsigned int nEventsTotal = 0;
   TObjArray *listOfFiles = chain->GetListOfFiles();

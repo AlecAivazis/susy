@@ -5,7 +5,7 @@ void RPVAnalysis::run(){
 
     // add the files to their respective chains
     TChain* signal600Chain = new TChain("tree");
-    signal600Chain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal600.root");
+    signal600Chain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal200.root");
 
     // add the files to their respective chains
     //TChain* signal800Chain = new TChain("tree");
@@ -63,7 +63,7 @@ void RPVAnalysis::run(){
     //fillPlots(signal800Chain, signal800, signalDel800);
     //fillPlots(signal1000Chain, signal1000, signalDel1000);
     // fill the data plots
-    //fillPlots(dataChain, data, dataDel);
+    fillPlots(dataChain, data, dataDel);
     // fill the tt plots
     fillPlots(ttjetsChain, ttjets, ttDel);
     // fill the dy plots
@@ -90,7 +90,7 @@ void RPVAnalysis::run(){
 // fill the given dictionary with the important quantities
 void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot){
 
-    float stopMass = 600.0;
+    float stopMass = 200.0;
 
     // get the list of files from the chain
     TObjArray* files = chain->GetListOfFiles();
@@ -205,7 +205,7 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
             
             // cuts that define the control region
             if (fabs(deltaMass) > 100) continue; 
-            if (fabs(avgMass) > 250) continue; 
+            if (fabs(avgMass - stopMass) > 50) continue; 
 
             // build the sigma matrix
             for (int i =0; i < metnumber; i++){
@@ -218,8 +218,8 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
                 }
             }
 
-            if (/*type() ==0 &&*/ met() < 60) continue; 
-            if (nJets < 3) continue;
+            if (/*type() ==0 &&*/ met() > 60) continue; 
+            if (nJets < 2) continue;
             // find the gen_ps particles corresponding to our p4s
             llGenerated = getMatchingGeneratedIndex(ll_p4(), indices);
             indices.insert(llGenerated);
@@ -287,6 +287,13 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
         // print the event counters
         cout << "number of mumu events: " << mumuCounter * lumi * scale_1fb() << ", unweighted: " << mumuCounter << endl;
         cout << "number of emu events: " << emuCounter * lumi * scale_1fb() << ", unweighted: " << emuCounter << endl;
+
+        float weightedCounter = sqrt(mumuCounter + emuCounter) * scale_1fb() * lumi;
+        if ( weightedCounter == 0){
+            weightedCounter = scale_1fb() * lumi;
+        }
+
+        cout << "error: " << weightedCounter << endl;
         cout << " " << endl;
     }
 
@@ -360,7 +367,7 @@ void RPVAnalysis::createHistograms() {
    
     // create signal200 plots
     signal600["avgMass"] = new TH1F("signal600_avgMass", "signal 600 Avg Mass", 240, 0, 1200);
-    signal600["met"] = new TH1F("signal600_met", "signal 600 met", 150, 0, 300);
+    signal600["met"] = new TH1F("signal600_met", "signal 600 met", 50, 10, 50);
 
     signalDel600 = new TH2F("signal600", "zz", 100, 0, 1200, 100, -200, 200);
     signalDel800 = new TH2F("signal800", "zz", 100, 0, 1200, 100, -200, 200);
@@ -378,44 +385,43 @@ void RPVAnalysis::createHistograms() {
 
     // create ttjets plots
     ttjets["avgMass"] = new TH1F("ttjets_avgMass", "ttjets Avg Mass", 240, 0, 1200);
-    ttjets["met"] = new TH1F("ttjets_met", "tt jets met", 150, 0, 300);
+    ttjets["met"] = new TH1F("ttjets_met", "tt jets met", 80, 0, 300);
 
     // create dy plots
     dy_M50["avgMass"] = new TH1F("dy_M50_avgMass", "dy_M50 Avg Mass", 240, 0, 1200);
-    dy_M50["met"] = new TH1F("dy_M50_met", "dy_M50 met", 150, 0, 300);
+    dy_M50["met"] = new TH1F("dy_M50_met", "dy_M50 met", 80, 0, 300);
 
     dy_M10to50["avgMass"] = new TH1F("dy_M10to50_avgMass", "dy_M10to50 Avg Mass", 240, 0, 1200);
-    dy_M10to50["met"] = new TH1F("dy_M10to50_met", "dy_M10to50 met", 150, 0, 300);
+    dy_M10to50["met"] = new TH1F("dy_M10to50_met", "dy_M10to50 met", 80, 0, 300);
 
     // create zz plots
     zz_2l2q["avgMass"] = new TH1F("zz_2l2q_avgMass", "zz_2l2q Avg Mass", 240, 0, 1200);
-    zz_2l2q["met"] = new TH1F("zz_2l2q_met", "zz_2l2q met", 150, 0, 300);
+    zz_2l2q["met"] = new TH1F("zz_2l2q_met", "zz_2l2q met", 80, 0, 300);
 
     zz_2l2n["avgMass"] = new TH1F("zz_2l2n_avgMass", "zz_2l2n Avg Mass", 240, 0, 1200);
-    zz_2l2n["met"] = new TH1F("zz_2l2n_met", "zz_2l2n met", 150, 0, 300);
+    zz_2l2n["met"] = new TH1F("zz_2l2n_met", "zz_2l2n met", 80, 0, 300);
 
     zz_4l["avgMass"] = new TH1F("zz_4l_avgMass", "zz_4l Avg Mass", 240, 0, 1200);
-    zz_4l["met"] = new TH1F("zz__4l_met", "zz_4l met", 150, 0, 300);
+    zz_4l["met"] = new TH1F("zz__4l_met", "zz_4l met", 80, 0, 300);
 
     // create w plots
     ww["avgMass"] = new TH1F("ww_avgMass", "ww Avg Mass", 240, 0, 1200);
-    ww["met"] = new TH1F("ww_met", "ww met", 150, 0, 300);
+    ww["met"] = new TH1F("ww_met", "ww met", 80, 0, 300);
 
     wz_2l2q["avgMass"] = new TH1F("wz_2l2q_avgMass", "wz_2l2q Avg Mass", 240, 0, 1200);
-    wz_2l2q["met"] = new TH1F("wz_2l2q_met", "wz_2l2q met", 150, 0, 300);
+    wz_2l2q["met"] = new TH1F("wz_2l2q_met", "wz_2l2q met", 80, 0, 300);
 
     wz_3ln["avgMass"] = new TH1F("wz_3ln_avgMass", "wz_3ln Avg Mass", 240, 0, 1200);
-    wz_3ln["met"] = new TH1F("wz_3ln_met", "wz_3ln met", 150, 0, 300);
+    wz_3ln["met"] = new TH1F("wz_3ln_met", "wz_3ln met", 80, 0, 300);
 
     // create data plots
     data["avgMass"] = new TH1F("data_avgMass", "data Avg Mass", 240, 0, 1200);
-    data["met"] = new TH1F("data_met", "data met", 150, 0, 300);
+    data["met"] = new TH1F("data_met", "data met", 80, 0, 300);
 
     // create sample plots
     data["avgMass"] = new TH1F("data_avgMass", "data Avg Mass", 240, 0, 1200);
     data["genMinusReco"] = new TH1F("data_genMinusReco", "data generated - reco mass", 100, -75, 75);
 
-    dataDel = new TH2F("data", "DelVsAvg", 100, 0, 1200, 100, -200, 200);
     return;
 }
 
@@ -487,7 +493,7 @@ void RPVAnalysis::plotHistograms(){
 
     // prepare the histograms
     prepareHistograms();
-    /*
+    
     signalDel600->GetYaxis()->SetTitle("Delta Mass (GeV)");
     signalDel600->GetXaxis()->SetTitle("Average Mass (GeV)");
 
@@ -506,8 +512,8 @@ void RPVAnalysis::plotHistograms(){
     
 
     c1->SaveAs("DelVsAvgMass.png");
-    */
     
+    /*
     // stacked plots 
     THStack *stack = new THStack("stack","");
 
@@ -516,7 +522,7 @@ void RPVAnalysis::plotHistograms(){
     //c1->SetLogy();
     leg = new TLegend(.73,.9,.89,.6);
     
-    leg->AddEntry(ww["met"], "ww", "f");
+    leg->AddEntry(ww["met"], "ww_2l2n", "f");
     leg->AddEntry(zz_2l2n["met"], "zz_2l2n", "f");
     leg->AddEntry(zz_4l["met"], "zz_4l", "f");
     leg->AddEntry(wz_3ln["met"], "wz_3ln", "f");
@@ -525,7 +531,7 @@ void RPVAnalysis::plotHistograms(){
     leg->AddEntry(dy_M50["met"], "DY", "f");
     leg->AddEntry(ttjets["met"], "TT", "f");
     leg->AddEntry(data["met"], "data", "p");
-    leg->AddEntry(signal600["met"], "data", "l");
+    leg->AddEntry(signal600["met"], "signal", "l");
 
     stack->Add(ww["met"]);
     stack->Add(zz_2l2n["met"]);
@@ -537,13 +543,14 @@ void RPVAnalysis::plotHistograms(){
     stack->Add(dy_M10to50["met"]);
     stack->Add(ttjets["met"]);
 
-    //signal600["met"]->GetXaxis()->SetTitle("GeV");
+    signal600["met"]->GetXaxis()->SetTitle("Average Mass (GeV)");
+
     stack->Draw();
     data["met"]->Draw("sameP");
     signal600["met"]->Draw("same");
     leg->Draw("same");
     c1->SaveAs("met.png");
-    
+    */
 }
 
     
