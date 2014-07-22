@@ -281,7 +281,7 @@ void babyMaker::ScanChain(TChain* chain, std::string baby_name, int numEvents, f
       if (numEvents == -1)
           // use the total number in the chain for the scale
           numEvents = nEventsChain;
-
+analysis-quick/
       // scale the scale for minis
       scale_1fb *= (nEventsChain/numEvents);
 

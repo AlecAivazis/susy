@@ -1,3 +1,3 @@
 #!/bin/bash
-root -b -q "doDY.C(1000, \"test\")"
+root -b -q "doTTbar.C(1000, \"test\")"
 

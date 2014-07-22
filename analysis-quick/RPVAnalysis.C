@@ -5,7 +5,7 @@ void RPVAnalysis::run(){
 
     // add the files to their respective chains
     TChain* signal600Chain = new TChain("tree");
-    signal600Chain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal200.root");
+    signal600Chain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal800.root");
 
     // add the files to their respective chains
     //TChain* signal800Chain = new TChain("tree");
@@ -59,11 +59,11 @@ void RPVAnalysis::run(){
     createHistograms();
 
     // use the jet correction for this sample
-    fillPlots(signal600Chain, signal600, signalDel600);
+    //fillPlots(signal600Chain, signal600, signalDel600);
     //fillPlots(signal800Chain, signal800, signalDel800);
     //fillPlots(signal1000Chain, signal1000, signalDel1000);
     // fill the data plots
-    fillPlots(dataChain, data, dataDel);
+    //fillPlots(dataChain, data, dataDel);
     // fill the tt plots
     fillPlots(ttjetsChain, ttjets, ttDel);
     // fill the dy plots
@@ -71,17 +71,17 @@ void RPVAnalysis::run(){
     // fill the dy plots
     fillPlots(dy_M50Chain, dy_M50, dy_M50Del);
     // fill the zz plots
-    fillPlots(zz_2l2qChain, zz_2l2q, zz_2l2qDel);
+    //fillPlots(zz_2l2qChain, zz_2l2q, zz_2l2qDel);
     // fill the zz plots
-    fillPlots(zz_2l2nChain, zz_2l2n, zz_2l2nDel);
+    //fillPlots(zz_2l2nChain, zz_2l2n, zz_2l2nDel);
     // fill the zz plots
-    fillPlots(zz_4lChain, zz_4l, zz_4lDel);
+    //fillPlots(zz_4lChain, zz_4l, zz_4lDel);
     // fill the ww plots
-    fillPlots(wwChain, ww, wwDel);
+    //fillPlots(wwChain, ww, wwDel);
     // fill the wz plots
-    fillPlots(wz_2l2qChain, wz_2l2q, wwDel);
+    //fillPlots(wz_2l2qChain, wz_2l2q, wwDel);
     // fill the wz plots
-    fillPlots(wz_3lnChain, wz_3ln, wwDel);
+    //fillPlots(wz_3lnChain, wz_3ln, wwDel);
 
     // draw the histograms
     //plotHistograms();
