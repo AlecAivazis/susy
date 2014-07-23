@@ -9,11 +9,11 @@ void RPVAnalysis::run(){
 
     // add the files to their respective chains
     //TChain* signal800Chain = new TChain("tree");
-    //signal800Chain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal800.root");
+    //signal800Chain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal250.root");
 
     // add the files to their respective chains
     //TChain* signal1000Chain = new TChain("tree");
-    //signal1000Chain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal1000.root");
+    //signal1000Chain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal300.root");
 
     // add the data file to a chain
     TChain* dataChain = new TChain("tree");
@@ -285,19 +285,24 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
         }
         
         // print the event counters
-        cout << "stop mass: " << stopMass << endl;
         cout << "number of mumu events: " << mumuCounter * lumi * scale_1fb() << ", unweighted: " << mumuCounter << endl;
         cout << "number of emu events: " << emuCounter * lumi * scale_1fb() << ", unweighted: " << emuCounter << endl;
 
-        float weightedCounter = sqrt(mumuCounter*mumuCounter + emuCounter*emuCounter) * scale_1fb() * lumi;
-        if ( weightedCounter == 0){
-            weightedCounter = scale_1fb() * lumi;
+        float mumuError = sqrt(mumuCounter) * scale_1fb() * lumi;
+        if ( mumuError == 0){
+            mumuError = scale_1fb() * lumi;
+        }
+        
+        float emuError = sqrt(emuCounter) * scale_1fb() * lumi;
+        if ( emuError == 0){
+            emuError = scale_1fb() * lumi;
         }
 
-        cout << "error: " << weightedCounter << endl;
+        cout << "mumu error: " << mumuError << endl;
+        cout << "emu error: " << emuError << endl;
         cout << " " << endl;
     }
-
+    
     stream.open("signalregion.txt", ios::app);
     for (int i = 0; i< metnumber; i++){
         for (int k =0; k < jetnumber; k++){
@@ -306,7 +311,7 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
     }
     stream << endl;
     stream.close();
-
+    
     return;
 }
 
