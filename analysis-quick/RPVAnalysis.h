@@ -4,6 +4,7 @@
 // C++
 #include <fstream>
 #include <set>
+#include <sstream>
 
 // root
 #include "TChain.h"
@@ -29,12 +30,12 @@ class RPVAnalysis {
  public:
 
     // run the analysis
-    void run();
+    void run(float stopMass = 600.0);
 
  private: 
     
     // fill the plots associated with a given signal
-    void fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot = 0);
+    void fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot = 0, float stopMass = 600);
     // draw an individual plot
     void makePlot(vector<TH1*> plots, TH1F* overlay=0);
     // check if the given jetIndex represents a "good" jet
@@ -53,9 +54,7 @@ class RPVAnalysis {
     int getMatchingGeneratedIndex(LorentzVector candidate, set<int> indices);
 
     // save the various one dimensional plots in maps for each signal
-    map<string, TH1F*> signal600;
-    map<string, TH1F*> signal800;
-    map<string, TH1F*> signal1000;
+    map<string, TH1F*> signal;
     map<string, TH1F*> data;
     map<string, TH1F*> ttjets;
     map<string, TH1F*> dy_M50;
@@ -67,9 +66,7 @@ class RPVAnalysis {
     map<string, TH1F*> wz_2l2q;
     map<string, TH1F*> wz_3ln;
 
-    TH2F * signalDel600;
-    TH2F * signalDel800;
-    TH2F * signalDel1000;
+    TH2F * signalDel;
     TH2F * dataDel;
     TH2F * ttDel;
     TH2F * zz_2l2qDel;

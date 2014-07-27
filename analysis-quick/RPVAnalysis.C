@@ -1,19 +1,19 @@
 #include "RPVAnalysis.h"
 
 // run the analysis
-void RPVAnalysis::run(){
+void RPVAnalysis::run(float stopMass){
 
     // add the files to their respective chains
-    TChain* signal600Chain = new TChain("tree");
-    signal600Chain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal200.root");
-
-    // add the files to their respective chains
-    //TChain* signal800Chain = new TChain("tree");
-    //signal800Chain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal250.root");
-
-    // add the files to their respective chains
-    //TChain* signal1000Chain = new TChain("tree");
-    //signal1000Chain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal300.root");
+    TChain* signalChain = new TChain("tree");
+    // convert the stop mass to a char
+    char mass[3];
+    sprintf(mass, "%.0f", stopMass);
+    // build the file name that points to the appropriate signal
+    std::string signalFileName("/hadoop/cms/store/user/aaivazis/samples/signal/signal");
+    signalFileName += mass ;
+    signalFileName += ".root" ;
+    // add it to the signal chain
+    signalChain->Add(signalFileName.c_str());
 
     // add the data file to a chain
     TChain* dataChain = new TChain("tree");
@@ -59,38 +59,24 @@ void RPVAnalysis::run(){
     createHistograms();
 
     // use the jet correction for this sample
-    fillPlots(signal600Chain, signal600, signalDel600);
-    //fillPlots(signal800Chain, signal800, signalDel800);
-    //fillPlots(signal1000Chain, signal1000, signalDel1000);
-    // fill the data plots
-    //fillPlots(dataChain, data, dataDel);
-    // fill the tt plots
-    fillPlots(ttjetsChain, ttjets, ttDel);
-    // fill the dy plots
-    fillPlots(dy_M10to50Chain, dy_M10to50, dy_M10to50Del);
-    // fill the dy plots
-    fillPlots(dy_M50Chain, dy_M50, dy_M50Del);
-    // fill the zz plots
-    fillPlots(zz_2l2qChain, zz_2l2q, zz_2l2qDel);
-    // fill the zz plots
-    fillPlots(zz_2l2nChain, zz_2l2n, zz_2l2nDel);
-    // fill the zz plots
-    fillPlots(zz_4lChain, zz_4l, zz_4lDel);
-    // fill the ww plots
-    fillPlots(wwChain, ww, wwDel);
-    // fill the wz plots
-    fillPlots(wz_2l2qChain, wz_2l2q, wwDel);
-    // fill the wz plots
-    fillPlots(wz_3lnChain, wz_3ln, wwDel);
+    fillPlots(signalChain, signal, signalDel, stopMass);
+    fillPlots(dataChain, data, dataDel, stopMass);
+    fillPlots(ttjetsChain, ttjets, ttDel, stopMass);
+    fillPlots(dy_M10to50Chain, dy_M10to50, dy_M10to50Del, stopMass);
+    fillPlots(dy_M50Chain, dy_M50, dy_M50Del, stopMass);
+    fillPlots(zz_2l2qChain, zz_2l2q, zz_2l2qDel, stopMass);
+    fillPlots(zz_2l2nChain, zz_2l2n, zz_2l2nDel, stopMass);
+    fillPlots(zz_4lChain, zz_4l, zz_4lDel, stopMass);
+    fillPlots(wwChain, ww, wwDel, stopMass);
+    fillPlots(wz_2l2qChain, wz_2l2q, wwDel, stopMass);
+    fillPlots(wz_3lnChain, wz_3ln, wwDel, stopMass);
 
     // draw the histograms
     //plotHistograms();
 }
 
 // fill the given dictionary with the important quantities
-void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot){
-
-    float stopMass = 200.0;
+void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot, float stopMass){
 
     // get the list of files from the chain
     TObjArray* files = chain->GetListOfFiles();
@@ -201,7 +187,7 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
 
             if (/*type() == 0 && */ fabs((ll_p4()+lt_p4()).M() - 91) < 15) continue; 
 
-            if (nBtags < 1) continue; 
+            if (nBtags < 2) continue; 
             
             // cuts that define the control region
             if (fabs(deltaMass) > 100) continue; 
@@ -285,8 +271,6 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
         }
         
         // print the event counters
-        cout << "number of mumu events: " << mumuCounter * lumi * scale_1fb() << ", unweighted: " << mumuCounter << endl;
-        cout << "number of emu events: " << emuCounter * lumi * scale_1fb() << ", unweighted: " << emuCounter << endl;
 
         float mumuError = sqrt(mumuCounter) * scale_1fb() * lumi;
         if ( mumuError == 0){
@@ -298,8 +282,16 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
             emuError = scale_1fb() * lumi;
         }
 
+        cout << "stop mass:" << stopMass << endl;
+
+        cout << "number of mumu events: " << mumuCounter * lumi * scale_1fb() 
+             << ", unweighted: " << mumuCounter << endl;
         cout << "mumu error: " << mumuError << endl;
+
+        cout << "number of emu events: " << emuCounter * lumi * scale_1fb() 
+             << ", unweighted: " << emuCounter << endl;
         cout << "emu error: " << emuError << endl;
+
         cout << " " << endl;
     }
     
@@ -372,12 +364,10 @@ int RPVAnalysis::getMatchingGeneratedIndex(const LorentzVector candidate, set<in
 void RPVAnalysis::createHistograms() {
    
     // create signal200 plots
-    signal600["avgMass"] = new TH1F("signal600_avgMass", "signal 600 Avg Mass", 240, 0, 1200);
-    signal600["met"] = new TH1F("signal600_met", "signal 600 met", 50, 10, 50);
+    signal["avgMass"] = new TH1F("signal600_avgMass", "signal 600 Avg Mass", 240, 0, 1200);
+    signal["met"] = new TH1F("signal600_met", "signal 600 met", 50, 10, 50);
 
-    signalDel600 = new TH2F("signal600", "zz", 100, 0, 1200, 100, -200, 200);
-    signalDel800 = new TH2F("signal800", "zz", 100, 0, 1200, 100, -200, 200);
-    signalDel1000 = new TH2F("signal1000", "zz", 100, 0, 1200, 100, -200, 200);
+    signalDel= new TH2F("signal600", "zz", 100, 0, 1200, 100, -200, 200);
     zz_2l2qDel = new TH2F("zz_2l2q", "zz_2l2q", 100, 0, 1200, 100, -200, 200);
     zz_2l2nDel = new TH2F("zz_2l2n", "zz_2l2n", 100, 0, 1200, 100, -200, 200);
     zz_4lDel = new TH2F("zz_4l", "zz_4l", 100, 0, 1200, 100, -200, 200);
@@ -436,8 +426,8 @@ void RPVAnalysis::prepareHistograms(){
 
 
     // color the histograms
-    signal600["avgMass"]->SetLineColor(kBlack);
-    signal600["met"]->SetLineColor(kBlack);
+    signal["avgMass"]->SetLineColor(kBlack);
+    signal["met"]->SetLineColor(kBlack);
     ttjets["met"]->SetFillColor(kBlue);
     dy_M50["met"]->SetFillColor(kMagenta);
     dy_M10to50["met"]->SetFillColor(kMagenta);
@@ -451,9 +441,7 @@ void RPVAnalysis::prepareHistograms(){
     ttjets["avgMass"]->SetLineColor(kRed);
     //  signal600before["genMinusReco"]->SetLineColor(kRed);
 
-    signalDel600->SetFillColor(kBlack);
-    signalDel800->SetFillColor(kBlack);
-    signalDel1000->SetFillColor(kBlack);
+    signalDel->SetFillColor(kBlack);
     dy_M50Del->SetFillColor(kRed);
     dy_M10to50Del->SetFillColor(kRed);
     zz_2l2qDel->SetFillColor(kRed);
@@ -465,7 +453,7 @@ void RPVAnalysis::prepareHistograms(){
     ttDel->SetFillColor(kRed);
     
     // set the overflow bins
-    overflow(signal600["avgMass"], 1200);
+    overflow(signal["avgMass"], 1200);
 
     return;
 }
@@ -500,12 +488,10 @@ void RPVAnalysis::plotHistograms(){
     // prepare the histograms
     prepareHistograms();
     
-    signalDel600->GetYaxis()->SetTitle("Delta Mass (GeV)");
-    signalDel600->GetXaxis()->SetTitle("Average Mass (GeV)");
+    signalDel->GetYaxis()->SetTitle("Delta Mass (GeV)");
+    signalDel->GetXaxis()->SetTitle("Average Mass (GeV)");
 
-    signalDel600->Draw("box");
-    signalDel800->Draw("samebox");
-    signalDel1000->Draw("samebox");
+    signalDel->Draw("box");
     dy_M50Del->Draw("samebox");
     dy_M10to50Del->Draw("samebox");
     zz_2l2qDel->Draw("samebox");
