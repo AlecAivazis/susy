@@ -100,7 +100,7 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
 
     // loop over the files to fill plots
     while(( currentFile = (TFile*)fileIter.Next() )) {
-        
+
         // get the file content
         TFile* file = new TFile(currentFile->GetTitle());
         TTree* tree = (TTree*)file->Get("tree");
@@ -282,17 +282,27 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
             emuError = scale_1fb() * lumi;
         }
 
-        cout << "stop mass:" << stopMass << endl;
 
-        cout << "number of mumu events: " << mumuCounter * lumi * scale_1fb() 
-             << ", unweighted: " << mumuCounter << endl;
-        cout << "mumu error: " << mumuError << endl;
+        char mass[3];
+        sprintf(mass, "%.0f", stopMass);
+        // build the file name that points to the appropriate signal
+        std::string yieldFileName("yields/yield-");
+        yieldFileName += mass ;
+        yieldFileName += ".txt" ;
 
-        cout << "number of emu events: " << emuCounter * lumi * scale_1fb() 
-             << ", unweighted: " << emuCounter << endl;
-        cout << "emu error: " << emuError << endl;
+        stream.open(yieldFileName.c_str(), ios::app);
+        stream << "stop mass:" << stopMass << endl;
 
-        cout << " " << endl;
+        stream << "number of mumu events: " << mumuCounter * lumi * scale_1fb() 
+               << ", unweighted: " << mumuCounter << endl;
+        stream << "mumu error: " << mumuError << endl;
+
+        stream << "number of emu events: " << emuCounter * lumi * scale_1fb() 
+               << ", unweighted: " << emuCounter << endl;
+        stream << "emu error: " << emuError << endl;
+
+        stream << " " << endl;
+        stream.close();
     }
     
     stream.open("signalregion.txt", ios::app);
