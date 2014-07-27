@@ -3,6 +3,8 @@
 // run the analysis
 void RPVAnalysis::run(float stopMass){
 
+    cout << "running" << endl;
+
     // add the files to their respective chains
     TChain* signalChain = new TChain("tree");
     // convert the stop mass to a char
@@ -286,7 +288,7 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
         char mass[3];
         sprintf(mass, "%.0f", stopMass);
         // build the file name that points to the appropriate signal
-        std::string yieldFileName("yields/yield-");
+        std::string yieldFileName("yields/sr/yield-");
         yieldFileName += mass ;
         yieldFileName += ".txt" ;
 
@@ -313,6 +315,8 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
     }
     stream << endl;
     stream.close();
+
+    cout << "done with file" << endl;
     
     return;
 }
