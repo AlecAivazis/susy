@@ -31,7 +31,7 @@ class RPVAnalysis {
  public:
 
     // run the analysis
-    void run(float stopMass = 600.0, string regionId = "cr1");
+    void run(float stopMass = 600.0, string regionId = "");
 
  private: 
     

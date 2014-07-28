@@ -183,7 +183,6 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
                 }
             }
 
-
             // perform cuts
             
             if (type() == 3) continue;
@@ -200,10 +199,11 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
             }
 
             // signal region avg cuts
-            if (regionId == "sr1" && regionid == "sr2" )
+            if (regionId == "sr1" && regionId == "sr2" ) {
                 if (fabs(avgMass - stopMass) > 50) continue;
-            else
-                if (stopMass > 250) continue;
+            } else {
+                if (avgMass > 250) continue;
+            }
 
             // control region definitions
             if (regionId == "cr1") {
@@ -245,8 +245,6 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
 
             
 
-            if (/*type() ==0 &&*/ met() < 60) continue; 
-            if (nJets < 2) continue;
             // find the gen_ps particles corresponding to our p4s
             llGenerated = getMatchingGeneratedIndex(ll_p4(), indices);
             indices.insert(llGenerated);
@@ -327,9 +325,9 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
         char mass[3];
         sprintf(mass, "%.0f", stopMass);
         // build the file name that points to the appropriate signal
-        std::string yieldFileName("yields/cr/yield-");
+        std::string yieldFileName("yields/yield-");
         yieldFileName += mass ;
-        yieldFileName += signalRegionId ;
+        yieldFileName += regionId ;
         yieldFileName += ".txt" ;
 
         stream.open(yieldFileName.c_str(), ios::app);
