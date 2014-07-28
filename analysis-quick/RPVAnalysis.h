@@ -5,6 +5,7 @@
 #include <fstream>
 #include <set>
 #include <sstream>
+#include <string>
 
 // root
 #include "TChain.h"
@@ -30,12 +31,13 @@ class RPVAnalysis {
  public:
 
     // run the analysis
-    void run(float stopMass = 600.0);
+    void run(float stopMass = 600.0, string regionId = "cr1");
 
  private: 
     
     // fill the plots associated with a given signal
-    void fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot = 0, float stopMass = 600);
+    void fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot = 0, 
+                   float stopMass = 600, string regionId = "");
     // draw an individual plot
     void makePlot(vector<TH1*> plots, TH1F* overlay=0);
     // check if the given jetIndex represents a "good" jet

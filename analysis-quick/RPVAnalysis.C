@@ -1,7 +1,7 @@
 #include "RPVAnalysis.h"
 
 // run the analysis
-void RPVAnalysis::run(float stopMass){
+void RPVAnalysis::run(float stopMass, string regionId){
 
     cout << "running" << endl;
 
@@ -19,66 +19,66 @@ void RPVAnalysis::run(float stopMass){
 
     // add the data file to a chain
     TChain* dataChain = new TChain("tree");
-    dataChain->Add("/hadoop/cms/store/user/aaivazis/samples/data/data.root");
+    dataChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal250.root");
 
     // add the ttjets file to a chain
     TChain* ttjetsChain = new TChain("tree");
-    ttjetsChain->Add("/hadoop/cms/store/user/aaivazis/samples/tt/ttjets.root");
+    ttjetsChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal300.root");
     
     // add the dy (Mass 10 to 50) file to a chain
     TChain* dy_M10to50Chain = new TChain("tree");
-    dy_M10to50Chain->Add("/hadoop/cms/store/user/aaivazis/samples/dy/dy_M10to50.root");
+    dy_M10to50Chain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal350.root");
     
     // add the dy (Mass greater than 50) file to a chain
     TChain* dy_M50Chain = new TChain("tree");
-    dy_M50Chain->Add("/hadoop/cms/store/user/aaivazis/samples/dy/dy_M50.root");
+    dy_M50Chain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal400.root");
     
     // add the zz_2l2q file to a chain
     TChain* zz_2l2qChain = new TChain("tree");
-    zz_2l2qChain->Add("/hadoop/cms/store/user/aaivazis/samples/zz/zz_2l2q.root");
+    zz_2l2qChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal450.root");
     
     // add the zz_2l2n file to a chain
     TChain* zz_2l2nChain = new TChain("tree");
-    zz_2l2nChain->Add("/hadoop/cms/store/user/aaivazis/samples/zz/zz_2l2n.root");
+    zz_2l2nChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal500.root");
     
     // add the zz_4l file to a chain
     TChain* zz_4lChain = new TChain("tree");
-    zz_4lChain->Add("/hadoop/cms/store/user/aaivazis/samples/zz/zz_4l.root");
+    zz_4lChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal550.root");
     
     // add the ww file to a chain
     TChain* wwChain = new TChain("tree");
-    wwChain->Add("/hadoop/cms/store/user/aaivazis/samples/w/ww.root");
+    wwChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal600.root");
 
     // add the wz_2l2q file to a chain
     TChain* wz_2l2qChain = new TChain("tree");
-    wz_2l2qChain->Add("/hadoop/cms/store/user/aaivazis/samples/w/wz_2l2q.root");
+    wz_2l2qChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal650.root");
 
     // add the wz_3ln file to a chain
     TChain* wz_3lnChain = new TChain("tree");
-    wz_3lnChain->Add("/hadoop/cms/store/user/aaivazis/samples/w/wz_3ln.root");
+    wz_3lnChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal700.root");
 
     // fill the dictionaries with empty histograms
     createHistograms();
 
     // use the jet correction for this sample
-    fillPlots(signalChain, signal, signalDel, stopMass);
-    fillPlots(dataChain, data, dataDel, stopMass);
-    fillPlots(ttjetsChain, ttjets, ttDel, stopMass);
-    fillPlots(dy_M10to50Chain, dy_M10to50, dy_M10to50Del, stopMass);
-    fillPlots(dy_M50Chain, dy_M50, dy_M50Del, stopMass);
-    fillPlots(zz_2l2qChain, zz_2l2q, zz_2l2qDel, stopMass);
-    fillPlots(zz_2l2nChain, zz_2l2n, zz_2l2nDel, stopMass);
-    fillPlots(zz_4lChain, zz_4l, zz_4lDel, stopMass);
-    fillPlots(wwChain, ww, wwDel, stopMass);
-    fillPlots(wz_2l2qChain, wz_2l2q, wwDel, stopMass);
-    fillPlots(wz_3lnChain, wz_3ln, wwDel, stopMass);
+    fillPlots(signalChain, signal, signalDel, stopMass, regionId);
+    fillPlots(dataChain, data, dataDel, stopMass, regionId);
+    fillPlots(ttjetsChain, ttjets, ttDel, stopMass, regionId);
+    fillPlots(dy_M10to50Chain, dy_M10to50, dy_M10to50Del, stopMass, regionId);
+    fillPlots(dy_M50Chain, dy_M50, dy_M50Del, stopMass, regionId);
+    fillPlots(zz_2l2qChain, zz_2l2q, zz_2l2qDel, stopMass, regionId);
+    fillPlots(zz_2l2nChain, zz_2l2n, zz_2l2nDel, stopMass, regionId);
+    fillPlots(zz_4lChain, zz_4l, zz_4lDel, stopMass, regionId);
+    fillPlots(wwChain, ww, wwDel, stopMass, regionId);
+    fillPlots(wz_2l2qChain, wz_2l2q, wwDel, stopMass, regionId);
+    fillPlots(wz_3lnChain, wz_3ln, wwDel, stopMass, regionId);
 
     // draw the histograms
     //plotHistograms();
 }
 
 // fill the given dictionary with the important quantities
-void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot, float stopMass){
+void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot, float stopMass, string regionId){
 
     // get the list of files from the chain
     TObjArray* files = chain->GetListOfFiles();
@@ -183,18 +183,55 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
                 }
             }
 
+
             // perform cuts
-            if (type() == 3) continue;
-            //if (type() != 0) continue; 
-
-            if (/*type() == 0 && */ fabs((ll_p4()+lt_p4()).M() - 91) < 15) continue; 
-
-            if (nBtags < 2) continue; 
             
-            // cuts that define the control region
-            if (fabs(deltaMass) > 100) continue; 
-            if (fabs(avgMass - stopMass) > 50) continue; 
+            if (type() == 3) continue;
+            if (fabs(deltaMass) > 100) continue;
 
+            // region sepcific cuts
+
+            // require zz for cr3 and cr4
+            if (regionId == "cr3" || regionId == "cr4") {
+                if (fabs((ll_p4()+lt_p4()).M() - 91) > 15) continue; 
+            // otherwise do a z-veto
+            } else {
+                if (fabs((ll_p4()+lt_p4()).M() - 91) < 15) continue; 
+            }
+
+            // signal region avg cuts
+            if (regionId == "sr1" && regionid == "sr2" )
+                if (fabs(avgMass - stopMass) > 50) continue;
+            else
+                if (stopMass > 250) continue;
+
+            // control region definitions
+            if (regionId == "cr1") {
+                if (met() < 60) continue;
+                if (nJets < 4) continue;
+                if (nBtags < 1) continue;
+            } else if (regionId == "cr2") {
+                if (met() < 60) continue;
+                if (nJets < 2) continue;
+                if (nBtags < 2) continue;
+            } else if (regionId == "cr3") {
+                if (met() < 60) continue;
+                if (nJets < 2) continue;
+                if (nBtags < 1) continue;
+            } else if (regionId == "cr4") {
+                if (met() < 60) continue;
+                if (nJets < 2) continue;
+                if (nBtags < 2) continue;
+            } else if (regionId == "sr1") {
+                if (met() > 60) continue;
+                if (nBtags < 1) continue;
+                if (nJets < 2) continue;
+            } else if (regionId == "sr2") {
+                if (met() > 60) continue;
+                if (nBtags < 2) continue;
+                if (nJets < 2) continue;
+            }
+         
             // build the sigma matrix
             for (int i =0; i < metnumber; i++){
                 // cout << "minimum met: " << mets.at(i) << endl;
@@ -206,7 +243,9 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
                 }
             }
 
-            if (/*type() ==0 &&*/ met() > 60) continue; 
+            
+
+            if (/*type() ==0 &&*/ met() < 60) continue; 
             if (nJets < 2) continue;
             // find the gen_ps particles corresponding to our p4s
             llGenerated = getMatchingGeneratedIndex(ll_p4(), indices);
@@ -288,8 +327,9 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
         char mass[3];
         sprintf(mass, "%.0f", stopMass);
         // build the file name that points to the appropriate signal
-        std::string yieldFileName("yields/sr/yield-");
+        std::string yieldFileName("yields/cr/yield-");
         yieldFileName += mass ;
+        yieldFileName += signalRegionId ;
         yieldFileName += ".txt" ;
 
         stream.open(yieldFileName.c_str(), ios::app);
@@ -434,6 +474,7 @@ void RPVAnalysis::createHistograms() {
 
     return;
 }
+
 
 // give the histograms color,overflow, etc.
 void RPVAnalysis::prepareHistograms(){

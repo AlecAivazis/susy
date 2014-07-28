@@ -1,4 +1,4 @@
-doAnalysis(float stopMass)
+doAnalysis(float stopMass = 200.0 , string signalRegion = "cr1")
 {
     gSystem->Load("/home/users/cgeorge/macros/MiniFWLite/libMiniFWLite.so");
     // load CMS2 core
