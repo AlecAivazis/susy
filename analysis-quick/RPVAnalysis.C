@@ -198,7 +198,7 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
                 if (fabs((ll_p4()+lt_p4()).M() - 91) < 15) continue; 
             }
 
-            // signal region avg cuts
+            // signal region avg mass cuts
             if (regionId == "sr1" && regionId == "sr2" ) {
                 if (fabs(avgMass - stopMass) > 50) continue;
             } else {
@@ -215,11 +215,11 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
                 if (nJets < 2) continue;
                 if (nBtags < 2) continue;
             } else if (regionId == "cr3") {
-                if (met() < 60) continue;
+                if (met() > 60) continue;
                 if (nJets < 2) continue;
                 if (nBtags < 1) continue;
             } else if (regionId == "cr4") {
-                if (met() < 60) continue;
+                if (met() > 60) continue;
                 if (nJets < 2) continue;
                 if (nBtags < 2) continue;
             } else if (regionId == "sr1") {
@@ -230,6 +230,10 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
                 if (met() > 60) continue;
                 if (nBtags < 2) continue;
                 if (nJets < 2) continue;
+            } else {
+                if (met() > 60) continue;
+                if (nJets < 2) continue;
+                if (nBtags < 2) continue;
             }
          
             // build the sigma matrix
