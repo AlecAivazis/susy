@@ -19,40 +19,40 @@ void RPVAnalysis::run(float stopMass, string regionId){
 
     // add the data file to a chain
     TChain* dataChain = new TChain("tree");
-    dataChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal250.root");
+    dataChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal650.root");
 
     // add the ttjets file to a chain
     TChain* ttjetsChain = new TChain("tree");
-    ttjetsChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal300.root");
+    ttjetsChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal450.root");
     
     // add the dy (Mass 10 to 50) file to a chain
     TChain* dyChain = new TChain("tree");
-    dyChain->Add("/hadoop/cms/store/user/aaivazis/samples/dy/dy_M10to50.root");
-    dyChain->Add("/hadoop/cms/store/user/aaivazis/samples/dy/dy_M50.root");
+    dyChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal250.root");
+    // dyChain->Add("/hadoop/cms/store/user/aaivazis/samples/dy/dy_M50.root");
     
     // add the zz_2l2q file to a chain
     TChain* zz_2l2qChain = new TChain("tree");
-    zz_2l2qChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal450.root");
+    zz_2l2qChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal350.root");
     
     // add the zz_2l2n file to a chain
     TChain* zz_2l2nChain = new TChain("tree");
-    zz_2l2nChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal500.root");
+    zz_2l2nChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal400.root");
     
     // add the zz_4l file to a chain
     TChain* zz_4lChain = new TChain("tree");
-    zz_4lChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal550.root");
+    zz_4lChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal500.root");
     
     // add the ww file to a chain
     TChain* wwChain = new TChain("tree");
-    wwChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal600.root");
+    wwChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal550.root");
 
     // add the wz_2l2q file to a chain
     TChain* wz_2l2qChain = new TChain("tree");
-    wz_2l2qChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal650.root");
+    wz_2l2qChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal300.root");
 
     // add the wz_3ln file to a chain
     TChain* wz_3lnChain = new TChain("tree");
-    wz_3lnChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal700.root");
+    wz_3lnChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal600.root");
 
     // fill the dictionaries with empty histograms
     createHistograms();
@@ -68,6 +68,18 @@ void RPVAnalysis::run(float stopMass, string regionId){
     fillPlots(wwChain, ww, wwDel, stopMass, regionId);
     fillPlots(wz_3lnChain, wz_3ln, wwDel, stopMass, regionId);
     fillPlots(dataChain, data, dataDel, stopMass, regionId);
+
+    // if stopMass is 200
+    if (stopMass == 200.0){
+        // then include the 700 mass point
+        TChain* signalExtraChain = new TChain("tree");
+        signalExtraChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal700.root");
+        map<string, TH1F*> signalExtra;
+        TH2F* signalExtraDel= new TH2F("signal600", "zz", 100, 0, 1200, 100, -200, 200);
+        fillPlots(signalExtraChain, signalExtra, signalExtraDel, stopMass, regionId);
+        
+        
+    }
 
     // draw the histograms
     //plotHistograms();
@@ -293,7 +305,7 @@ void RPVAnalysis::fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot
             stream.close();
             
             // fill the appopriate plots
-            sample["met"]->Fill(met(), scale_1fb());
+            //  sample["met"]->Fill(met(), scale_1fb());
             
             // fill the 2d plot if it was given
             if (plot) plot->Fill(avgMass, deltaMass, scale_1fb());
