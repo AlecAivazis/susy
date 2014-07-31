@@ -19,11 +19,11 @@ void RPVAnalysis::run(float stopMass, string regionId){
 
     // add the data file to a chain
     TChain* dataChain = new TChain("tree");
-    dataChain->Add("/hadoop/cms/store/user/aaivazis/samples/data/data.root");
+    dataChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal250.root");
 
     // add the ttjets file to a chain
     TChain* ttjetsChain = new TChain("tree");
-    ttjetsChain->Add("/hadoop/cms/store/user/aaivazis/samples/tt/ttjets.root");
+    ttjetsChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal300.root");
     
     // add the dy (Mass 10 to 50) file to a chain
     TChain* dyChain = new TChain("tree");
@@ -32,27 +32,27 @@ void RPVAnalysis::run(float stopMass, string regionId){
     
     // add the zz_2l2q file to a chain
     TChain* zz_2l2qChain = new TChain("tree");
-    zz_2l2qChain->Add("/hadoop/cms/store/user/aaivazis/samples/zz/zz_2l2q.root");
+    zz_2l2qChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal450.root");
     
     // add the zz_2l2n file to a chain
     TChain* zz_2l2nChain = new TChain("tree");
-    zz_2l2nChain->Add("/hadoop/cms/store/user/aaivazis/samples/zz/zz_2l2n.root");
+    zz_2l2nChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal500.root");
     
     // add the zz_4l file to a chain
     TChain* zz_4lChain = new TChain("tree");
-    zz_4lChain->Add("/hadoop/cms/store/user/aaivazis/samples/zz/zz_4l.root");
+    zz_4lChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal550.root");
     
     // add the ww file to a chain
     TChain* wwChain = new TChain("tree");
-    wwChain->Add("/hadoop/cms/store/user/aaivazis/samples/w/ww.root");
+    wwChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal600.root");
 
     // add the wz_2l2q file to a chain
     TChain* wz_2l2qChain = new TChain("tree");
-    wz_2l2qChain->Add("/hadoop/cms/store/user/aaivazis/samples/w/wz_2l2q.root");
+    wz_2l2qChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal650.root");
 
     // add the wz_3ln file to a chain
     TChain* wz_3lnChain = new TChain("tree");
-    wz_3lnChain->Add("/hadoop/cms/store/user/aaivazis/samples/w/wz_3ln.root");
+    wz_3lnChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal700.root");
 
     // fill the dictionaries with empty histograms
     createHistograms();
