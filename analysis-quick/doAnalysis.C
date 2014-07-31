@@ -1,3 +1,4 @@
+doAnalysis(float stopMass = 200.0 , string signalRegion = "")
 {
     gSystem->Load("/home/users/cgeorge/macros/MiniFWLite/libMiniFWLite.so");
     // load CMS2 core
@@ -11,6 +12,6 @@
     // set lumi to 19.5
     RPVAnalysis *analysis = new RPVAnalysis();
 
-    analysis->run(); 
+    analysis->run(stopMass, signalRegion); 
 }
 
