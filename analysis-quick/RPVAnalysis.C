@@ -19,59 +19,55 @@ void RPVAnalysis::run(float stopMass, string regionId){
 
     // add the data file to a chain
     TChain* dataChain = new TChain("tree");
-    dataChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal250.root");
+    dataChain->Add("/hadoop/cms/store/user/aaivazis/samples/data/data.root");
 
     // add the ttjets file to a chain
     TChain* ttjetsChain = new TChain("tree");
-    ttjetsChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal300.root");
+    ttjetsChain->Add("/hadoop/cms/store/user/aaivazis/samples/tt/ttjets.root");
     
     // add the dy (Mass 10 to 50) file to a chain
-    TChain* dy_M10to50Chain = new TChain("tree");
-    dy_M10to50Chain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal350.root");
-    
-    // add the dy (Mass greater than 50) file to a chain
-    TChain* dy_M50Chain = new TChain("tree");
-    dy_M50Chain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal400.root");
+    TChain* dyChain = new TChain("tree");
+    dyChain->Add("/hadoop/cms/store/user/aaivazis/samples/dy/dy_M10to50.root");
+    dyChain->Add("/hadoop/cms/store/user/aaivazis/samples/dy/dy_M50.root");
     
     // add the zz_2l2q file to a chain
     TChain* zz_2l2qChain = new TChain("tree");
-    zz_2l2qChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal450.root");
+    zz_2l2qChain->Add("/hadoop/cms/store/user/aaivazis/samples/zz/zz_2l2q.root");
     
     // add the zz_2l2n file to a chain
     TChain* zz_2l2nChain = new TChain("tree");
-    zz_2l2nChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal500.root");
+    zz_2l2nChain->Add("/hadoop/cms/store/user/aaivazis/samples/zz/zz_2l2n.root");
     
     // add the zz_4l file to a chain
     TChain* zz_4lChain = new TChain("tree");
-    zz_4lChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal550.root");
+    zz_4lChain->Add("/hadoop/cms/store/user/aaivazis/samples/zz/zz_4l.root");
     
     // add the ww file to a chain
     TChain* wwChain = new TChain("tree");
-    wwChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal600.root");
+    wwChain->Add("/hadoop/cms/store/user/aaivazis/samples/w/ww.root");
 
     // add the wz_2l2q file to a chain
     TChain* wz_2l2qChain = new TChain("tree");
-    wz_2l2qChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal650.root");
+    wz_2l2qChain->Add("/hadoop/cms/store/user/aaivazis/samples/w/wz_2l2q.root");
 
     // add the wz_3ln file to a chain
     TChain* wz_3lnChain = new TChain("tree");
-    wz_3lnChain->Add("/hadoop/cms/store/user/aaivazis/samples/signal/signal700.root");
+    wz_3lnChain->Add("/hadoop/cms/store/user/aaivazis/samples/w/wz_3ln.root");
 
     // fill the dictionaries with empty histograms
     createHistograms();
 
     // use the jet correction for this sample
     fillPlots(signalChain, signal, signalDel, stopMass, regionId);
-    fillPlots(dataChain, data, dataDel, stopMass, regionId);
-    fillPlots(ttjetsChain, ttjets, ttDel, stopMass, regionId);
-    fillPlots(dy_M10to50Chain, dy_M10to50, dy_M10to50Del, stopMass, regionId);
-    fillPlots(dy_M50Chain, dy_M50, dy_M50Del, stopMass, regionId);
+    fillPlots(dyChain, dy, dyDel, stopMass, regionId);
+    fillPlots(wz_2l2qChain, wz_2l2q, wwDel, stopMass, regionId);
     fillPlots(zz_2l2qChain, zz_2l2q, zz_2l2qDel, stopMass, regionId);
     fillPlots(zz_2l2nChain, zz_2l2n, zz_2l2nDel, stopMass, regionId);
+    fillPlots(ttjetsChain, ttjets, ttDel, stopMass, regionId);
     fillPlots(zz_4lChain, zz_4l, zz_4lDel, stopMass, regionId);
     fillPlots(wwChain, ww, wwDel, stopMass, regionId);
-    fillPlots(wz_2l2qChain, wz_2l2q, wwDel, stopMass, regionId);
     fillPlots(wz_3lnChain, wz_3ln, wwDel, stopMass, regionId);
+    fillPlots(dataChain, data, dataDel, stopMass, regionId);
 
     // draw the histograms
     //plotHistograms();
@@ -430,8 +426,7 @@ void RPVAnalysis::createHistograms() {
     wwDel = new TH2F("ww", "ww", 100, 0, 1200, 100, -200, 200);
     wz_2l2qDel = new TH2F("wz_2l2q", "wz_2l2q", 100, 0, 1200, 100, -200, 200);
     wz_3lnDel = new TH2F("wz_3ln", "wz_3ln", 100, 0, 1200, 100, -200, 200);
-    dy_M50Del = new TH2F("dy_M50", "zz", 100, 0, 1200, 100, -200, 200);
-    dy_M10to50Del = new TH2F("dy_M10to50", "zz", 100, 0, 1200, 100, -200, 200);
+    dyDel = new TH2F("dy_M10to50", "zz", 100, 0, 1200, 100, -200, 200);
     ttDel = new TH2F("tt", "zz", 100, 0, 1200, 100, -200, 200);
     dataDel = new TH2F("data", "zz", 100, 0, 1200, 100, -200, 200);
 
@@ -440,11 +435,8 @@ void RPVAnalysis::createHistograms() {
     ttjets["met"] = new TH1F("ttjets_met", "tt jets met", 80, 0, 300);
 
     // create dy plots
-    dy_M50["avgMass"] = new TH1F("dy_M50_avgMass", "dy_M50 Avg Mass", 240, 0, 1200);
-    dy_M50["met"] = new TH1F("dy_M50_met", "dy_M50 met", 80, 0, 300);
-
-    dy_M10to50["avgMass"] = new TH1F("dy_M10to50_avgMass", "dy_M10to50 Avg Mass", 240, 0, 1200);
-    dy_M10to50["met"] = new TH1F("dy_M10to50_met", "dy_M10to50 met", 80, 0, 300);
+    dy["avgMass"] = new TH1F("dy_M50_avgMass", "dy_M50 Avg Mass", 240, 0, 1200);
+    dy["met"] = new TH1F("dy_M50_met", "dy_M50 met", 80, 0, 300);
 
     // create zz plots
     zz_2l2q["avgMass"] = new TH1F("zz_2l2q_avgMass", "zz_2l2q Avg Mass", 240, 0, 1200);
@@ -486,8 +478,7 @@ void RPVAnalysis::prepareHistograms(){
     signal["avgMass"]->SetLineColor(kBlack);
     signal["met"]->SetLineColor(kBlack);
     ttjets["met"]->SetFillColor(kBlue);
-    dy_M50["met"]->SetFillColor(kMagenta);
-    dy_M10to50["met"]->SetFillColor(kMagenta);
+    dy["met"]->SetFillColor(kMagenta);
     zz_2l2q["met"]->SetFillColor(kGreen);
     zz_2l2n["met"]->SetFillColor(kGreen+1);
     zz_4l["met"]->SetFillColor(kGreen+2);
@@ -499,8 +490,7 @@ void RPVAnalysis::prepareHistograms(){
     //  signal600before["genMinusReco"]->SetLineColor(kRed);
 
     signalDel->SetFillColor(kBlack);
-    dy_M50Del->SetFillColor(kRed);
-    dy_M10to50Del->SetFillColor(kRed);
+    dyDel->SetFillColor(kRed);
     zz_2l2qDel->SetFillColor(kRed);
     zz_2l2nDel->SetFillColor(kRed);
     zz_4lDel->SetFillColor(kRed);
@@ -549,8 +539,7 @@ void RPVAnalysis::plotHistograms(){
     signalDel->GetXaxis()->SetTitle("Average Mass (GeV)");
 
     signalDel->Draw("box");
-    dy_M50Del->Draw("samebox");
-    dy_M10to50Del->Draw("samebox");
+    dyDel->Draw("samebox");
     zz_2l2qDel->Draw("samebox");
     zz_2l2nDel->Draw("samebox");
     zz_4lDel->Draw("samebox");

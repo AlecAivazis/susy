@@ -59,8 +59,7 @@ class RPVAnalysis {
     map<string, TH1F*> signal;
     map<string, TH1F*> data;
     map<string, TH1F*> ttjets;
-    map<string, TH1F*> dy_M50;
-    map<string, TH1F*> dy_M10to50;
+    map<string, TH1F*> dy;
     map<string, TH1F*> zz_2l2q;
     map<string, TH1F*> zz_2l2n;
     map<string, TH1F*> zz_4l;
@@ -77,8 +76,7 @@ class RPVAnalysis {
     TH2F * wwDel;
     TH2F * wz_2l2qDel;
     TH2F * wz_3lnDel;
-    TH2F * dy_M50Del;
-    TH2F * dy_M10to50Del;
+    TH2F * dyDel;
     // store the analysis luminosity
     const static float lumi = 5.2;
 };
