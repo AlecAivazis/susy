@@ -79,10 +79,11 @@ void RPVAnalysis::run(float stopMass, string regionId){
     float scale = (dataSum - twoToOneSum) / nonTwoToOneSum;
     // compute the total error
     float totalErrorSquared;
+    // add the systematic error
     if (regionId == "sr1") {
-        totalErrorSquared = ( ( (.5*.5) + (.02*.02) )  * nonTwoToOneQuadSum) + (.2 * .2 * twoToOneQuadSum);
+        totalErrorSquared = ( ( (.5*.5) + (.2*.2) )  * nonTwoToOneQuadSum) + (.2 * .2 * twoToOneQuadSum);
     } else if (regionId == "sr2") {
-        totalErrorSquared = ( ( (.5*.5) + (.04*.04) )  * nonTwoToOneQuadSum) + (.4 * .4 * twoToOneQuadSum);
+        totalErrorSquared = ( ( (.5*.5) + (.4*.4) )  * nonTwoToOneQuadSum) + (.4 * .4 * twoToOneQuadSum);
     }
 
     // add the error due to the luminosity

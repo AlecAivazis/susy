@@ -37,7 +37,7 @@ class RPVAnalysis {
     
     // fill the plots associated with a given signal
     void fillPlots(TChain* chain, map<string, TH1F*> sample, TH2F* plot = 0, 
-                   float stopMass = 600, string regionId = "");
+                   float stopMass = 600, string regionId = "", int sumFamily = -1);
     // draw an individual plot
     void makePlot(vector<TH1*> plots, TH1F* overlay=0);
     // check if the given jetIndex represents a "good" jet
@@ -79,5 +79,12 @@ class RPVAnalysis {
     TH2F * dyDel;
     // store the analysis luminosity
     const static float lumi = 5.2;
+
+    // running sums for error calculation
+    float dataSum;
+    float twoToOneSum;
+    float nonTwoToOneSum;
+    float twoToOneQuadSum;
+    float nonTwoToOneQuadSum;
 };
 #endif

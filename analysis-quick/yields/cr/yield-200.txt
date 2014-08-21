@@ -1,0 +1,96 @@
+stop mass:200
+number of mumu events: 904.514, unweighted: 939
+mumu error: 29.5177
+number of emu events: 1.92655, unweighted: 2
+emu error: 1.36228
+ 
+stop mass:200
+number of mumu events: 347.362, unweighted: 1198
+mumu error: 10.0359
+number of emu events: 3.18947, unweighted: 11
+emu error: 0.961662
+ 
+stop mass:200
+number of mumu events: 80.4428, unweighted: 775
+mumu error: 2.88959
+number of emu events: 1.45316, unweighted: 14
+emu error: 0.388374
+ 
+stop mass:200
+number of mumu events: 25.6076, unweighted: 610
+mumu error: 1.03682
+number of emu events: 0.293857, unweighted: 7
+emu error: 0.111068
+ 
+stop mass:200
+number of mumu events: 6.28967, unweighted: 339
+mumu error: 0.341608
+number of emu events: 0.111322, unweighted: 6
+emu error: 0.0454469
+ 
+stop mass:200
+number of mumu events: 4.16512, unweighted: 472
+mumu error: 0.191715
+number of emu events: 0.0794196, unweighted: 9
+emu error: 0.0264732
+ 
+stop mass:200
+number of mumu events: 2.59505, unweighted: 583
+mumu error: 0.107476
+number of emu events: 0.0623168, unweighted: 14
+emu error: 0.0166549
+ 
+stop mass:200
+number of mumu events: 1.17285, unweighted: 499
+mumu error: 0.052504
+number of emu events: 0.0188032, unweighted: 8
+emu error: 0.00664794
+ 
+stop mass:200
+number of mumu events: 0.616429, unweighted: 478
+mumu error: 0.0281948
+number of emu events: 0.0167648, unweighted: 13
+emu error: 0.00464972
+ 
+stop mass:200
+number of mumu events: 0.370552, unweighted: 509
+mumu error: 0.0164244
+number of emu events: 0.005824, unweighted: 8
+emu error: 0.00205909
+ 
+stop mass:200
+number of mumu events: 0.105721, unweighted: 251
+mumu error: 0.00667306
+number of emu events: 0.0025272, unweighted: 6
+emu error: 0.00103172
+ 
+stop mass:200
+number of mumu events: 1767.61, unweighted: 1835
+mumu error: 41.2637
+number of emu events: 13.4858, unweighted: 14
+emu error: 3.60424
+ 
+stop mass:200
+number of mumu events: 1323.54, unweighted: 1374
+mumu error: 35.7062
+number of emu events: 8.66947, unweighted: 9
+emu error: 2.88982
+ 
+stop mass:200
+number of mumu events: 581.644, unweighted: 2006
+mumu error: 12.9865
+number of emu events: 4.34928, unweighted: 15
+emu error: 1.12298
+ 
+stop mass:200
+number of mumu events: 272.883, unweighted: 2629
+mumu error: 5.32207
+number of emu events: 1.86835, unweighted: 18
+emu error: 0.440374
+ 
+stop mass:200
+number of mumu events: 136.812, unweighted: 3259
+mumu error: 2.39652
+number of emu events: 0.797612, unweighted: 19
+emu error: 0.182985
+ 

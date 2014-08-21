@@ -1,0 +1,78 @@
+stop mass:200
+number of mumu events: 10400.5, unweighted: 10797
+mumu error: 100.092
+number of emu events: 26.9717, unweighted: 28
+emu error: 5.09717
+ 
+stop mass:200
+number of mumu events: 10400.5, unweighted: 10797
+mumu error: 100.092
+number of emu events: 26.9717, unweighted: 28
+emu error: 5.09717
+ 
+stop mass:200
+number of mumu events: 10400.5, unweighted: 10797
+mumu error: 100.092
+number of emu events: 26.9717, unweighted: 28
+emu error: 5.09717
+ 
+stop mass:200
+number of mumu events: 203, unweighted: 203
+mumu error: 14.2478
+number of emu events: 209, unweighted: 209
+emu error: 14.4568
+ 
+stop mass:200
+number of mumu events: 95.7799, unweighted: 545
+mumu error: 4.10276
+number of emu events: 200.347, unweighted: 1140
+emu error: 5.93376
+ 
+stop mass:200
+number of mumu events: 18.2865, unweighted: 24
+mumu error: 3.73271
+number of emu events: 1.52387, unweighted: 2
+emu error: 1.07754
+ 
+stop mass:200
+number of mumu events: 44.6306, unweighted: 74
+mumu error: 5.18821
+number of emu events: 4.22182, unweighted: 7
+emu error: 1.5957
+ 
+stop mass:200
+number of mumu events: 1.91979, unweighted: 292
+mumu error: 0.112347
+number of emu events: 0.0986193, unweighted: 15
+emu error: 0.0254634
+ 
+stop mass:200
+number of mumu events: 0.00596286, unweighted: 3
+mumu error: 0.00344266
+number of emu events: 0.00198762, unweighted: 1
+emu error: 0.00198762
+ 
+stop mass:200
+number of mumu events: 0.0801697, unweighted: 419
+mumu error: 0.00391654
+number of emu events: 0.0912671, unweighted: 477
+emu error: 0.00417883
+ 
+stop mass:200
+number of mumu events: 0.719158, unweighted: 46
+mumu error: 0.106034
+number of emu events: 1.42268, unweighted: 91
+emu error: 0.149138
+ 
+stop mass:200
+number of mumu events: 0.738354, unweighted: 207
+mumu error: 0.0513191
+number of emu events: 0.0392362, unweighted: 11
+emu error: 0.0118302
+ 
+stop mass:200
+number of mumu events: 0.16895, unweighted: 62
+mumu error: 0.0214567
+number of emu events: 0.29975, unweighted: 110
+emu error: 0.0285801
+ 

@@ -1,0 +1,66 @@
+stop mass:750
+number of mumu events: 0.0007488, unweighted: 3
+mumu error: 0.00043232
+number of emu events: 0, unweighted: 0
+emu error: 0.0002496
+ 
+stop mass:750
+number of mumu events: 1301, unweighted: 1301
+mumu error: 36.0694
+number of emu events: 1533, unweighted: 1533
+emu error: 39.1535
+ 
+stop mass:750
+number of mumu events: 788.734, unweighted: 4488
+mumu error: 11.7735
+number of emu events: 1639.68, unweighted: 9330
+emu error: 16.9753
+ 
+stop mass:750
+number of mumu events: 0, unweighted: 0
+mumu error: 0.761936
+number of emu events: 0, unweighted: 0
+emu error: 0.761936
+ 
+stop mass:750
+number of mumu events: 442.688, unweighted: 734
+mumu error: 16.3399
+number of emu events: 4.22182, unweighted: 7
+emu error: 1.5957
+ 
+stop mass:750
+number of mumu events: 6.35766, unweighted: 967
+mumu error: 0.204448
+number of emu events: 0.0788954, unweighted: 12
+emu error: 0.0227751
+ 
+stop mass:750
+number of mumu events: 3.09274, unweighted: 1556
+mumu error: 0.078404
+number of emu events: 0.00397524, unweighted: 2
+emu error: 0.00281092
+ 
+stop mass:750
+number of mumu events: 1.33858, unweighted: 6996
+mumu error: 0.0160037
+number of emu events: 0.084953, unweighted: 444
+emu error: 0.00403169
+ 
+stop mass:750
+number of mumu events: 4.8465, unweighted: 310
+mumu error: 0.275263
+number of emu events: 10.1777, unweighted: 651
+emu error: 0.398894
+ 
+stop mass:750
+number of mumu events: 3.97712, unweighted: 1115
+mumu error: 0.119105
+number of emu events: 0.0356693, unweighted: 10
+emu error: 0.0112796
+ 
+stop mass:750
+number of mumu events: 15.478, unweighted: 5680
+mumu error: 0.205372
+number of emu events: 1.53145, unweighted: 562
+emu error: 0.0646004
+ 
